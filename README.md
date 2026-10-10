@@ -13,7 +13,7 @@ ai/schemas/   JSON schema untuk output AI
 data/         daftar kamera publik Semarang (seed)
 docs/         brief, arsitektur, spesifikasi, roadmap
 supabase/     skema database dan seed kamera
-web/          aplikasi Next.js (belum dibuat)
+web/          aplikasi Next.js: beranda, peta kamera, detail kamera
 worker/       worker Python: akuisisi frame, cek kesehatan, kualitas gambar
 ```
 
@@ -34,6 +34,21 @@ Mulai dari [docs/01-project-brief.md](docs/01-project-brief.md) dan [docs/02-arc
 ## Konfigurasi
 
 Salin `.env.example` menjadi `.env` (worker) dan `web/.env.local` (web), lalu isi nilainya. File berisi nilai asli tidak boleh di-commit.
+
+## Menjalankan web
+
+Prasyarat: Node.js 20+ dan `web/.env.local` berisi `NEXT_PUBLIC_SUPABASE_URL` serta `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Hanya dua nilai publik itu yang boleh berawalan `NEXT_PUBLIC_`.
+
+```bash
+cd web
+npm install
+npm run dev      # http://localhost:3000
+npm run lint && npm run build
+```
+
+Halaman yang sudah ada: `/` (ringkasan), `/peta` (peta semua kamera dengan lapisan Kesehatan Kamera, Lalu Lintas, Air, Ruang Publik), dan `/kamera/[id]` (snapshot, status, grafik kepadatan 24 jam). Penanda peta berubah tanpa refresh lewat Supabase Realtime, dan banner muncul jika worker tidak terlihat lebih dari 15 menit.
+
+Tampilan saat ini adalah **desain placeholder**: semua warna, radius, dan font berasal dari token di `web/app/globals.css`.
 
 ## Menjalankan worker
 

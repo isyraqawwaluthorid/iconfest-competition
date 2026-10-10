@@ -45,12 +45,12 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T2.2 [K]** `fusion/baseline.py`: baseline sementara (median 24 jam bergulir), `density_index`, level `lancar/normal/ramai/padat`, `is_anomaly`. Unit test.
 - [x] **T2.3 [K]** Sambungkan ke siklus: tulis `traffic_readings`, perbarui `camera_status`.
 - [ ] **T2.12 [K]** Evaluasi hitungan YOLO pada siang hari (malam: sepeda motor kecil banyak terlewat); pertimbangkan model lebih besar atau ambang berbeda jika perlu.
-- [ ] **T2.4 [K]** Scaffold `web/` (Next.js App Router, TypeScript strict, Tailwind), design tokens placeholder di `globals.css`.
-- [ ] **T2.5 [K]** `lib/`: `supabase/browser.ts`, `supabase/server.ts` (`server-only`), `status.ts`, `time.ts` (WIB), `queries.ts`, `types.ts`.
-- [ ] **T2.6 [K]** `components/ui/`: Button, Card, Badge, Stat, Tabs, Skeleton, EmptyState, ErrorState.
-- [ ] **T2.7 [K]** `/peta`: peta Leaflet (dynamic import, `ssr: false`), marker dari `v_camera_overview`, filter modul, legenda.
-- [ ] **T2.8 [K]** `/kamera/[id]`: snapshot terbaru, status, grafik kepadatan vs baseline, keadaan offline ("Offline sejak HH:MM").
-- [ ] **T2.9 [K]** Realtime `camera_status` + `SystemBanner` (worker tidak terlihat > 15 menit) + `FreshnessTag`.
+- [x] **T2.4 [K]** Scaffold `web/` (Next.js App Router, TypeScript strict, Tailwind), design tokens placeholder di `globals.css`.
+- [x] **T2.5 [K]** `lib/`: `supabase/public.ts` (`supabase/server.ts` menyusul bersama admin), `status.ts`, `time.ts` (WIB), `queries.ts`, `types.ts`.
+- [x] **T2.6 [K]** `components/ui/`: Button, Card, Badge, Stat, Skeleton, EmptyState, ErrorState. (`Tabs` dibuat saat pertama dibutuhkan.)
+- [x] **T2.7 [K]** `/peta`: peta Leaflet (dynamic import, `ssr: false`), marker dari `v_camera_overview`, filter modul, legenda.
+- [x] **T2.8 [K]** `/kamera/[id]`: snapshot terbaru, status, grafik kepadatan vs baseline, keadaan offline ("Offline sejak HH:MM").
+- [x] **T2.9 [K]** Realtime `camera_status` + `SystemBanner` (worker tidak terlihat > 15 menit) + `FreshnessTag`.
 - [ ] **T2.10 [M+K]** Deploy pertama ke Vercel; isi env di dashboard Vercel. *Bukti:* link publik menampilkan peta dengan data nyata; tidak ada secret di bundle client.
 - [ ] **T2.11 [M]** Pilih 15–20 kamera air unggulan dan beberapa kamera lalu lintas unggulan (siang hari); tandai `is_featured`.
 

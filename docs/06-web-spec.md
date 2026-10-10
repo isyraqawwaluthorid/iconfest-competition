@@ -2,10 +2,13 @@
 
 ## Stack dan konvensi
 
-- Next.js App Router + TypeScript (strict) + Tailwind CSS.
+- Next.js 16 (App Router, Cache Components aktif) + TypeScript (strict) + Tailwind CSS 4.
+  - Dengan Cache Components, opsi `revalidate` per halaman tidak dipakai. Komponen server yang membaca Supabase dibungkus `<Suspense>` dengan skeleton, sehingga kerangka halaman tampil seketika dan datanya selalu diambil saat diminta.
+  - Waktu relatif ("x menit lalu") dihitung di komponen client (`useNow`), bukan di server.
+  - Konvensi versi ini berbeda dari versi lama; rujuk `web/node_modules/next/dist/docs/` sebelum memakai API yang belum dipakai di repo.
 - Data: `@supabase/supabase-js`. Dua client:
-  - `lib/supabase/browser.ts`: anon key, read-only, untuk Realtime dan query publik.
-  - `lib/supabase/server.ts`: service role, **hanya** di route handler/server action (`import "server-only"`).
+  - `lib/supabase/public.ts`: kunci publik (anon), read-only, dipakai komponen server maupun browser (query publik dan Realtime).
+  - `lib/supabase/server.ts`: service role, **hanya** di route handler/server action (`import "server-only"`). Dibuat bersama halaman admin.
 - Peta: `react-leaflet` + tile OpenStreetMap (atribusi wajib). Komponen peta di-*dynamic import* dengan `ssr: false`.
 - Grafik: Recharts. Validasi: Zod. Tanggal: tampilkan dalam `Asia/Jakarta` (WIB).
 - Video live (opsional): `hls.js` langsung ke URL stream (CORS PANTAUSEMAR terbuka). Default yang ditampilkan adalah **snapshot**, bukan video.
@@ -79,10 +82,12 @@ web/
 │   ├── insight/               # InsightCard, AlertList
 │   └── system/                # SystemBanner, FreshnessTag
 ├── lib/
-│   ├── supabase/{browser,server}.ts
+│   ├── supabase/{public,server}.ts
 │   ├── status.ts              # label, urutan, token warna per status
 │   ├── time.ts                # format WIB, "x menit lalu"
 │   ├── queries.ts             # semua query baca
+│   ├── hooks.ts               # useNow, useLiveCameras, useWorkerHeartbeat (Realtime)
+│   ├── storage.ts             # URL publik snapshot
 │   └── types.ts               # tipe hasil query (atau generate dari Supabase)
 └── ...
 ```

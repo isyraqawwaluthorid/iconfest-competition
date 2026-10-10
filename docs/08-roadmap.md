@@ -17,10 +17,10 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 **Selesai jika:** `camera_status` terisi untuk 146 kamera, snapshot terbaru ada di Storage, frame lokal bertambah tiap 5 menit.
 
 ### Minggu 11 Okt — Lalu lintas + web dasar + deploy
-- [ ] Penganalisis YOLO (traffic + crowd) → `traffic_readings`, baseline sementara (median 24 jam), indeks kepadatan.
-- [ ] Scaffold Next.js, design tokens placeholder, komponen `ui/`.
-- [ ] Halaman `/peta` (marker dari `v_camera_overview`, filter modul) dan `/kamera/[id]` (snapshot, status, grafik kepadatan).
-- [ ] Realtime `camera_status`; banner status sistem.
+- [x] Penganalisis YOLO (traffic + crowd) → `traffic_readings`, baseline sementara (median 24 jam), indeks kepadatan.
+- [x] Scaffold Next.js, design tokens placeholder, komponen `ui/`.
+- [x] Halaman `/peta` (marker dari `v_camera_overview`, filter modul) dan `/kamera/[id]` (snapshot, status, grafik kepadatan).
+- [x] Realtime `camera_status`; banner status sistem.
 - [ ] **Deploy pertama ke Vercel.**
 - [ ] Pilih 15–20 kamera air unggulan (siang hari, sudut jelas, ada benda tetap sebagai acuan) dan beberapa kamera lalu lintas unggulan.
 
