@@ -113,7 +113,10 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 ## Akuisisi (`acquisition.py`)
 
 - `ffmpeg -nostdin -loglevel error -rw_timeout 15000000 -user_agent "<UA>" -i URL -frames:v 1 -f image2pipe -vcodec mjpeg -` → baca bytes dari stdout → `cv2.imdecode`. Bungkus `subprocess.run(timeout=FRAME_TIMEOUT_SECONDS)`.
-- **Frozen:** hitung dHash 64-bit (resize 9×8 grayscale). Jika jarak Hamming ≤ 2 terhadap frame sebelumnya selama 3 siklus berturut-turut → `frozen`.
+- **Frozen:** hitung sidik 64-bit (BLAKE2b dari frame grayscale 160×90). Jika sidiknya **persis sama** dengan frame sebelumnya selama 3 siklus berturut-turut → `frozen`.
+  - Rancangan awal memakai dHash 9×8 dengan jarak Hamming ≤ 2. Pada uji malam 10 Okt, aturan itu menandai 43 dari 146 kamera sebagai beku dalam satu jam, padahal semuanya hidup: adegan diam (rumah pompa, jalan sepi) menghasilkan dHash yang nyaris sama dari siklus ke siklus.
+  - Stream yang benar-benar beku mengirim ulang frame yang sama, sehingga hasil decode-nya identik. Kamera hidup selalu berbeda di tingkat piksel karena derau sensor dan jam di pojok gambar. Aturan baru diuji pada 1.848 pasangan frame berurutan dari arsip: 0 positif palsu.
+  - Batasan: kamera yang gambarnya macet tetapi tetap di-encode ulang oleh perangkatnya tidak terdeteksi oleh aturan ini.
 - **Dead:** ffmpeg gagal atau timeout.
 - Jejak dHash per kamera disimpan di `FRAMES_DIR/_state/frame_states.json` agar deteksi beku bertahan saat worker dimulai ulang.
 - Simpan frame lokal: `FRAMES_DIR/{camera_id}/{YYYYMMDD}/{HHMMSS}.jpg` (kualitas JPEG 85, nama folder dan file memakai waktu UTC). Frame berstatus `frozen` tetap diarsipkan (tetapi tidak diunggah) supaya ambang deteksi beku bisa dikalibrasi dari data nyata.
@@ -128,13 +131,19 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 
 ## Lalu lintas dan keramaian (`analyzers/traffic.py`)
 
-- Muat model sekali (singleton). `model.predict(frame, imgsz=640, conf=YOLO_CONF, classes=[0,1,2,3,5,7], verbose=False)`.
+- Muat model sekali (singleton). `model.predict(frame, imgsz=<adaptif>, conf=YOLO_CONF, classes=[0,1,2,3,5,7], verbose=False)`. Inferensi dijalankan bergantian (lock), karena frame diproses dari beberapa thread akuisisi.
+- **Ukuran inferensi adaptif:** sisi terpanjang frame dibulatkan ke kelipatan 32, dibatasi 640–1280 px. Pada kamera 1080p ke atas dengan sudut lebar, 640 px melewatkan kira-kira separuh mobil (uji 10 Okt, Simpang Lima 1: 15 mobil di 640 px, 30 di 1280 px; ±30 ms vs ±90 ms per frame di CPU). Kamera resolusi rendah tetap 640 px.
+- **Batasan yang diketahui:** sepeda motor kecil dan rapat pada malam hari banyak yang tidak terdeteksi oleh YOLO11n, di ukuran berapa pun. Karena itu angka yang ditampilkan adalah **indeks relatif terhadap baseline kamera itu sendiri**, bukan jumlah kendaraan. Perlu dievaluasi ulang pada siang hari.
+- Instalasi: `ultralytics` menarik `opencv-python` (dengan GUI) yang bertabrakan dengan `opencv-python-headless`; `requirements.txt` mengunci versi headless dan `ultralytics` dipasang dengan `--no-deps` (lihat README).
 - Jika `traffic_roi` ada, hitung hanya kotak yang titik tengah-bawahnya berada di dalam poligon.
 - Untuk `crowd`, metrik utama `persons`; untuk `traffic`, `vehicle_total = cars + motorcycles + buses + trucks`.
 
 ### Baseline (`fusion/baseline.py`)
 - Job malam (02.00 WIB): untuk setiap kamera dan metrik, hitung median dan p90 per `hour_of_week` dari 28 hari terakhir dengan `n ≥ 3`.
 - `density_index = value / max(median, 1)`. Jika baseline belum ada: median 24 jam bergulir, set `baseline_is_provisional = true`.
+- Baseline sementara disimpan di memori worker (`RollingHistory`) dan diisi ulang dari `traffic_readings` 24 jam terakhir saat worker dimulai. Indeks baru dihitung setelah ada ≥ 12 pembacaan (±1 jam); sebelum itu `density_level = tidak_diketahui`.
+- **Anomali tidak dinilai selama baseline masih sementara.** Median 24 jam mencampur siang dan malam, sehingga jam sibuk harian akan selalu tampak tidak normal. Anomali aktif setelah baseline per jam-dalam-minggu tersedia.
+- Metrik utama per kamera: `vehicle_total` jika kamera punya modul `traffic`, selain itu `persons` (modul `crowd`).
 - Level: `lancar` < 0,8 ≤ `normal` < 1,3 ≤ `ramai` < 1,8 ≤ `padat`.
 - Anomali: nilai > p90 **dan** index ≥ 1,5 selama 2 siklus berturut-turut.
 - Pembacaan malam hari dengan kualitas `poor` tidak dipakai untuk baseline maupun anomali.

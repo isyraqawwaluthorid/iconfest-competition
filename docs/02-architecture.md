@@ -69,7 +69,7 @@ Tugas terjadwal lain:
 - Ambil 1 frame per kamera dengan ffmpeg dari URL `.m3u8` (timeout 15 detik), paralel dengan batas konkurensi (mis. 8).
 - Status kesehatan:
   - `live`: frame berhasil diambil dan berbeda dari frame sebelumnya.
-  - `frozen`: frame identik (hash persepsi sama) dengan frame sebelumnya beberapa kali berturut-turut, atau `MEDIA-SEQUENCE` playlist tidak bertambah.
+  - `frozen`: frame persis sama (sidik gambar identik) dengan frame sebelumnya 3 siklus berturut-turut. Adegan diam tidak dihitung beku, karena derau sensor membuat tiap frame kamera hidup tetap berbeda.
   - `dead`: playlist/frame gagal diambil.
 - Simpan frame penuh ke disk lokal worker (dataset untuk evaluasi), unggah ke Storage hanya `latest/{camera_id}.jpg` (ditimpa) dan snapshot kejadian.
 

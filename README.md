@@ -44,6 +44,7 @@ cd worker
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+pip install --no-deps ultralytics==8.4.175   # terpisah agar tidak menimpa OpenCV headless
 
 python -m semarsight_worker.main --once --limit 3 --dry-run --verbose   # uji tanpa menulis apa pun
 python -m semarsight_worker.main --once                                 # satu siklus penuh
@@ -52,3 +53,5 @@ pytest
 ```
 
 Setiap siklus worker mengambil satu frame per kamera aktif, menentukan status `live` / `frozen` / `dead`, menilai kualitas gambar, mengarsipkan frame ke `FRAMES_DIR`, mengunggah snapshot terbaru ke Storage, lalu memperbarui `camera_status`, `health_checks`, dan heartbeat di `system_status`.
+
+Untuk kamera bermodul `traffic` atau `crowd`, YOLO11n lokal menghitung kendaraan dan orang per kelas. Hitungan dibandingkan dengan baseline kamera itu sendiri menjadi **indeks kepadatan relatif** (`lancar` / `normal` / `ramai` / `padat`) dan disimpan di `traffic_readings`. Sistem tidak melacak kendaraan, tidak mengenali wajah, dan tidak membaca pelat nomor.

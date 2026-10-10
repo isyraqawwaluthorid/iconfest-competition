@@ -33,16 +33,18 @@ Tujuan: data historis mulai terkumpul malam ini. Belum ada YOLO dan AI.
 - [x] **T1.9 [K]** Unit test: `quality.assess`, dHash/frozen. *Bukti:* `pytest` hijau.
 - [x] **T1.10 [K]** Uji `--once` terhadap 3 kamera nyata, lalu semua kamera aktif. *Bukti:* `camera_status` terisi, snapshot ada di Storage, baris `health_checks` bertambah.
 - [ ] **T1.11 [M]** Biarkan worker berjalan di laptop semalaman (matikan mode tidur). *Bukti:* frame lokal bertambah tiap 5 menit.
-- [ ] **T1.12 [K]** Setelah data semalam terkumpul: kalibrasi ambang `quality` (banyak adegan malam berlampu jalan masih terbaca `is_night = false`) dan periksa positif palsu deteksi beku pada adegan statis.
+- [ ] **T1.12 [K]** Setelah data semalam terkumpul: kalibrasi ambang `quality` (banyak adegan malam berlampu jalan masih terbaca `is_night = false`).
+- [x] **T1.14 [K]** Perbaiki deteksi beku: aturan dHash menandai 43 kamera hidup sebagai beku pada malam pertama; diganti sidik gambar persis sama (0 positif palsu pada 1.848 pasangan frame arsip).
 - [ ] **T1.13 [K]** Retensi frame: kecualikan file yang direferensikan `labels` atau `events` (belum perlu sebelum 24 Okt, saat frame pertama berumur 14 hari).
 
 Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 131 `live`, 15 `dead` (13 membalas 404, 2 membalas 5xx). Arsip frame resolusi penuh ±26 MB per siklus, atau ±7,5 GB per hari.
 
 ## Fase 2 — Lalu lintas + web dasar + deploy pertama (Minggu 11 Okt)
 
-- [ ] **T2.1 [K]** `analyzers/traffic.py`: YOLO11n singleton, hitung per kelas, filter ROI jalan (titik tengah-bawah kotak).
-- [ ] **T2.2 [K]** `fusion/baseline.py`: baseline sementara (median 24 jam bergulir), `density_index`, level `lancar/normal/ramai/padat`, `is_anomaly`. Unit test.
-- [ ] **T2.3 [K]** Sambungkan ke siklus: tulis `traffic_readings`, perbarui `camera_status`.
+- [x] **T2.1 [K]** `analyzers/traffic.py`: YOLO11n singleton, hitung per kelas, filter ROI jalan (titik tengah-bawah kotak).
+- [x] **T2.2 [K]** `fusion/baseline.py`: baseline sementara (median 24 jam bergulir), `density_index`, level `lancar/normal/ramai/padat`, `is_anomaly`. Unit test.
+- [x] **T2.3 [K]** Sambungkan ke siklus: tulis `traffic_readings`, perbarui `camera_status`.
+- [ ] **T2.12 [K]** Evaluasi hitungan YOLO pada siang hari (malam: sepeda motor kecil banyak terlewat); pertimbangkan model lebih besar atau ambang berbeda jika perlu.
 - [ ] **T2.4 [K]** Scaffold `web/` (Next.js App Router, TypeScript strict, Tailwind), design tokens placeholder di `globals.css`.
 - [ ] **T2.5 [K]** `lib/`: `supabase/browser.ts`, `supabase/server.ts` (`server-only`), `status.ts`, `time.ts` (WIB), `queries.ts`, `types.ts`.
 - [ ] **T2.6 [K]** `components/ui/`: Button, Card, Badge, Stat, Tabs, Skeleton, EmptyState, ErrorState.
