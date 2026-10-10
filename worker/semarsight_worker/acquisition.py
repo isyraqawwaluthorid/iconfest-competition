@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import subprocess
@@ -17,7 +18,7 @@ from .models import FrameState, Health
 log = logging.getLogger(__name__)
 
 RW_TIMEOUT_MICROSECONDS = 15_000_000
-FROZEN_MAX_DISTANCE = 2  # jarak Hamming dHash yang masih dianggap "gambar sama"
+FINGERPRINT_SIZE = (160, 90)
 FROZEN_CYCLES = 3  # berapa siklus berturut-turut gambar sama sebelum dinyatakan beku
 
 
@@ -53,27 +54,27 @@ def grab_frame(stream_url: str, *, timeout_seconds: int, user_agent: str) -> Gra
     return GrabResult(frame, latency_ms)
 
 
-def dhash(frame: np.ndarray) -> int:
-    """Difference hash 64-bit: bandingkan piksel bersebelahan pada gambar 9x8 grayscale."""
+def fingerprint(frame: np.ndarray) -> int:
+    """Sidik 64-bit dari versi kecil frame; hanya sama jika gambarnya persis sama.
+
+    Adegan yang diam (rumah pompa, jalan sepi malam hari) tetap menghasilkan sidik berbeda
+    tiap siklus karena derau sensor dan jam di pojok gambar ikut berubah. Sidik yang sama
+    berarti stream mengirim ulang frame yang sama.
+    """
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    small = cv2.resize(gray, (9, 8), interpolation=cv2.INTER_AREA)
-    bits = (small[:, 1:] > small[:, :-1]).flatten()
-    return int("".join("1" if bit else "0" for bit in bits), 2)
-
-
-def hamming(a: int, b: int) -> int:
-    return (a ^ b).bit_count()
+    small = cv2.resize(gray, FINGERPRINT_SIZE, interpolation=cv2.INTER_AREA)
+    return int.from_bytes(hashlib.blake2b(small.tobytes(), digest_size=8).digest(), "big")
 
 
 def check_health(frame: np.ndarray, previous: FrameState | None) -> tuple[Health, FrameState]:
     """Tentukan `live` atau `frozen` dari frame yang berhasil diambil.
 
-    Kamera dinyatakan beku jika gambarnya nyaris identik dengan siklus sebelumnya
+    Kamera dinyatakan beku jika gambarnya persis sama dengan siklus sebelumnya
     selama `FROZEN_CYCLES` siklus berturut-turut.
     """
-    current = dhash(frame)
+    current = fingerprint(frame)
     still_cycles = 0
-    if previous is not None and hamming(current, previous.hash) <= FROZEN_MAX_DISTANCE:
+    if previous is not None and current == previous.hash:
         still_cycles = previous.still_cycles + 1
     health: Health = "frozen" if still_cycles >= FROZEN_CYCLES else "live"
     return health, FrameState(hash=current, still_cycles=still_cycles)
