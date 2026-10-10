@@ -1,3 +1,9 @@
+# Pasang dalam dua langkah (lihat README):
+#   pip install -r requirements.txt
+#   pip install --no-deps ultralytics==8.4.175
+# ultralytics dipasang terpisah karena dependensinya menarik opencv-python (dengan GUI),
+# yang bertabrakan dengan opencv-python-headless di bawah ini.
+
 opencv-python-headless==5.0.0.93
 numpy==2.5.3
 supabase==2.32.0
@@ -6,3 +12,16 @@ pydantic==2.14.0
 python-dotenv==1.2.4
 APScheduler==3.11.3
 pytest==9.1.1
+
+# YOLO (dependensi ultralytics, tanpa opencv-python)
+torch==2.14.1
+torchvision==0.29.1
+ultralytics-thop==2.2.2
+ultralytics-platform==0.1.83
+matplotlib==3.11.2
+pillow==12.3.0
+polars==2.0.0
+psutil==7.2.2
+PyYAML==6.0.3
+requests==2.34.2
+nvidia-ml-py==13.615.71

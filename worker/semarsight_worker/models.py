@@ -9,6 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from .analyzers.traffic import Counts
+
 Health = Literal["live", "frozen", "dead"]
 Quality = Literal["good", "fair", "poor"]
 
@@ -24,6 +26,7 @@ class CameraRow(BaseModel):
     modules: list[str] = []
     stream_url: str
     is_featured: bool = False
+    traffic_roi: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -43,6 +46,18 @@ class FrameState:
     still_cycles: int
 
 
+@dataclass(frozen=True)
+class TrafficReading:
+    """Hitungan YOLO satu frame beserta posisinya terhadap baseline kamera itu sendiri."""
+
+    counts: Counts
+    density_index: float | None
+    density_level: str
+    baseline_median: float | None
+    baseline_is_provisional: bool
+    is_anomaly: bool
+
+
 @dataclass
 class CameraResult:
     """Hasil memproses satu kamera dalam satu siklus."""
@@ -56,6 +71,8 @@ class CameraResult:
     local_path: Path | None = None
     snapshot_path: str | None = None
     frame_state: FrameState | None = None
+    counts: Counts | None = None
+    traffic: TrafficReading | None = None
 
 
 @dataclass(frozen=True)

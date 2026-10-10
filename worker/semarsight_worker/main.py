@@ -20,13 +20,16 @@ from typing import Any
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from . import acquisition, housekeeping, quality, storage
+from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
-from .models import CameraResult, CameraRow, CycleStats, FrameState
+from .fusion import baseline
+from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
 
 log = logging.getLogger("semarsight_worker")
 
 FRAME_STATE_FILE = "_state/frame_states.json"
+COUNTING_MODULES = {"traffic", "crowd"}
 
 
 def process_camera(
@@ -59,6 +62,14 @@ def process_camera(
         except Exception as exc:  # noqa: BLE001 - unggahan gagal tidak boleh membatalkan pembacaan
             result.error = f"unggah snapshot gagal: {exc}"[:300]
             log.warning("%s: %s", cam.name, result.error)
+
+        if COUNTING_MODULES & set(cam.modules):
+            try:
+                result.counts = traffic.count_objects(
+                    grab.frame, cam.traffic_roi, model_name=settings.yolo_model, conf=settings.yolo_conf
+                )
+            except Exception:  # noqa: BLE001 - kamera tetap live walau penghitungan gagal
+                log.exception("%s: penghitungan YOLO gagal", cam.name)
         return result
     except Exception as exc:  # noqa: BLE001 - satu kamera tidak boleh menghentikan siklus
         log.exception("%s: error tak terduga", cam.name)
@@ -69,6 +80,7 @@ def run_cycle(
     settings: Settings,
     database: Database,
     frame_states: dict[str, FrameState],
+    history: baseline.RollingHistory,
     *,
     only: list[str] | None = None,
     limit: int | None = None,
@@ -87,15 +99,12 @@ def run_cycle(
     for result in results:
         if result.frame_state is not None:
             frame_states[result.camera.id] = result.frame_state
-        log.debug(
-            "%-32s %-6s %5s ms %s",
-            result.camera.name[:32],
-            result.health,
-            result.latency_ms,
-            result.error or (result.quality.quality if result.quality else ""),
-        )
+        if result.counts is not None:
+            result.traffic = _evaluate_traffic(result, history)
+        log.debug("%-32s %-6s %5s ms %s", result.camera.name[:32], result.health, result.latency_ms, _detail(result))
 
     database.insert_health_checks([_health_row(r) for r in results])
+    database.insert_traffic_readings([_traffic_row(r, settings.yolo_model) for r in results if r.traffic])
     database.upsert_camera_status([_status_row(r, failures.get(r.camera.id, 0)) for r in results])
 
     stats = CycleStats(
@@ -107,11 +116,54 @@ def run_cycle(
     )
     housekeeping.heartbeat(database, stats)
     log.info(
-        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d) dalam %.1f detik%s",
-        stats.total, stats.live, stats.frozen, stats.dead, stats.duration_ms / 1000,
-        " [dry-run]" if database.dry_run else "",
+        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d, %d dihitung YOLO) dalam %.1f detik%s",
+        stats.total, stats.live, stats.frozen, stats.dead, sum(r.traffic is not None for r in results),
+        stats.duration_ms / 1000, " [dry-run]" if database.dry_run else "",
     )  # fmt: skip
     return stats
+
+
+def seed_history(history: baseline.RollingHistory, database: Database) -> None:
+    """Isi baseline bergulir dari pembacaan 24 jam terakhir, agar tidak mulai dari nol saat restart."""
+    metric_by_camera = {cam.id: _density_metric(cam) for cam in database.active_cameras()}
+    rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.WINDOW)
+    for row in rows:
+        metric = metric_by_camera.get(row["camera_id"])
+        if metric is None or not _usable_for_baseline(row["quality"], row["is_night"]):
+            continue
+        history.add(row["camera_id"], datetime.fromisoformat(row["captured_at"]), row[metric])
+    log.info("baseline bergulir diisi dari %d pembacaan 24 jam terakhir", len(rows))
+
+
+def _evaluate_traffic(result: CameraResult, history: baseline.RollingHistory) -> TrafficReading:
+    """Bandingkan hitungan frame ini dengan baseline kamera, lalu catat ke riwayat bergulir."""
+    cam, counts = result.camera, result.counts
+    assert counts is not None
+    value = getattr(counts, _density_metric(cam))
+    base = history.baseline(cam.id, result.checked_at)
+    index = round(baseline.density_index(value, base.median), 3) if base else None
+    usable = result.quality is None or _usable_for_baseline(result.quality.quality, result.quality.is_night)
+    is_anomaly = usable and history.is_anomaly(cam.id, value, base)
+    if usable:
+        history.add(cam.id, result.checked_at, value)
+    return TrafficReading(
+        counts=counts,
+        density_index=index,
+        density_level=baseline.density_level(index),
+        baseline_median=base.median if base else None,
+        baseline_is_provisional=base.provisional if base else True,
+        is_anomaly=is_anomaly,
+    )
+
+
+def _density_metric(cam: CameraRow) -> str:
+    """Metrik utama kamera: kendaraan untuk modul lalu lintas, orang untuk ruang publik."""
+    return "vehicle_total" if "traffic" in cam.modules else "persons"
+
+
+def _usable_for_baseline(image_quality: str | None, is_night: bool | None) -> bool:
+    """Pembacaan malam berkualitas buruk tidak dipakai untuk baseline maupun anomali."""
+    return not (is_night and image_quality == "poor")
 
 
 def _select_cameras(cameras: list[CameraRow], only: list[str] | None, limit: int | None) -> list[CameraRow]:
@@ -124,6 +176,21 @@ def _select_cameras(cameras: list[CameraRow], only: list[str] | None, limit: int
     return cameras[:limit] if limit else cameras
 
 
+def _detail(result: CameraResult) -> str:
+    if result.error:
+        return result.error
+    parts = [_quality_label(result.quality)]
+    if result.traffic:
+        counts = result.traffic.counts
+        parts.append(f"kendaraan={counts.vehicle_total} orang={counts.persons}")
+        parts.append(f"indeks={result.traffic.density_index} ({result.traffic.density_level})")
+    return " ".join(p for p in parts if p)
+
+
+def _quality_label(q: QualityResult | None) -> str:
+    return f"{q.quality}{'/malam' if q.is_night else ''}" if q else ""
+
+
 def _health_row(result: CameraResult) -> dict[str, Any]:
     return {
         "camera_id": result.camera.id,
@@ -131,6 +198,30 @@ def _health_row(result: CameraResult) -> dict[str, Any]:
         "health": result.health,
         "latency_ms": result.latency_ms,
         "error": result.error,
+    }
+
+
+def _traffic_row(result: CameraResult, model_name: str) -> dict[str, Any]:
+    reading = result.traffic
+    assert reading is not None
+    counts = reading.counts
+    return {
+        "camera_id": result.camera.id,
+        "captured_at": result.checked_at.isoformat(),
+        "cars": counts.cars,
+        "motorcycles": counts.motorcycles,
+        "buses": counts.buses,
+        "trucks": counts.trucks,
+        "bicycles": counts.bicycles,
+        "persons": counts.persons,
+        "vehicle_total": counts.vehicle_total,
+        "density_index": reading.density_index,
+        "density_level": reading.density_level,
+        "baseline_median": reading.baseline_median,
+        "is_anomaly": reading.is_anomaly,
+        "quality": result.quality.quality if result.quality else None,
+        "is_night": result.quality.is_night if result.quality else None,
+        "model": model_name,
     }
 
 
@@ -154,6 +245,13 @@ def _status_row(result: CameraResult, previous_failures: int) -> dict[str, Any]:
     if result.snapshot_path is not None:
         row["latest_snapshot_path"] = result.snapshot_path
         row["latest_snapshot_at"] = checked_at
+    if result.traffic is not None:
+        row["vehicle_count"] = result.traffic.counts.vehicle_total
+        row["person_count"] = result.traffic.counts.persons
+        row["density_index"] = result.traffic.density_index
+        row["density_level"] = result.traffic.density_level
+        row["is_anomaly"] = result.traffic.is_anomaly
+        row["baseline_is_provisional"] = result.traffic.baseline_is_provisional
     return row
 
 
@@ -179,7 +277,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
         stream=sys.stdout,
     )
-    for noisy in ("httpx", "httpcore", "hpack", "apscheduler"):
+    for noisy in ("httpx", "httpcore", "hpack", "apscheduler", "urllib3"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
     if shutil.which("ffmpeg") is None:
@@ -190,10 +288,12 @@ def main(argv: list[str] | None = None) -> int:
     database = Database(settings, dry_run=args.dry_run)
     state_path = settings.frames_dir / FRAME_STATE_FILE
     frame_states = acquisition.load_frame_states(state_path)
+    history = baseline.RollingHistory()
+    seed_history(history, database)
 
     def cycle() -> None:
         try:
-            run_cycle(settings, database, frame_states, only=args.only_camera, limit=args.limit)
+            run_cycle(settings, database, frame_states, history, only=args.only_camera, limit=args.limit)
         except Exception:  # noqa: BLE001 - siklus berikutnya harus tetap berjalan
             log.exception("siklus gagal")
         finally:

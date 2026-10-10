@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
+from datetime import datetime
 from typing import Any
 
 from supabase import Client, create_client
@@ -15,6 +16,8 @@ from .config import Settings
 from .models import CameraRow
 
 log = logging.getLogger(__name__)
+
+PAGE_SIZE = 1000  # batas baris per permintaan PostgREST
 
 
 class Database:
@@ -35,6 +38,30 @@ class Database:
         """Jumlah kegagalan berturut-turut per kamera sebelum siklus ini."""
         response = self._client.table("camera_status").select("camera_id, consecutive_failures").execute()
         return {row["camera_id"]: row["consecutive_failures"] for row in response.data}
+
+    def recent_traffic(self, since: datetime) -> list[dict[str, Any]]:
+        """Pembacaan lalu lintas `live` sejak `since`, urut waktu, untuk mengisi ulang baseline bergulir."""
+        rows: list[dict[str, Any]] = []
+        while True:
+            page = (
+                self._client.table("traffic_readings")
+                .select("camera_id, captured_at, vehicle_total, persons, quality, is_night")
+                .eq("source", "live")
+                .gte("captured_at", since.isoformat())
+                .order("captured_at")
+                .order("id")
+                .range(len(rows), len(rows) + PAGE_SIZE - 1)
+                .execute()
+                .data
+            )
+            rows.extend(page)
+            if len(page) < PAGE_SIZE:
+                return rows
+
+    def insert_traffic_readings(self, rows: list[dict[str, Any]]) -> None:
+        if not rows or self.dry_run:
+            return
+        self._client.table("traffic_readings").insert(rows).execute()
 
     def insert_health_checks(self, rows: list[dict[str, Any]]) -> None:
         if not rows or self.dry_run:
