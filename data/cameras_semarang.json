@@ -1,0 +1,1809 @@
+{
+  "source": "https://pantausemar.semarangkota.go.id/",
+  "checked_at": "2026-10-10T10:40:50.313Z",
+  "note": "Daftar kamera publik PANTAUSEMAR (kategori RT RW sengaja dikecualikan karena privasi). Satu kamera bisa punya beberapa kategori. alive_at_check = hasil uji playlist HLS saat checked_at.",
+  "category_source_ids": {
+    "kantor": "ee2827a7-f7a2-4599-bd22-5bbf4844fa2d",
+    "lalin": "fc3ed271-787c-4191-a7dd-fc84314a9f71",
+    "pompa": "5b5b7e51-3a2e-446f-8fae-50d8e9e7196d",
+    "pariwisata": "815111a4-2beb-41f0-a44a-d6d11dfc31ca",
+    "genangan": "df69dbea-87c9-4d79-9ddc-f388c33f2dc9",
+    "sungai": "194fd5d9-098f-4dbe-93da-8288c6761bf0"
+  },
+  "cameras": [
+    {
+      "source_link_id": 3281,
+      "name": "DPU-Museum Kota Lama",
+      "categories": [
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.969596749489755,
+      "lng": 110.43069856227545,
+      "stream_url": "https://livepantau.semarangkota.go.id/badad780-a5a5-4a2e-834f-c50c617286b3/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8334,
+      "name": "HALAMAN BALAIKOTA",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.981555873183958,
+      "lng": 110.41271958474753,
+      "stream_url": "https://livepantau.semarangkota.go.id/f042650d-d819-4754-a4bb-5985eba2553c/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8713,
+      "name": "PAHLAWAN 180",
+      "categories": [
+        "kantor",
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9945187357073335,
+      "lng": 110.42081059423737,
+      "stream_url": "https://livepantau.semarangkota.go.id/5a9b5e8f-3336-4a0a-8fe0-6a7e48c43c1f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7641,
+      "name": "PAHLAWAN PTZ 1",
+      "categories": [
+        "kantor",
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9945187357073335,
+      "lng": 110.42081059423737,
+      "stream_url": "https://livepantau.semarangkota.go.id/41bedb9a-b93f-4f7d-b1a4-b6d0bc166c7d/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7642,
+      "name": "PAHLAWAN PTZ 2",
+      "categories": [
+        "kantor",
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9945187357073335,
+      "lng": 110.42081059423737,
+      "stream_url": "https://livepantau.semarangkota.go.id/d7fa15ea-df64-4865-a24e-32a333b17207/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8342,
+      "name": "PINTU BELAKANG",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9837725344576125,
+      "lng": 110.4140631815781,
+      "stream_url": "https://livepantau.semarangkota.go.id/25851800-86b6-442d-b886-2b25266ed5bb/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8343,
+      "name": "PINTU BELAKANG",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9837725344576125,
+      "lng": 110.4140631815781,
+      "stream_url": "https://livepantau.semarangkota.go.id/1044173d-f9d0-4e73-b782-3a48456cc967/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8344,
+      "name": "PINTU BELAKANG",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9837725344576125,
+      "lng": 110.4140631815781,
+      "stream_url": "https://livepantau.semarangkota.go.id/81d01d2c-304e-4f66-898f-22d86592aa87/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8336,
+      "name": "PINTU KELUAR BALAIKOTA 01",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.981539414010194,
+      "lng": 110.41231165521954,
+      "stream_url": "https://livepantau.semarangkota.go.id/cd0524ff-48fa-4774-a1e6-fd61959283a3/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8335,
+      "name": "PINTU KELUAR BALAIKOTA 02",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.981539414010194,
+      "lng": 110.41231165521954,
+      "stream_url": "https://livepantau.semarangkota.go.id/3287748c-77f0-4971-a204-23acfb119cd1/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8389,
+      "name": "PINTU KELUAR BALAIKOTA 03",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.981539414010194,
+      "lng": 110.41231165521954,
+      "stream_url": "https://livepantau.semarangkota.go.id/94c3b797-c4ad-4aff-8984-9ae4d3f14d25/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8386,
+      "name": "PINTU MASUK BALAIKOTA 01",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.980957342869116,
+      "lng": 110.41294318528529,
+      "stream_url": "https://livepantau.semarangkota.go.id/fad816ff-1bc4-44ab-bc4e-82ccefcb9d71/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8387,
+      "name": "PINTU MASUK BALAIKOTA 02",
+      "categories": [
+        "kantor"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.980957342869116,
+      "lng": 110.41294318528529,
+      "stream_url": "https://livepantau.semarangkota.go.id/55cc5559-12b8-4c7e-9666-d0cd4f7a57ec/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8857,
+      "name": "ARAH PANDANARAN",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9915460998662855,
+      "lng": 110.42001900715552,
+      "stream_url": "https://livepantau.semarangkota.go.id/78e494b8-4873-4bfd-96ad-a319358e3f21/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 7645,
+      "name": "ARAH TUGU TUNAS",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9928050474372645,
+      "lng": 110.42072595566216,
+      "stream_url": "https://livepantau.semarangkota.go.id/9468fa0e-c92f-4178-a9b6-3e94af0f456d/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 334,
+      "name": "BALAIKOTA",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.981802885757487,
+      "lng": 110.41203745360802,
+      "stream_url": "https://livepantau.semarangkota.go.id/bfcb0bac-048f-4b4f-a607-83267af978dc/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8393,
+      "name": "BATAN-THAMRIN",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.985533103185366,
+      "lng": 110.41761658090108,
+      "stream_url": "https://livepantau.semarangkota.go.id/db2df515-cb51-4163-ba76-11d6d9f1b9a4/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 355,
+      "name": "BERGOTA 360",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.993292725367926,
+      "lng": 110.4137406704881,
+      "stream_url": "https://livepantau.semarangkota.go.id/0ccddd03-b302-458c-8618-69807ff6622c/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 1621,
+      "name": "BUNDARAN DIPONEGORO",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.007793814036264,
+      "lng": 110.41604327781859,
+      "stream_url": "https://livepantau.semarangkota.go.id/c878988b-26b8-48ee-8352-4c5abfb61275/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 6601,
+      "name": "Bawah Tol X3W_IN",
+      "categories": [
+        "lalin",
+        "pompa",
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.956617414460944,
+      "lng": 110.45134081788028,
+      "stream_url": "https://livepantau.semarangkota.go.id/9b4a952d-5ebd-45a3-8dc6-e04d44851f51/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 343,
+      "name": "Bea Cukai",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.962162914166672,
+      "lng": 110.39435494849369,
+      "stream_url": "https://livepantau.semarangkota.go.id/e74537ad-d4d8-4230-8144-d371eda979f4/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3324,
+      "name": "Bukit Sari",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.043874961260227,
+      "lng": 110.42157761119759,
+      "stream_url": "https://livepantau.semarangkota.go.id/4ff40187-00a9-440f-9256-9c0a89af55aa/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8872,
+      "name": "Bundaran Madukoro",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.980879592814979,
+      "lng": 110.39905219218345,
+      "stream_url": "https://livepantau.semarangkota.go.id/c69f8d1a-3534-4f14-b858-a577b461a266/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 4653,
+      "name": "COUNTING BANYUMANIK",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.074309653496582,
+      "lng": 110.41118334226366,
+      "stream_url": "https://livepantau.semarangkota.go.id/68322b26-693f-479a-84a0-4ba700ec3c41/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7767,
+      "name": "Camera 01",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.072943100573512,
+      "lng": 110.41118323453831,
+      "stream_url": "https://livepantau.semarangkota.go.id/7455b40f-bbec-4b52-9a2b-f33b4364c4c2/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 6268,
+      "name": "Counting Krapyak",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.987779431038806,
+      "lng": 110.36820064210754,
+      "stream_url": "https://livepantau.semarangkota.go.id/60690ef5-ec79-4020-ae17-788a9df42566/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3279,
+      "name": "DPU-Kel.Wonosari",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.974747423836861,
+      "lng": 110.31560102777037,
+      "stream_url": "https://livepantau.semarangkota.go.id/02066f7c-0377-45c9-8804-f3ad65569ed0/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3278,
+      "name": "DPU-Terowongan Soetta USM",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.979362074903987,
+      "lng": 110.45117518523813,
+      "stream_url": "https://livepantau.semarangkota.go.id/41f054be-4f47-46f3-b5eb-263c82ada1f5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3277,
+      "name": "DPU_Pahlawan",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.992240022320623,
+      "lng": 110.42185968058838,
+      "stream_url": "https://livepantau.semarangkota.go.id/c954ee49-2de6-4e7e-be98-8e17c659f9a9/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 361,
+      "name": "Exit Tol Srondol",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.0610319210434955,
+      "lng": 110.4136417797885,
+      "stream_url": "https://livepantau.semarangkota.go.id/c3814165-b28d-4a32-b33f-007a8e412003/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 326,
+      "name": "FATMAWATI",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.0111193118503525,
+      "lng": 110.47278279634085,
+      "stream_url": "https://livepantau.semarangkota.go.id/5d13ca45-d96a-43b0-af69-6b01c5168305/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3323,
+      "name": "Fly Over Jatingaleh",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.030798827358735,
+      "lng": 110.41818059590902,
+      "stream_url": "https://livepantau.semarangkota.go.id/26b8b50f-4144-488c-a471-637879fbd5d7/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 2792,
+      "name": "Fly Over Jatingaleh WIde",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.031379565095236,
+      "lng": 110.41811864815716,
+      "stream_url": "https://livepantau.semarangkota.go.id/5b09107f-81a6-4e14-b9b7-7712ef5aef7a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 354,
+      "name": "INDRAPRASTA-IMAM BONJOL",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.97857137309681,
+      "lng": 110.41163595541559,
+      "stream_url": "https://livepantau.semarangkota.go.id/0b44f5b2-780d-4f86-9ecd-801041b8925a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9859,
+      "name": "JPO JALAN AHMAD YANI",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9909267384127345,
+      "lng": 110.42445237707864,
+      "stream_url": "https://livepantau.semarangkota.go.id/5e20c403-7f34-4749-8f56-3863711e0d38/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 327,
+      "name": "JRAKAH",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.98662715622268,
+      "lng": 110.36059956505855,
+      "stream_url": "https://livepantau.semarangkota.go.id/cd99f288-896a-4e73-9d8c-275ac0008a7d/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2798,
+      "name": "Jembatan Mberok",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.968559914132089,
+      "lng": 110.42504213633904,
+      "stream_url": "https://livepantau.semarangkota.go.id/ac03c11b-4aa8-4311-a2c3-1dcdf12e33ab/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 312,
+      "name": "KALIBANTENG",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.9845739281732975,
+      "lng": 110.38351440522527,
+      "stream_url": "https://livepantau.semarangkota.go.id/14692ada-0bf1-4da9-bd4f-13a926804958/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 316,
+      "name": "KALIBANTENG 2",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.9845739281732975,
+      "lng": 110.38351440522527,
+      "stream_url": "https://livepantau.semarangkota.go.id/c5e748d2-ee65-4a81-91d7-07085a6fad50/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 1305,
+      "name": "KALIGARANG",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.995766634139341,
+      "lng": 110.40231267560914,
+      "stream_url": "https://livepantau.semarangkota.go.id/c118ec35-b342-4b76-927e-672d5b5c53d6/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 341,
+      "name": "KALIWIRU",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.0234963601843,
+      "lng": 110.42039310747082,
+      "stream_url": "https://livepantau.semarangkota.go.id/cbb3e887-84c4-43c7-9e70-913dc8f460fd/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9581,
+      "name": "KARIADI",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.994456408986015,
+      "lng": 110.40679725503159,
+      "stream_url": "https://livepantau.semarangkota.go.id/30993efa-38bc-42f7-a74e-7044fe42e3a9/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 307,
+      "name": "KYAI SALEH",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.986660206981591,
+      "lng": 110.41393529540247,
+      "stream_url": "https://livepantau.semarangkota.go.id/ba20c7a2-f499-48c4-af4f-815068f678a0/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9612,
+      "name": "Karangayu ke barat",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.982547251583242,
+      "lng": 110.39172256228,
+      "stream_url": "https://livepantau.semarangkota.go.id/0305a054-bb38-42f9-801b-113385baa0f6/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9611,
+      "name": "Karangayu ke timur",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.982547251583242,
+      "lng": 110.39172256228,
+      "stream_url": "https://livepantau.semarangkota.go.id/fcd5964e-b58b-48f5-b6f0-3e9af143f5c8/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9103,
+      "name": "METRO JOHAR",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.971095117010179,
+      "lng": 110.42277318994154,
+      "stream_url": "https://livepantau.semarangkota.go.id/20fbd70b-a1df-4fa1-a3fa-1115a6bf43d8/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7644,
+      "name": "PAHLAWAN - BUNDARAN AIR MANCUR",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.992932591996135,
+      "lng": 110.42144602839531,
+      "stream_url": "https://livepantau.semarangkota.go.id/0b552199-1ac2-45b0-9096-7c9e1b3848d1/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7643,
+      "name": "PAHLAWAN - RIMBA GRAHA",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.995875641261524,
+      "lng": 110.41988482785995,
+      "stream_url": "https://livepantau.semarangkota.go.id/98291649-01d5-46a0-9f7b-204c48a2e139/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8887,
+      "name": "PEMUDA - GAJAHMADA",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.973747366261158,
+      "lng": 110.41997868344541,
+      "stream_url": "https://livepantau.semarangkota.go.id/4f06d6ad-9448-4397-843c-59e66f68252b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 315,
+      "name": "POLDA 360",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.99734554026615,
+      "lng": 110.41946265584971,
+      "stream_url": "https://livepantau.semarangkota.go.id/74ffdc80-264f-4028-94cc-4ede386b0340/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 342,
+      "name": "PUCANG GADING",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.0180394,
+      "lng": 110.4896678,
+      "stream_url": "https://livepantau.semarangkota.go.id/6fc25748-f6d0-48e9-8c7b-b1489c1765af/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3326,
+      "name": "Pasar Banyumanik",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.073300281863589,
+      "lng": 110.41115190419555,
+      "stream_url": "https://livepantau.semarangkota.go.id/190e60ca-44df-4bb1-840b-7a0ccf35f169/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 3325,
+      "name": "Patung Diponegoro 360",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.048618184210592,
+      "lng": 110.41965451794837,
+      "stream_url": "https://livepantau.semarangkota.go.id/533f1fdf-bc9d-44e4-ae3e-fdee94061cd5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9588,
+      "name": "RUAS KERAPYAK",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.987600326282743,
+      "lng": 110.36876663570018,
+      "stream_url": "https://livepantau.semarangkota.go.id/f058e160-742f-4960-a47f-ad1fc5354bd4/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 313,
+      "name": "SIMP EXIT TOL KRAPYAK 360",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.987905205244879,
+      "lng": 110.36834198834495,
+      "stream_url": "https://livepantau.semarangkota.go.id/5bcd5bbc-91fb-4496-bcc9-a362ec48a7f0/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 314,
+      "name": "SIMPANG KARIADI PTZ",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.994456408986015,
+      "lng": 110.40679725503159,
+      "stream_url": "https://livepantau.semarangkota.go.id/5ed366a4-fec8-43b4-9052-6fe9a3fd5847/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 337,
+      "name": "SIMPANG LIMA 1 360",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.989453409357332,
+      "lng": 110.42248309240397,
+      "stream_url": "https://livepantau.semarangkota.go.id/60a471ab-c4ea-48c8-8032-23c1b98a6087/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 338,
+      "name": "SIMPANG LIMA 2",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.989701906091162,
+      "lng": 110.4239394386692,
+      "stream_url": "https://livepantau.semarangkota.go.id/7af16225-3215-49b7-8966-d649a947960d/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8856,
+      "name": "SIMPANG TENTREM MALL",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.986070372503007,
+      "lng": 110.42239339565648,
+      "stream_url": "https://livepantau.semarangkota.go.id/873d1c8c-56d6-4918-906f-514cbbce5ea4/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 360,
+      "name": "SIMPANG THAMRIN",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.985533103185366,
+      "lng": 110.41761658090108,
+      "stream_url": "https://livepantau.semarangkota.go.id/3278760a-a203-4eb4-a331-3519eeb6bd1a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8871,
+      "name": "SIMPANG WAGISAN TAMAN KASMARAN",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.991401779097943,
+      "lng": 110.4063248690095,
+      "stream_url": "https://livepantau.semarangkota.go.id/7a8e0b4a-af0c-4b65-a43f-fe441c4bf4d3/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 330,
+      "name": "SP. AKPOL",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.015755239902285,
+      "lng": 110.41839208187575,
+      "stream_url": "https://livepantau.semarangkota.go.id/ceda53cc-7431-4e23-aa31-ccc312deac09/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 335,
+      "name": "SP. PARAGON",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.978089132875512,
+      "lng": 110.41565103528339,
+      "stream_url": "https://livepantau.semarangkota.go.id/b5dc5775-d7ab-41b1-9dca-42ce96a2304e/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 8868,
+      "name": "SRIWIJAYA 01",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -7.001459211428023,
+      "lng": 110.42441362970271,
+      "stream_url": "https://livepantau.semarangkota.go.id/8eb25438-c8d3-4c8d-98fd-be74d14df3fa/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 8869,
+      "name": "SRIWIJAYA 02",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -7.001459211428023,
+      "lng": 110.42441362970271,
+      "stream_url": "https://livepantau.semarangkota.go.id/b23731ab-2aae-4bd0-8b22-2c47d8461f1a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9656,
+      "name": "Sam Poo Kong ke barat",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.994830867612991,
+      "lng": 110.39940912943106,
+      "stream_url": "https://livepantau.semarangkota.go.id/74de8123-8a1a-4bc1-8e16-cac739c61d8f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9583,
+      "name": "Sam Poo Kong ke timur",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.9948348624975925,
+      "lng": 110.39924880659301,
+      "stream_url": "https://livepantau.semarangkota.go.id/2789145c-177d-424c-a9e6-affc59ba5967/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 362,
+      "name": "Simp Sukun",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -7.062605567256019,
+      "lng": 110.4129704721982,
+      "stream_url": "https://livepantau.semarangkota.go.id/b5e002b6-9d51-4055-a56c-690b773bd809/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9584,
+      "name": "Simpang Paragon",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.977594829865367,
+      "lng": 110.41648579644745,
+      "stream_url": "https://livepantau.semarangkota.go.id/7382d640-b645-451e-9029-4744950209ae/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 308,
+      "name": "THAMRIN PANDANARAN 360",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.9874484,
+      "lng": 110.417212,
+      "stream_url": "https://livepantau.semarangkota.go.id/162c2b72-d3a6-490e-b15e-eca621897f3b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2105,
+      "name": "TITIK NOL",
+      "categories": [
+        "lalin",
+        "pompa",
+        "pariwisata",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9688885,
+      "lng": 110.4246946,
+      "stream_url": "https://livepantau.semarangkota.go.id/a0deaf08-a8f1-415a-9315-d1424f0ef9fb/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 4145,
+      "name": "TUGUMUDA",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.9843574,
+      "lng": 110.40915,
+      "stream_url": "https://livepantau.semarangkota.go.id/f71d6c72-db49-475b-b170-bfac944eeac0/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7860,
+      "name": "Tugumuda 2",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.984831335934285,
+      "lng": 110.41013985942459,
+      "stream_url": "https://livepantau.semarangkota.go.id/0f310a61-9d28-4f03-845d-daa815b72ccf/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 349,
+      "name": "Tugumuda 2 Wide",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.984085673745568,
+      "lng": 110.40957461560829,
+      "stream_url": "https://livepantau.semarangkota.go.id/26306fea-44d0-4fa7-a82d-c153e86deaa2/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 333,
+      "name": "Tugumuda 3",
+      "categories": [
+        "lalin",
+        "genangan"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.983552591745231,
+      "lng": 110.41007168405561,
+      "stream_url": "https://livepantau.semarangkota.go.id/9ea9723a-1384-42dd-9ca7-0b593a4c000b/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 3636,
+      "name": "Tugumuda 3-2",
+      "categories": [
+        "lalin"
+      ],
+      "owner": "DINAS PERHUBUNGAN KOTA SEMARANG",
+      "lat": -6.984085673745568,
+      "lng": 110.40957461560829,
+      "stream_url": "https://livepantau.semarangkota.go.id/cad1b0a8-696f-419b-9da4-cea853304ce7/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 9462,
+      "name": "Camera 01",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -7.038651517029666,
+      "lng": 110.35113761299137,
+      "stream_url": "https://livepantau.semarangkota.go.id/0bd96e9d-52da-4175-a77a-5e684e93b82c/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9463,
+      "name": "Camera 01",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -7.038651517029666,
+      "lng": 110.35113761299137,
+      "stream_url": "https://livepantau.semarangkota.go.id/7ac29f6f-cbe3-465a-868c-e0b407562290/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7647,
+      "name": "DEPAN OUDETRAP",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.967942362986023,
+      "lng": 110.42769784955819,
+      "stream_url": "https://livepantau.semarangkota.go.id/9a1028b7-de57-4a0a-832d-94d516bd7f38/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9105,
+      "name": "GEREJA BLENDUK",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.967942362986023,
+      "lng": 110.42769784955819,
+      "stream_url": "https://livepantau.semarangkota.go.id/2a21bbe2-0de9-4646-ac66-e61b0b1c353a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7646,
+      "name": "PINTU MASUK LAWANG SEWU",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.9832124223032555,
+      "lng": 110.41050764160852,
+      "stream_url": "https://livepantau.semarangkota.go.id/82e26ff9-ed66-41af-9a55-b7af5a0feb12/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7648,
+      "name": "SRI GUNTING 01",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.968287332505104,
+      "lng": 110.42786028169091,
+      "stream_url": "https://livepantau.semarangkota.go.id/fe0da192-2e48-4c43-a873-f4844a7a83da/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9328,
+      "name": "SRI GUNTING 02",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.968287332505104,
+      "lng": 110.42786028169091,
+      "stream_url": "https://livepantau.semarangkota.go.id/87c259ee-bac7-45e1-a95b-057be06115b5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 7649,
+      "name": "SRI GUNTING 03",
+      "categories": [
+        "pariwisata"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.968287332505104,
+      "lng": 110.42786028169091,
+      "stream_url": "https://livepantau.semarangkota.go.id/cc7c8e9d-2ff4-44a9-8adc-293b3785741e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2071,
+      "name": "Banger-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9514709,
+      "lng": 110.4400677,
+      "stream_url": "https://livepantau.semarangkota.go.id/8736fed8-69d2-40e3-9c1f-65a072076898/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2074,
+      "name": "Banger-Lorong Pompa",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9511065,
+      "lng": 110.4401713,
+      "stream_url": "https://livepantau.semarangkota.go.id/d6f16334-2ba2-4cdb-9f64-dc2c9cfc7d4a/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2073,
+      "name": "Banger-Out",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9514709,
+      "lng": 110.4400677,
+      "stream_url": "https://livepantau.semarangkota.go.id/8ce0326f-adf4-4843-a5fc-5d5d1fea9ec2/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2148,
+      "name": "Banger-Pompa",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9515643,
+      "lng": 110.4368953,
+      "stream_url": "https://livepantau.semarangkota.go.id/0a4f3d3d-365f-4e2c-9f4a-d810d0140905/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2075,
+      "name": "Banger-SD-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.951265202144239,
+      "lng": 110.44004499647285,
+      "stream_url": "https://livepantau.semarangkota.go.id/5015d3e2-ef48-4661-bdec-d744f4e7ba49/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2072,
+      "name": "Banger-Tanki",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9511065,
+      "lng": 110.4401713,
+      "stream_url": "https://livepantau.semarangkota.go.id/d08c137f-bff9-4e03-a826-a7b62f79b000/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2095,
+      "name": "Banjardowo-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.955274644104525,
+      "lng": 110.48835724083416,
+      "stream_url": "https://livepantau.semarangkota.go.id/f5137983-30cf-4e28-be0b-6a5acbce479d/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2094,
+      "name": "Banjardowo-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9555826,
+      "lng": 110.4888807,
+      "stream_url": "https://livepantau.semarangkota.go.id/913d8b40-a610-4274-9d65-bab9fc352a5e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 6600,
+      "name": "Bawah Tol X3W_OUT",
+      "categories": [
+        "pompa",
+        "genangan"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.957262267175519,
+      "lng": 110.45199848179288,
+      "stream_url": "https://livepantau.semarangkota.go.id/ec3868fc-cbdb-4995-bcd5-3abe90ac6a0b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2117,
+      "name": "Bridge Fountain",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.980748255242761,
+      "lng": 110.402115718502,
+      "stream_url": "https://livepantau.semarangkota.go.id/78138f71-d2bd-4104-97ab-6b43ba6259f2/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2098,
+      "name": "Bulu Drain-IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.954800045409884,
+      "lng": 110.39913776308681,
+      "stream_url": "https://livepantau.semarangkota.go.id/5d278437-8235-4e2a-8ef6-91891f043351/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2099,
+      "name": "Bulu Drain-OUT",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9546377078298764,
+      "lng": 110.39921117898842,
+      "stream_url": "https://livepantau.semarangkota.go.id/8db4b1a5-c247-45f5-83cb-6e812c906394/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 9628,
+      "name": "CCTV Sungai Plumbon Wonosari",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DISKOMINFO KOTA SEMARANG",
+      "lat": -6.977266,
+      "lng": 110.295786,
+      "stream_url": "https://livepantau.semarangkota.go.id/88d28769-713f-4a53-8eee-e888c74d12d7/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2141,
+      "name": "DPU-Mberok2-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9686322,
+      "lng": 110.4249574,
+      "stream_url": "https://livepantau.semarangkota.go.id/3be4a466-1a7b-41ee-bdf6-8dc08010b807/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2097,
+      "name": "Gdg Senjata-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9624913,
+      "lng": 110.440817,
+      "stream_url": "https://livepantau.semarangkota.go.id/c75f868b-b43f-4db5-958e-55cbee5d48fc/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2096,
+      "name": "Gudang Senjata_Out",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9624496,
+      "lng": 110.4407964,
+      "stream_url": "https://livepantau.semarangkota.go.id/06c0f815-80c5-4a08-b912-5672422505f2/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2100,
+      "name": "IPdome-Madukoro",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.960226624735889,
+      "lng": 110.39920446931083,
+      "stream_url": "https://livepantau.semarangkota.go.id/f9e5e4a7-7cf2-4deb-9e02-33a3aa6e6ca9/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2107,
+      "name": "IPdome-Polder Tawang",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9659878,
+      "lng": 110.4278911,
+      "stream_url": "https://livepantau.semarangkota.go.id/ce65efc3-8f8e-4d9d-afc1-2885c4b7e33b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2154,
+      "name": "Jinunjung_Bendung",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -7.1068288,
+      "lng": 110.3860731,
+      "stream_url": "https://livepantau.semarangkota.go.id/4f1ca874-065b-4db0-b75e-c89d9a43f5e6/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2153,
+      "name": "Jinunjung_Halaman",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -7.106915,
+      "lng": 110.3861078,
+      "stream_url": "https://livepantau.semarangkota.go.id/55fba8a0-848a-44b6-b2cf-b6466c2b5835/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2060,
+      "name": "K. SMG-Halaman",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.949904,
+      "lng": 110.405751,
+      "stream_url": "https://livepantau.semarangkota.go.id/0c4b9efe-cf84-4f72-a5e2-db5908e86afa/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2083,
+      "name": "KP.Kali-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9856046,
+      "lng": 110.4308502,
+      "stream_url": "https://livepantau.semarangkota.go.id/ad01c3ae-1183-4351-91fd-d6e7dc37df25/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2082,
+      "name": "KP.Kali-OUT",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.985236713918527,
+      "lng": 110.43098818182037,
+      "stream_url": "https://livepantau.semarangkota.go.id/59534af5-534e-4baa-954c-dc033ea5917c/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2127,
+      "name": "KS-Genset",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.949914,
+      "lng": 110.40622,
+      "stream_url": "https://livepantau.semarangkota.go.id/b87b1b7c-c8c3-415c-8e71-dd0c19523392/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2062,
+      "name": "KS-Kolam",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9498077,
+      "lng": 110.4059602,
+      "stream_url": "https://livepantau.semarangkota.go.id/9054e4f0-c8ad-47f4-9e49-81aeb442a512/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2128,
+      "name": "KS-Lorong Genset-1",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.950217,
+      "lng": 110.406305,
+      "stream_url": "https://livepantau.semarangkota.go.id/912af1a4-7978-4dc5-86ec-6275117e8666/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2064,
+      "name": "KS-OUT-2",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9498072,
+      "lng": 110.4033782,
+      "stream_url": "https://livepantau.semarangkota.go.id/90668c18-e971-43ca-bf26-1ae708b97aeb/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2063,
+      "name": "KS-Out-1",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.950116,
+      "lng": 110.406976,
+      "stream_url": "https://livepantau.semarangkota.go.id/cb6a8dbc-ed27-4471-b71e-c9ee9184dc0b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2129,
+      "name": "KS-POMPA",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9588011,
+      "lng": 110.4104139,
+      "stream_url": "https://livepantau.semarangkota.go.id/899609d4-fee4-41da-b9ee-f1063e9e4769/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2065,
+      "name": "KS-Screen",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.949990566728178,
+      "lng": 110.40629245344982,
+      "stream_url": "https://livepantau.semarangkota.go.id/a609dc13-364d-4f68-ba84-afe34508817f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2069,
+      "name": "Kali Baru -OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9636403,
+      "lng": 110.4224727,
+      "stream_url": "https://livepantau.semarangkota.go.id/9330f380-4eea-4b5c-99ae-0c179a00079f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2070,
+      "name": "Kali Baru-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9635943,
+      "lng": 110.4226468,
+      "stream_url": "https://livepantau.semarangkota.go.id/cf216202-72fa-494c-b416-436c1a25bb32/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 2068,
+      "name": "Kali Baru-Tanki",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9639414,
+      "lng": 110.4227216,
+      "stream_url": "https://livepantau.semarangkota.go.id/ef712b3d-3b6c-4a35-a930-e17fd57d5f4a/index.m3u8",
+      "alive_at_check": false
+    },
+    {
+      "source_link_id": 2061,
+      "name": "Kali SMG-2",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.949658074888319,
+      "lng": 110.4059745576723,
+      "stream_url": "https://livepantau.semarangkota.go.id/a186429d-8c63-4f3a-9929-fba9d8c8741e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2120,
+      "name": "Kartini-Gerbang Depan",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.985243799325773,
+      "lng": 110.43988486263787,
+      "stream_url": "https://livepantau.semarangkota.go.id/0e6ae30a-d440-4b69-b9e3-b7470259e7a4/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2121,
+      "name": "Kartini-IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.985069540094816,
+      "lng": 110.43966729150968,
+      "stream_url": "https://livepantau.semarangkota.go.id/76473b98-1891-4deb-8fda-f46aff1fc7e1/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2118,
+      "name": "Kartini-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9858716,
+      "lng": 110.440632,
+      "stream_url": "https://livepantau.semarangkota.go.id/9740f7ce-9eb2-4669-acc3-4000415bc4b5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2119,
+      "name": "Kartini-Tanki",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9850248707567815,
+      "lng": 110.44004682246685,
+      "stream_url": "https://livepantau.semarangkota.go.id/7634a646-be0f-4fa2-9417-79a78e6b273c/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2104,
+      "name": "Kdg Kebo-IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9778107,
+      "lng": 110.4491257,
+      "stream_url": "https://livepantau.semarangkota.go.id/8f732d18-0f0e-4b1b-8e29-ae79f1d7a99f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2103,
+      "name": "Kdg Kebo-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9740185,
+      "lng": 110.4432693,
+      "stream_url": "https://livepantau.semarangkota.go.id/056fd7e6-05a5-466b-9066-91b6c46bca90/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2137,
+      "name": "Kol.Sugiono_Gerbang",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.967789240399054,
+      "lng": 110.42308337589083,
+      "stream_url": "https://livepantau.semarangkota.go.id/1f1bfa6d-820c-48a1-901a-29604c3b4147/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2145,
+      "name": "Madukoro_Depan",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.96195143714867,
+      "lng": 110.39929724842825,
+      "stream_url": "https://livepantau.semarangkota.go.id/b130e76e-385f-469c-ba33-20b7a6cdb7c5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2086,
+      "name": "Majapahit-IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.99748890651647,
+      "lng": 110.43912768299528,
+      "stream_url": "https://livepantau.semarangkota.go.id/fbc67a2d-13a1-4807-b44f-f551ba8ded32/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2087,
+      "name": "Majapahit-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.99697123116908,
+      "lng": 110.43885912621337,
+      "stream_url": "https://livepantau.semarangkota.go.id/f62c9dfa-6d01-42b0-b394-6cea29344fe6/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2085,
+      "name": "Manggis-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -7.000221166989992,
+      "lng": 110.4378371678179,
+      "stream_url": "https://livepantau.semarangkota.go.id/7459ce3c-46bb-43e0-af24-7602d7490e8e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2084,
+      "name": "Manggis-OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -7.0003581,
+      "lng": 110.4377678,
+      "stream_url": "https://livepantau.semarangkota.go.id/e34c67b8-c752-4612-9229-130dc0b7b5f5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2066,
+      "name": "Mberok Baru_Pompa",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.968644251533486,
+      "lng": 110.42494548633903,
+      "stream_url": "https://livepantau.semarangkota.go.id/c0d902ed-487e-4601-be8b-c696818e208e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2106,
+      "name": "Mberok Out",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.968568430514702,
+      "lng": 110.42480790916419,
+      "stream_url": "https://livepantau.semarangkota.go.id/4e937a1f-0fe3-4c77-a390-72bfc869a2d8/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2081,
+      "name": "Muktiharjo _Tanki",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9647446656942344,
+      "lng": 110.45106740265817,
+      "stream_url": "https://livepantau.semarangkota.go.id/34b19f5d-804d-451f-a678-4f57984f312f/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2080,
+      "name": "Muktiharjo-Kolam",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.959489567234538,
+      "lng": 110.45131030737058,
+      "stream_url": "https://livepantau.semarangkota.go.id/54ca600c-1a4c-4359-86cf-c47a16de46cd/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2076,
+      "name": "Progo-IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9668503,
+      "lng": 110.4397146,
+      "stream_url": "https://livepantau.semarangkota.go.id/4ac5be52-704d-4a52-8c1d-9b5ea1e0278e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2077,
+      "name": "Progo-OUT",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9668503,
+      "lng": 110.4397146,
+      "stream_url": "https://livepantau.semarangkota.go.id/dd027826-c10a-4dcf-871d-041e8236bb07/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2115,
+      "name": "SBF C2",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.980809654908744,
+      "lng": 110.40066286781769,
+      "stream_url": "https://livepantau.semarangkota.go.id/123a7946-9a0a-4169-8ef9-ae429431495b/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2114,
+      "name": "SBF N1",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9808244,
+      "lng": 110.4015731,
+      "stream_url": "https://livepantau.semarangkota.go.id/c6c02515-5267-43f9-afb1-fbdc30e59927/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2116,
+      "name": "SBF N2",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.981171066334956,
+      "lng": 110.40173070254912,
+      "stream_url": "https://livepantau.semarangkota.go.id/1679a999-9393-46bc-a938-f9111145f2e5/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2152,
+      "name": "Sedompyong_IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.956880025901932,
+      "lng": 110.43946787300473,
+      "stream_url": "https://livepantau.semarangkota.go.id/5b3d4976-df73-4c2e-8271-a2f910dd6e5e/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2151,
+      "name": "Sedompyong_Out",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.956528696917937,
+      "lng": 110.43951949665339,
+      "stream_url": "https://livepantau.semarangkota.go.id/540fc64b-4055-4138-9c62-8bc485735698/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2102,
+      "name": "Semarang Indah_IN",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9647513,
+      "lng": 110.3994177,
+      "stream_url": "https://livepantau.semarangkota.go.id/a6c20e2e-1a51-48c6-9815-7a86abdf5de1/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2101,
+      "name": "Semarang Indah_OUT",
+      "categories": [
+        "pompa",
+        "sungai"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9648018,
+      "lng": 110.3991846,
+      "stream_url": "https://livepantau.semarangkota.go.id/92d991e8-7f6a-4355-a4bf-398ee2e53196/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2140,
+      "name": "Trimulyo_Depan",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.94678279293719,
+      "lng": 110.4801632602867,
+      "stream_url": "https://livepantau.semarangkota.go.id/e0c5c461-cb3e-421a-b98e-dac2545a0bb9/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2139,
+      "name": "Trimulyo_IN",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.947008123876042,
+      "lng": 110.4801674163666,
+      "stream_url": "https://livepantau.semarangkota.go.id/74ab608b-0d9c-4d90-9944-a154cc924191/index.m3u8",
+      "alive_at_check": true
+    },
+    {
+      "source_link_id": 2138,
+      "name": "Trimulyo_OUT",
+      "categories": [
+        "pompa"
+      ],
+      "owner": "DPU KOTA SEMARANG",
+      "lat": -6.9469289791942685,
+      "lng": 110.48017857213094,
+      "stream_url": "https://livepantau.semarangkota.go.id/92689b60-90d9-4199-bb5b-c0bcf4a08cd8/index.m3u8",
+      "alive_at_check": true
+    }
+  ]
+}

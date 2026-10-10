@@ -1,0 +1,47 @@
+{
+  "name": "city_insight",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["headline", "summary", "overall_level", "items"],
+    "properties": {
+      "headline": { "type": "string", "description": "Satu kalimat, maks. 90 karakter" },
+      "summary": { "type": "string", "description": "2-3 kalimat untuk orang awam" },
+      "overall_level": { "type": "string", "enum": ["aman", "perlu_perhatian", "waspada", "siaga", "awas"] },
+      "items": {
+        "type": "array",
+        "description": "Maks. 5 insight, urut dari yang paling penting",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "body", "module", "level", "camera_ids", "evidence", "recommendations"],
+          "properties": {
+            "title": { "type": "string" },
+            "body": { "type": "string", "description": "Penjelasan 1-3 kalimat, hanya memakai angka dari facts" },
+            "module": { "type": "string", "enum": ["air", "lalu_lintas", "ruang_publik", "lintas_modul", "sistem"] },
+            "level": { "type": "string", "enum": ["info", "waspada", "siaga", "awas"] },
+            "camera_ids": { "type": "array", "items": { "type": "string" } },
+            "evidence": {
+              "type": "array",
+              "description": "Fakta yang menjadi dasar, dikutip dari facts",
+              "items": { "type": "string" }
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["audience", "action"],
+                "properties": {
+                  "audience": { "type": "string", "enum": ["bpbd", "pu", "dishub", "perencana", "warga"] },
+                  "action": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

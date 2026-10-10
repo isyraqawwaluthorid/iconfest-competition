@@ -1,0 +1,45 @@
+{
+  "name": "water_reading",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["image_usable", "status", "road_flood", "trash", "water_position", "change_vs_reference", "confidence", "reason"],
+    "properties": {
+      "image_usable": {
+        "type": "boolean",
+        "description": "false jika gambar terlalu gelap, buram, tertutup, atau area air tidak terlihat"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["normal", "waspada", "siaga", "awas", "tidak_dapat_dinilai"],
+        "description": "Posisi permukaan air relatif terhadap garis acuan N/W/S/A. tidak_dapat_dinilai jika image_usable=false"
+      },
+      "road_flood": {
+        "type": "string",
+        "enum": ["tidak_tergenang", "genangan_ringan", "genangan_sedang", "genangan_tinggi", "tidak_dapat_dinilai", "tidak_relevan"],
+        "description": "Untuk kamera jalan. tidak_relevan untuk kamera sungai/pompa yang tidak memperlihatkan jalan"
+      },
+      "trash": {
+        "type": "string",
+        "enum": ["tidak_terlihat", "sedikit", "banyak", "tidak_dapat_dinilai", "tidak_relevan"]
+      },
+      "water_position": {
+        "type": "string",
+        "description": "Deskripsi singkat posisi air terhadap garis acuan, maks. 120 karakter"
+      },
+      "change_vs_reference": {
+        "type": "string",
+        "enum": ["lebih_rendah", "sama", "sedikit_lebih_tinggi", "jauh_lebih_tinggi", "tidak_dapat_dinilai"]
+      },
+      "confidence": {
+        "type": "number",
+        "description": "0 sampai 1"
+      },
+      "reason": {
+        "type": "string",
+        "description": "Alasan visual singkat dalam Bahasa Indonesia, maks. 200 karakter"
+      }
+    }
+  }
+}
