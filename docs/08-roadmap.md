@@ -8,9 +8,9 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 ## Fase 1 — Penyisihan (10–16 Okt)
 
 ### Sabtu 10 Okt (malam) — Fondasi + mulai merekam
-- [ ] Repo GitHub (monorepo `web/`, `worker/`, `supabase/`, `docs/`, `data/`), README awal, `.gitignore`, `.env.example`.
-- [ ] Proyek Supabase: jalankan `schema.sql` lalu `seed_cameras.sql`.
-- [ ] Worker minimal: akuisisi + kesehatan + kualitas + simpan frame lokal + unggah `latest/` + `camera_status` + heartbeat.
+- [x] Repo GitHub (monorepo `web/`, `worker/`, `supabase/`, `docs/`, `data/`), README awal, `.gitignore`, `.env.example`.
+- [x] Proyek Supabase: jalankan `schema.sql` lalu `seed_cameras.sql`.
+- [x] Worker minimal: akuisisi + kesehatan + kualitas + simpan frame lokal + unggah `latest/` + `camera_status` + heartbeat.
 - [ ] **Jalankan worker di laptop malam ini** untuk semua kamera aktif (data mentah untuk baseline, kalibrasi, dan evaluasi).
 - [ ] Kirim email permohonan izin ke Diskominfo Kota Semarang.
 

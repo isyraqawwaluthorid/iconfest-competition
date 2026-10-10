@@ -45,9 +45,10 @@ Paket sistem: **ffmpeg**.
 
 ```
 semarsight_worker/
-├── main.py            # entrypoint + APScheduler; flag --once, --only-camera <id>, --dry-run
+├── main.py            # entrypoint + APScheduler; flag --once, --only-camera <id>, --limit <n>, --dry-run, --verbose
 ├── config.py
 ├── db.py              # client Supabase (service role), helper upsert/insert, unggah Storage
+├── storage.py         # arsip frame lokal + encode JPEG untuk snapshot `latest/`
 ├── models.py          # Pydantic: CameraRow, VisionResult, InsightResult, dst.
 ├── sources/
 │   ├── pantausemar.py # sync_cameras(): parse `var cctvs` per kategori → upsert
@@ -114,7 +115,9 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 - `ffmpeg -nostdin -loglevel error -rw_timeout 15000000 -user_agent "<UA>" -i URL -frames:v 1 -f image2pipe -vcodec mjpeg -` → baca bytes dari stdout → `cv2.imdecode`. Bungkus `subprocess.run(timeout=FRAME_TIMEOUT_SECONDS)`.
 - **Frozen:** hitung dHash 64-bit (resize 9×8 grayscale). Jika jarak Hamming ≤ 2 terhadap frame sebelumnya selama 3 siklus berturut-turut → `frozen`.
 - **Dead:** ffmpeg gagal atau timeout.
-- Simpan frame lokal: `FRAMES_DIR/{camera_id}/{YYYYMMDD}/{HHMMSS}.jpg` (kualitas JPEG 85).
+- Jejak dHash per kamera disimpan di `FRAMES_DIR/_state/frame_states.json` agar deteksi beku bertahan saat worker dimulai ulang.
+- Simpan frame lokal: `FRAMES_DIR/{camera_id}/{YYYYMMDD}/{HHMMSS}.jpg` (kualitas JPEG 85, nama folder dan file memakai waktu UTC). Frame berstatus `frozen` tetap diarsipkan (tetapi tidak diunggah) supaya ambang deteksi beku bisa dikalibrasi dari data nyata.
+- Status dan log kesehatan ditulis **sekali per siklus secara batch** (`health_checks` insert, `camera_status` upsert), bukan satu permintaan per kamera.
 - Unggah `latest/{camera_id}.jpg` (lebar maks. 960 px) ke bucket `snapshots` dengan `upsert=True`, lalu isi `camera_status.latest_snapshot_path` dan `latest_snapshot_at`.
 
 ## Kualitas (`quality.py`)
@@ -211,7 +214,9 @@ Setiap 30 menit: untuk tiap titik di `weather_grid`, ambil data Open-Meteo (liha
 ## Pengujian
 - Unit test: `quality.assess`, dHash/frozen, `smoothing.confirm_water_status` (kasus naik, turun, keyakinan rendah), `baseline.density_index`, `risk.score`, parser `var cctvs`, validasi Pydantic output AI.
 - Uji integrasi: `python -m semarsight_worker.main --once --only-camera <id>` terhadap kamera nyata.
-- `--dry-run`: tidak menulis ke database dan tidak memanggil AI (cetak hasil ke log).
+- `--dry-run`: tidak menulis ke database, Storage, maupun disk, dan tidak memanggil AI (cetak hasil ke log; pakai bersama `--verbose` untuk hasil per kamera).
+- `--limit <n>`: batasi ke n kamera pertama, untuk uji cepat.
+- Catatan kunci Supabase format baru (`sb_secret_...`): server menolaknya jika `User-Agent` mirip browser, jadi `HTTP_USER_AGENT` hanya dipakai untuk ffmpeg ke PANTAUSEMAR, tidak untuk client Supabase.
 
 ## Deployment
 - **Pengembangan:** laptop, `python -m semarsight_worker.main`. Mulai **secepatnya** agar data historis terkumpul.

@@ -14,8 +14,10 @@ data/         daftar kamera publik Semarang (seed)
 docs/         brief, arsitektur, spesifikasi, roadmap
 supabase/     skema database dan seed kamera
 web/          aplikasi Next.js (belum dibuat)
-worker/       worker Python (belum dibuat)
+worker/       worker Python: akuisisi frame, cek kesehatan, kualitas gambar
 ```
+
+Daftar tugas dan progres ada di [docs/10-tasklist.md](docs/10-tasklist.md).
 
 ## Stack
 
@@ -32,3 +34,21 @@ Mulai dari [docs/01-project-brief.md](docs/01-project-brief.md) dan [docs/02-arc
 ## Konfigurasi
 
 Salin `.env.example` menjadi `.env` (worker) dan `web/.env.local` (web), lalu isi nilainya. File berisi nilai asli tidak boleh di-commit.
+
+## Menjalankan worker
+
+Prasyarat: Python 3.11+, ffmpeg di `PATH`, dan proyek Supabase yang sudah menjalankan `supabase/schema.sql` lalu `supabase/seed_cameras.sql`.
+
+```bash
+cd worker
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+python -m semarsight_worker.main --once --limit 3 --dry-run --verbose   # uji tanpa menulis apa pun
+python -m semarsight_worker.main --once                                 # satu siklus penuh
+python -m semarsight_worker.main                                        # jalan terus, siklus tiap 5 menit
+pytest
+```
+
+Setiap siklus worker mengambil satu frame per kamera aktif, menentukan status `live` / `frozen` / `dead`, menilai kualitas gambar, mengarsipkan frame ke `FRAMES_DIR`, mengunggah snapshot terbaru ke Storage, lalu memperbarui `camera_status`, `health_checks`, dan heartbeat di `system_status`.
