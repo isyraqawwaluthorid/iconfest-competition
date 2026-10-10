@@ -14,7 +14,7 @@ Keadaan awal (10 Okt): repo berisi dokumen, skema, dan seed. `web/` dan `worker/
 - [x] **T0.2 [M]** Buat proyek Supabase; jalankan `supabase/schema.sql` lalu `supabase/seed_cameras.sql` di SQL Editor. *Bukti:* tabel `cameras` berisi 146 baris.
 - [x] **T0.3 [M]** Pastikan bucket Storage `snapshots` (publik, baca saja) ada; `schema.sql` membuatnya otomatis. Saat membuat proyek, biarkan **Automatically expose new tables** aktif (skema tidak memuat `GRANT` sendiri) dan aktifkan **Enable automatic RLS**.
 - [x] **T0.4 [M]** Salin `.env.example` → `.env`, isi `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_*`, `SUPABASE_STORAGE_BUCKET`.
-- [ ] **T0.5 [M]** Buat API key OpenAI khusus proyek, pasang spending limit. Boleh ditunda sampai Fase 3.
+- [x] **T0.5 [M]** Buat API key OpenAI khusus proyek (masa berlaku 30 hari, lewat final 26 Okt). Pastikan auto recharge mati agar pengeluaran tidak melewati kredit.
 - [ ] **T0.6 [M]** Kirim email permohonan izin ke Diskominfo Kota Semarang.
 - [ ] **T0.7 [M]** Tanyakan jam batas pengumpulan 16 Okt ke panitia.
 
@@ -59,7 +59,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T3.3 [K]** `/admin/kalibrasi/[id]`: canvas ROI poligon, garis acuan N/W/S/A, simpan referensi siang/malam, catatan (`/api/admin/calibration/[id]`). Koordinat ternormalisasi 0..1.
 - [ ] **T3.4 [M]** Kalibrasi kamera unggulan (±5 menit per kamera).
 - [ ] **T3.5 [K]** `analyzers/water.py`: `change_score()` (SSIM di ROI), `should_call_ai()` (change / rain / heartbeat), batas `AI_DAILY_CALL_CAP`.
-- [ ] **T3.6 [M+K]** Pilih model OpenAI dari dokumentasi terbaru, isi `OPENAI_VISION_MODEL` dan `OPENAI_TEXT_MODEL`.
+- [x] **T3.6 [M+K]** Pilih model OpenAI dari dokumentasi terbaru, isi `OPENAI_VISION_MODEL` dan `OPENAI_TEXT_MODEL`. Dipilih `gpt-6-luna` untuk keduanya (input gambar + structured outputs, $0,10 / $0,50 per 1 juta token). Uji 10 Okt: gambar 512×290 dihitung ±190 token, jadi satu panggilan modul air ±$0,0002 dan 2.000 panggilan per hari ±$0,4. Akurasi diuji di T3.10; cadangan untuk kasus sulit: naikkan `reasoning.effort`, lalu `gpt-6.1-sol`.
 - [ ] **T3.7 [K]** `classify_with_ai()`: gambar ROI + garis acuan + referensi, structured outputs sesuai `ai/schemas/water_vision.schema.json`, validasi Pydantic, gagal → `tidak_dapat_dinilai`.
 - [ ] **T3.8 [K]** `fusion/smoothing.py`: konfirmasi naik (2 pembacaan), turun (3 pembacaan), keyakinan rendah → `needs_verification`. Unit test.
 - [ ] **T3.9 [K]** `sources/openmeteo.py`: ingest per `weather_grid` tiap 30 menit; peringatan `heavy_rain`.
