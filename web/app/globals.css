@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/*
+ * Design tokens (placeholder).
+ * Semua warna, radius, dan font di aplikasi berasal dari variabel di bawah ini.
+ * Untuk mengganti tampilan, cukup ubah nilainya di sini; komponen tidak memakai kode warna langsung.
+ */
+:root {
+  --bg: #f7f7f8;
+  --surface: #ffffff;
+  --text: #18181b;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --primary: #2563eb;
+  --on-primary: #ffffff;
+
+  --status-normal: #16a34a;
+  --status-waspada: #ca8a04;
+  --status-siaga: #ea580c;
+  --status-awas: #dc2626;
+  --status-unknown: #a1a1aa;
+  --status-offline: #52525b;
+
+  --density-lancar: var(--status-normal);
+  --density-normal: var(--primary);
+  --density-ramai: var(--status-waspada);
+  --density-padat: var(--status-awas);
+
+  --radius: 8px;
+  --font-sans: system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0b0c;
+    --surface: #18181b;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --border: #27272a;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-status-normal: var(--status-normal);
+  --color-status-waspada: var(--status-waspada);
+  --color-status-siaga: var(--status-siaga);
+  --color-status-awas: var(--status-awas);
+  --color-status-unknown: var(--status-unknown);
+  --color-status-offline: var(--status-offline);
+  --color-density-lancar: var(--density-lancar);
+  --color-density-normal: var(--density-normal);
+  --color-density-ramai: var(--density-ramai);
+  --color-density-padat: var(--density-padat);
+  --radius-token: var(--radius);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+/* Warna penanda peta mengikuti token; `data-tone` diisi dari lib/status.ts. */
+.camera-marker {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+  fill-opacity: 0.95;
+}
+.camera-marker.tone-normal { fill: var(--status-normal); }
+.camera-marker.tone-waspada { fill: var(--status-waspada); }
+.camera-marker.tone-siaga { fill: var(--status-siaga); }
+.camera-marker.tone-awas { fill: var(--status-awas); }
+.camera-marker.tone-unknown { fill: var(--status-unknown); }
+.camera-marker.tone-offline { fill: var(--status-offline); }
+.camera-marker.tone-density-lancar { fill: var(--density-lancar); }
+.camera-marker.tone-density-normal { fill: var(--density-normal); }
+.camera-marker.tone-density-ramai { fill: var(--density-ramai); }
+.camera-marker.tone-density-padat { fill: var(--density-padat); }
+.camera-marker.is-selected {
+  stroke: var(--text);
+  stroke-width: 3;
+}
