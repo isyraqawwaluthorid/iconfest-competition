@@ -1,9 +1,11 @@
-"""Heartbeat worker dan retensi frame lokal."""
+"""Heartbeat worker, retensi frame lokal, dan menjaga mesin tetap terjaga."""
 
 from __future__ import annotations
 
+import ctypes
 import logging
 import shutil
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -12,6 +14,25 @@ from .db import Database
 from .models import CycleStats
 
 log = logging.getLogger(__name__)
+
+ES_CONTINUOUS = 0x80000000
+ES_SYSTEM_REQUIRED = 0x00000001
+
+
+def keep_system_awake() -> bool:
+    """Minta Windows tidak menidurkan mesin karena diam selama worker berjalan.
+
+    Layar tetap boleh mati. Permintaan ini berlaku selama thread pemanggil hidup dan hanya
+    dihormati penuh saat tercolok ke listrik. Di luar Windows fungsi ini tidak melakukan apa pun
+    (di VPS Linux worker dijalankan oleh systemd dan mesin tidak tidur).
+    """
+    if sys.platform != "win32":
+        return False
+    previous = ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)
+    if previous == 0:
+        log.warning("permintaan agar mesin tetap terjaga ditolak Windows")
+        return False
+    return True
 
 
 def heartbeat(database: Database, stats: CycleStats) -> None:

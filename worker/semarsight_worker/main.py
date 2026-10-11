@@ -330,7 +330,11 @@ def main(argv: list[str] | None = None) -> int:
         cycle()
         return 0
 
-    log.info("worker mulai: siklus tiap %d detik, konkurensi %d", settings.cycle_seconds, settings.max_concurrency)
+    awake = housekeeping.keep_system_awake()
+    log.info(
+        "worker mulai: siklus tiap %d detik, konkurensi %d%s",
+        settings.cycle_seconds, settings.max_concurrency, ", mesin dijaga tetap terjaga" if awake else "",
+    )  # fmt: skip
     scheduler = BlockingScheduler(timezone="UTC")
     scheduler.add_job(
         cycle,
