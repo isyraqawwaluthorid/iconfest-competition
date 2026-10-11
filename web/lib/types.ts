@@ -2,6 +2,21 @@ export type Health = "live" | "frozen" | "dead" | "unknown";
 export type ImageQuality = "good" | "fair" | "poor";
 export type WaterStatus = "normal" | "waspada" | "siaga" | "awas" | "tidak_dapat_dinilai";
 export type DensityLevel = "lancar" | "normal" | "ramai" | "padat" | "tidak_diketahui";
+export type TrashLevel = "tidak_terlihat" | "sedikit" | "banyak" | "tidak_dapat_dinilai" | "tidak_relevan";
+export type ReferenceLevel = "normal" | "waspada" | "siaga" | "awas";
+export type ReferenceLine = { level: ReferenceLevel; points: [[number, number], [number, number]] };
+
+/** Satu penilaian AI atas satu frame kamera air (tabel `water_readings`). */
+export type WaterReading = {
+  captured_at: string;
+  status: WaterStatus;
+  trash: TrashLevel;
+  water_position: string | null;
+  confidence: number | null;
+  reason: string | null;
+  trigger: "change" | "heartbeat" | "rain" | "manual" | null;
+  is_night: boolean | null;
+};
 export type CameraModule = "traffic" | "crowd" | "water";
 
 /** Satu baris view `v_camera_overview`: kamera aktif beserta kondisi terkininya. */
@@ -26,6 +41,10 @@ export type CameraOverview = {
   latest_quality: ImageQuality | null;
   is_night: boolean | null;
   water_status: WaterStatus | null;
+  water_status_since: string | null;
+  trash: TrashLevel | null;
+  water_confidence: number | null;
+  needs_verification: boolean | null;
   vehicle_count: number | null;
   person_count: number | null;
   density_index: number | null;

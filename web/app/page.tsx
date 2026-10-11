@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Stat } from "@/components/ui/Stat";
 import { getCameraOverview } from "@/lib/queries";
-import { isOnline } from "@/lib/status";
+import { isElevated, isOnline } from "@/lib/status";
 
 export default function HomePage() {
   return (
@@ -34,6 +34,8 @@ async function Summary() {
   }
   const online = cameras.filter(isOnline);
   const busy = online.filter((c) => c.density_level === "ramai" || c.density_level === "padat");
+  const assessed = cameras.filter((c) => c.water_status && c.water_status !== "tidak_dapat_dinilai");
+  const elevated = assessed.filter((c) => isElevated(c.water_status));
   const latest = cameras.reduce<string | null>(
     (max, c) => (c.status_updated_at && (!max || c.status_updated_at > max) ? c.status_updated_at : max),
     null,
@@ -45,7 +47,11 @@ async function Summary() {
         <Stat label="Kamera dipantau" value={cameras.length} />
         <Stat label="Kamera aktif" value={online.length} hint={`${cameras.length - online.length} offline atau beku`} />
         <Stat label="Titik ramai atau padat" value={busy.length} hint="Dibanding kebiasaan tiap kamera" />
-        <Stat label="Status air ≥ waspada" value="–" hint="Modul air belum aktif" />
+        <Stat
+          label="Lokasi air waspada ke atas"
+          value={assessed.length > 0 ? elevated.length : "–"}
+          hint={assessed.length > 0 ? `Dari ${assessed.length} kamera air yang dinilai` : "Belum ada kamera air yang dinilai"}
+        />
       </div>
       <FreshnessTag at={latest} />
     </section>

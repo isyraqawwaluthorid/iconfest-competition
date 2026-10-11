@@ -1,4 +1,4 @@
-import type { CameraModule, CameraOverview, DensityLevel, Health, WaterStatus } from "./types";
+import type { CameraModule, CameraOverview, DensityLevel, Health, TrashLevel, WaterStatus } from "./types";
 
 /**
  * Satu sumber untuk label dan warna status. `tone` adalah nama token warna di globals.css
@@ -41,7 +41,26 @@ export const WATER: Record<WaterStatus, StatusDisplay> = {
   tidak_dapat_dinilai: { label: "Tidak dapat dinilai", tone: "unknown" },
 };
 
-const NOT_ASSESSED: StatusDisplay = { label: "Belum dinilai", tone: "unknown" };
+export const NOT_ASSESSED: StatusDisplay = { label: "Belum dinilai", tone: "unknown" };
+
+export const TRASH_LABEL: Record<TrashLevel, string> = {
+  tidak_terlihat: "Tidak terlihat",
+  sedikit: "Sedikit",
+  banyak: "Banyak",
+  tidak_dapat_dinilai: "Tidak dapat dinilai",
+  tidak_relevan: "Tidak relevan",
+};
+
+/** Keyakinan AI ditulis sebagai kata lebih dulu; angkanya hanya pelengkap. */
+export function confidenceLabel(confidence: number | null): string {
+  if (confidence == null) return "tidak diketahui";
+  const word = confidence >= 0.75 ? "tinggi" : confidence >= 0.5 ? "sedang" : "rendah";
+  return `${word} (${confidence.toFixed(2).replace(".", ",")})`;
+}
+
+export function isElevated(status: WaterStatus | null): boolean {
+  return status === "waspada" || status === "siaga" || status === "awas";
+}
 
 /** Kelas Tailwind latar per tone, ditulis lengkap agar terbaca oleh pemindai Tailwind. */
 export const TONE_BG: Record<Tone, string> = {
