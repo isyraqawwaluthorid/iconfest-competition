@@ -372,6 +372,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     settings = get_settings()
+    if not args.dry_run:
+        housekeeping.log_to_file(settings.frames_dir)
     database = Database(settings, dry_run=args.dry_run)
     state_path = settings.frames_dir / FRAME_STATE_FILE
     frame_states = acquisition.load_frame_states(state_path)

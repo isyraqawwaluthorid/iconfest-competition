@@ -7,6 +7,7 @@ import logging
 import shutil
 import sys
 from datetime import date, datetime, timedelta, timezone
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from . import __version__
@@ -17,6 +18,19 @@ log = logging.getLogger(__name__)
 
 ES_CONTINUOUS = 0x80000000
 ES_SYSTEM_REQUIRED = 0x00000001
+LOG_FILE = "_state/worker.log"
+LOG_MAX_BYTES = 2_000_000
+LOG_BACKUPS = 3
+
+
+def log_to_file(frames_dir: Path) -> Path:
+    """Salin log ke berkas bergulir, agar siklus yang gagal bisa ditelusuri setelah jendela terminal hilang."""
+    path = frames_dir / LOG_FILE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handler = RotatingFileHandler(path, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUPS, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)-7s %(name)s: %(message)s"))
+    logging.getLogger().addHandler(handler)
+    return path
 
 
 def keep_system_awake() -> bool:
