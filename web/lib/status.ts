@@ -1,4 +1,14 @@
-import type { CameraModule, CameraOverview, DensityLevel, Health, TrashLevel, WaterStatus } from "./types";
+import type {
+  AlertLevel,
+  CameraModule,
+  CameraOverview,
+  DensityLevel,
+  Health,
+  RiskLevel,
+  TrashLevel,
+  WaterStatus,
+  WaterTrend,
+} from "./types";
 
 /**
  * Satu sumber untuk label dan warna status. `tone` adalah nama token warna di globals.css
@@ -14,7 +24,13 @@ export type Tone =
   | "density-lancar"
   | "density-normal"
   | "density-ramai"
-  | "density-padat";
+  | "density-padat"
+  | "untracked"
+  | "rain-0"
+  | "rain-1"
+  | "rain-2"
+  | "rain-3"
+  | "rain-4";
 
 export type StatusDisplay = { label: string; tone: Tone };
 
@@ -40,6 +56,33 @@ export const WATER: Record<WaterStatus, StatusDisplay> = {
   awas: { label: "Awas", tone: "awas" },
   tidak_dapat_dinilai: { label: "Tidak dapat dinilai", tone: "unknown" },
 };
+
+/** Tingkat risiko memakai warna yang sama dengan status air agar skala bahayanya konsisten. */
+export const RISK: Record<RiskLevel, StatusDisplay> = {
+  rendah: { label: "Risiko rendah", tone: "normal" },
+  sedang: { label: "Risiko sedang", tone: "waspada" },
+  tinggi: { label: "Risiko tinggi", tone: "siaga" },
+  sangat_tinggi: { label: "Risiko sangat tinggi", tone: "awas" },
+  tidak_diketahui: { label: "Risiko belum diketahui", tone: "unknown" },
+};
+
+export const ALERT: Record<AlertLevel, StatusDisplay> = {
+  info: { label: "Info", tone: "density-normal" },
+  waspada: { label: "Waspada", tone: "waspada" },
+  siaga: { label: "Siaga", tone: "siaga" },
+  awas: { label: "Awas", tone: "awas" },
+};
+
+export const TREND_LABEL: Record<WaterTrend, string> = {
+  naik_cepat: "naik cepat",
+  naik: "naik",
+  stabil: "stabil",
+  turun: "turun",
+  tidak_diketahui: "tren belum diketahui",
+};
+
+/** Wilayah tanpa sumber data untuk tema yang sedang dilihat. */
+export const UNTRACKED: StatusDisplay = { label: "Tidak terpantau", tone: "untracked" };
 
 export const NOT_ASSESSED: StatusDisplay = { label: "Belum dinilai", tone: "unknown" };
 
@@ -74,6 +117,12 @@ export const TONE_BG: Record<Tone, string> = {
   "density-normal": "bg-density-normal",
   "density-ramai": "bg-density-ramai",
   "density-padat": "bg-density-padat",
+  untracked: "bg-untracked",
+  "rain-0": "bg-rain-0",
+  "rain-1": "bg-rain-1",
+  "rain-2": "bg-rain-2",
+  "rain-3": "bg-rain-3",
+  "rain-4": "bg-rain-4",
 };
 
 export type MapLayer = "health" | "traffic" | "crowd" | "water";

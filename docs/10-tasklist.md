@@ -113,13 +113,13 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 
 Lihat `06-web-spec.md`. Kamera menjadi lapisan bukti; Beranda dan Peta dibangun ulang per wilayah.
 
-- [ ] **TV.1 [K]** Data batas 16 kecamatan (GeoJSON) di `data/`, dengan sumber dan lisensinya.
-- [ ] **TV.2 [K]** Pemetaan kamera → kecamatan dan agregat per kecamatan (risiko air, indeks kepadatan, jumlah titik pantau).
-- [ ] **TV.3 [K]** Peta tematik: choropleth risiko air, lapisan kepadatan (heatmap radius kecil atau lingkaran proporsional), hujan per wilayah; titik kamera sebagai lapisan tambahan.
-- [ ] **TV.4 [K]** Panel wilayah: tren 24 jam, temuan, jumlah titik pantau, tautan "lihat buktinya".
-- [ ] **TV.5 [K]** Beranda insight: kalimat kondisi kota, peta kecamatan, kartu insight Kondisi → Penyebab → Dampak → Tindakan (menggantikan cakupan T4.9).
+- [x] **TV.1 [K]** Data batas 16 kecamatan (GeoJSON), dengan sumber dan lisensinya. Selesai 11 Okt: dari OpenStreetMap (ODbL), disimpan di `web/lib/geo/kecamatan-semarang.json`; catatan sumber di `03-data-sources.md`.
+- [x] **TV.2 [K]** Pemetaan kamera → kecamatan dan agregat per kecamatan (risiko air, indeks kepadatan, jumlah titik pantau). Selesai 11 Okt, dihitung di web (`lib/insight.ts`).
+- [x] **TV.3 [K]** Peta tematik: choropleth risiko air, kepadatan lalu lintas, dan hujan per wilayah; sumber data sebagai titik kecil. Selesai 11 Okt. Kepadatan memakai choropleth median per kecamatan, bukan heatmap, agar tidak mengesankan ada data di antara titik ukur.
+- [ ] **TV.4 [K]** Panel wilayah: tren 24 jam, temuan, jumlah titik pantau, tautan "lihat buktinya". Sebagian 11 Okt: kondisi air per lokasi, kepadatan, hujan, dan tautan ke kamera sudah ada; **tren 24 jam belum**.
+- [ ] **TV.5 [K]** Beranda insight: kalimat kondisi kota, peta kecamatan, kartu insight Kondisi → Penyebab → Dampak → Tindakan (menggantikan cakupan T4.9). Sebagian 11 Okt: kalimat kondisi kota (dari aturan), peringatan aktif, peta, dan peringkat sudah ada; **kartu insight dari LLM belum** (menunggu T4.7).
 - [ ] **TV.6 [K]** Heatmap jam × hari di `/lalu-lintas` (bagian dari T5.1).
-- [ ] **TV.7 [K]** Menu utama berisi halaman insight; `/kamera` dan `/mosaik` pindah ke kelompok "Sumber data".
+- [x] **TV.7 [K]** Menu utama berisi halaman insight; `/kamera` dan `/mosaik` pindah ke kelompok "Sumber data". Selesai 11 Okt.
 
 ## Fitur tambahan terpilih
 

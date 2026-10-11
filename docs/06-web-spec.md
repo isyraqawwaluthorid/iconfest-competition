@@ -30,12 +30,21 @@ Menu utama berisi halaman insight (Beranda, Peta, Air, Lalu Lintas, Riwayat). `/
 
 Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan, dan agregat per kecamatan.
 
+### Yang sudah dibangun (11 Okt)
+
+- **Beranda `/`** kini berisi: kalimat kondisi kota yang disusun dari aturan (`citySituation` di `lib/insight.ts`, bukan LLM, jadi selalu tersedia), daftar peringatan aktif (Realtime), peta tematik per kecamatan, panel wilayah, dan dua daftar peringkat (lokasi air menurut risiko, lalu lintas paling padat dibanding kebiasaannya).
+- **Peta tematik** punya tiga tema: risiko air (warna = lokasi dengan skor risiko tertinggi di kecamatan itu), kepadatan lalu lintas (median indeks kepadatan relatif kamera lalu lintas yang hidup; batas kelas sama dengan worker), dan hujan 3 jam ke depan (titik grid Open-Meteo terdekat ke pusat kecamatan). Sumber data tiap tema digambar sebagai titik kecil.
+- **Kecamatan tanpa sumber data** untuk tema yang dilihat diberi warna abu-abu bergaris putus dan label "Tidak terpantau". Saat ini lokasi air baru terpantau di 9 dari 16 kecamatan.
+- **Pemetaan kamera → kecamatan** dihitung di web (titik-dalam-poligon di `lib/geo/districts.ts`), tanpa kolom baru di database.
+- **Peta titik kamera pindah ke `/kamera`** dan, bersama `/mosaik`, masuk kelompok "Sumber data" di menu. `/peta` dialihkan ke `/kamera`.
+- Belum dibangun: tren 24 jam di panel wilayah, kartu insight Kondisi → Penyebab → Dampak → Tindakan dari LLM, garis alir hulu–hilir, heatmap jam × hari.
+
 ## Halaman publik
 
 | Rute | Nama | Isi utama |
 |---|---|---|
-| `/` | **Denyut Kota** | Ringkasan kondisi saat ini: kartu angka (kamera live, status air ≥ waspada, titik padat, hujan), insight AI terbaru, peringatan aktif, peta mini |
-| `/peta` | Peta | Peta penuh semua kamera; filter modul (Air / Lalu Lintas / Ruang Publik / Kesehatan Kamera); klik marker → panel kamera |
+| `/` | **Denyut Kota** | Kalimat kondisi kota, peringatan aktif, peta tematik per kecamatan (risiko air / kepadatan lalu lintas / hujan), panel wilayah, peringkat lokasi; insight AI menyusul |
+| `/kamera` | Kamera sumber data | Peta penuh semua kamera; filter modul (Air / Lalu Lintas / Ruang Publik / Kesehatan Kamera); klik marker → panel kamera. `/peta` dialihkan ke sini |
 | `/mosaik` | Semarang Saat Ini | Grid snapshot terbaru semua kamera dari Storage (bukan video live), saringan modul, hanya kamera aktif, cari nama |
 | `/udara` | Kualitas Udara (direncanakan) | Kartu "Kondisi luar ruang": kualitas udara (model Open-Meteo, terukur BMKG jika ada akses) dengan label sumber dan kategori ISPU, suhu terasa, indeks UV, hujan; grafik 24 jam + prakiraan 48 jam |
 | `/emisi` | Emisi (setelah uji kelayakan) | Peta estimasi emisi per kamera, arus per jenis kendaraan, kotak "Metode & asumsi" (lihat `12-emisi-kualitas-udara.md`) |

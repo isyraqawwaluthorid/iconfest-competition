@@ -8,7 +8,7 @@ export default function NotFound() {
         title="Halaman tidak ditemukan"
         reason="Alamatnya mungkin salah, atau kamera ini sudah tidak dipantau."
       />
-      <Link href="/peta" className="text-sm font-medium text-primary underline">
+      <Link href="/kamera" className="text-sm font-medium text-primary underline">
         Buka peta kamera
       </Link>
     </div>

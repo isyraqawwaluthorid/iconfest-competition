@@ -18,8 +18,8 @@ const QUALITY_LABEL = { good: "Baik", fair: "Cukup", poor: "Buruk" } as const;
 export default function CameraPage({ params }: PageProps<"/kamera/[id]">) {
   return (
     <div className="space-y-4">
-      <Link href="/peta" className="text-sm font-medium text-primary underline">
-        ← Kembali ke peta
+      <Link href="/kamera" className="text-sm font-medium text-primary underline">
+        ← Kembali ke peta kamera
       </Link>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <CameraDetail params={params} />

@@ -3,6 +3,16 @@ export type ImageQuality = "good" | "fair" | "poor";
 export type WaterStatus = "normal" | "waspada" | "siaga" | "awas" | "tidak_dapat_dinilai";
 export type DensityLevel = "lancar" | "normal" | "ramai" | "padat" | "tidak_diketahui";
 export type TrashLevel = "tidak_terlihat" | "sedikit" | "banyak" | "tidak_dapat_dinilai" | "tidak_relevan";
+export type WaterTrend = "naik_cepat" | "naik" | "stabil" | "turun" | "tidak_diketahui";
+export type RiskLevel = "rendah" | "sedang" | "tinggi" | "sangat_tinggi" | "tidak_diketahui";
+export type RoadFlood =
+  | "tidak_tergenang"
+  | "genangan_ringan"
+  | "genangan_sedang"
+  | "genangan_tinggi"
+  | "tidak_dapat_dinilai"
+  | "tidak_relevan";
+export type AlertLevel = "info" | "waspada" | "siaga" | "awas";
 export type ReferenceLevel = "normal" | "waspada" | "siaga" | "awas";
 export type ReferenceLine = { level: ReferenceLevel; points: [[number, number], [number, number]] };
 
@@ -32,6 +42,7 @@ export type CameraOverview = {
   is_featured: boolean;
   water_kind: string | null;
   river_system: string | null;
+  weather_grid_id: string | null;
   is_calibrated: boolean;
   health: Health | null;
   last_checked_at: string | null;
@@ -42,9 +53,14 @@ export type CameraOverview = {
   is_night: boolean | null;
   water_status: WaterStatus | null;
   water_status_since: string | null;
+  water_trend: WaterTrend | null;
+  road_flood: RoadFlood | null;
   trash: TrashLevel | null;
   water_confidence: number | null;
   needs_verification: boolean | null;
+  risk_score: number | null;
+  risk_level: RiskLevel | null;
+  risk_components: RiskComponents | null;
   vehicle_count: number | null;
   person_count: number | null;
   density_index: number | null;
@@ -52,6 +68,42 @@ export type CameraOverview = {
   is_anomaly: boolean | null;
   baseline_is_provisional: boolean | null;
   status_updated_at: string | null;
+};
+
+/** Rincian skor risiko yang disimpan worker: nilai tiap komponen (0..1), bobotnya, dan masukannya. */
+export type RiskComponents = {
+  status: number;
+  trend: number;
+  upstream: number;
+  rain: number;
+  weights: Record<"status" | "trend" | "upstream" | "rain", number>;
+  inputs?: { rain_next_3h_mm?: number | null };
+};
+
+/** Peringatan aktif dari tabel `alerts`; teksnya dibuat worker dari template. */
+export type Alert = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  type: string;
+  level: AlertLevel;
+  camera_id: string | null;
+  title: string;
+  message: string;
+};
+
+/** Hujan terbaru untuk satu titik grid cuaca (Open-Meteo). */
+export type GridWeather = {
+  grid_id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  fetched_at: string;
+  precip_now_mm: number;
+  precip_next_1h_mm: number;
+  precip_next_3h_mm: number;
+  precip_next_6h_mm: number;
+  precip_prob_max_3h: number | null;
 };
 
 /** Baris tabel `camera_status` seperti yang dikirim Supabase Realtime. */

@@ -27,6 +27,14 @@
   --density-ramai: var(--status-waspada);
   --density-padat: var(--status-awas);
 
+  /* Peta tematik: wilayah tanpa data dan skala hujan (makin gelap makin lebat). */
+  --untracked: #71717a;
+  --rain-0: #e0f2fe;
+  --rain-1: #7dd3fc;
+  --rain-2: #0ea5e9;
+  --rain-3: #0369a1;
+  --rain-4: #1e1b4b;
+
   --radius: 8px;
   --font-sans: system-ui, sans-serif;
 }
@@ -59,6 +67,12 @@
   --color-density-normal: var(--density-normal);
   --color-density-ramai: var(--density-ramai);
   --color-density-padat: var(--density-padat);
+  --color-untracked: var(--untracked);
+  --color-rain-0: var(--rain-0);
+  --color-rain-1: var(--rain-1);
+  --color-rain-2: var(--rain-2);
+  --color-rain-3: var(--rain-3);
+  --color-rain-4: var(--rain-4);
   --radius-token: var(--radius);
 }
 
@@ -89,6 +103,38 @@ body {
   stroke-width: 3;
 }
 
+/* Peta tematik: satu poligon per kecamatan, diwarnai menurut tema yang dipilih. */
+.district {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+  fill-opacity: 0.6;
+  cursor: pointer;
+}
+.district.tone-normal { fill: var(--status-normal); }
+.district.tone-waspada { fill: var(--status-waspada); }
+.district.tone-siaga { fill: var(--status-siaga); }
+.district.tone-awas { fill: var(--status-awas); }
+.district.tone-unknown { fill: var(--status-unknown); }
+.district.tone-density-lancar { fill: var(--density-lancar); }
+.district.tone-density-normal { fill: var(--density-normal); }
+.district.tone-density-ramai { fill: var(--density-ramai); }
+.district.tone-density-padat { fill: var(--density-padat); }
+.district.tone-rain-0 { fill: var(--rain-0); }
+.district.tone-rain-1 { fill: var(--rain-1); }
+.district.tone-rain-2 { fill: var(--rain-2); }
+.district.tone-rain-3 { fill: var(--rain-3); }
+.district.tone-rain-4 { fill: var(--rain-4); }
+.district.tone-untracked {
+  fill: var(--untracked);
+  fill-opacity: 0.3;
+  stroke: var(--untracked);
+  stroke-dasharray: 5 5;
+}
+.district.is-selected {
+  stroke: var(--text);
+  stroke-width: 3;
+  fill-opacity: 0.75;
+}
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {
   fill: color-mix(in srgb, var(--primary) 22%, transparent);

@@ -11,9 +11,10 @@ export const metadata: Metadata = {
     "CCTV publik Kota Semarang sebagai sensor kota: kondisi air, kepadatan lalu lintas, dan keramaian ruang publik.",
 };
 
-const NAV = [
-  { href: "/", label: "Beranda" },
-  { href: "/peta", label: "Peta" },
+const NAV = [{ href: "/", label: "Beranda" }];
+// Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.
+const SOURCES = [
+  { href: "/kamera", label: "Kamera" },
   { href: "/mosaik", label: "Mosaik" },
 ];
 
@@ -32,9 +33,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="text-lg font-semibold">
               SemarSight
             </Link>
-            <nav aria-label="Navigasi utama" className="flex gap-4 text-sm">
+            <nav aria-label="Navigasi utama" className="flex flex-wrap items-center gap-4 text-sm">
               {NAV.map((item) => (
                 <Link key={item.href} href={item.href} className="font-medium hover:text-primary">
+                  {item.label}
+                </Link>
+              ))}
+              <span className="text-xs text-muted">Sumber data:</span>
+              {SOURCES.map((item) => (
+                <Link key={item.href} href={item.href} className="text-muted hover:text-primary">
                   {item.label}
                 </Link>
               ))}

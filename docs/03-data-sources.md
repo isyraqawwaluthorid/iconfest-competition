@@ -89,6 +89,13 @@ ffmpeg -nostdin -loglevel error -rw_timeout 15000000 \
 - Strategi: **grid ±6–9 titik** yang menutupi Kota Semarang (cuaca tidak perlu per kamera). Setiap kamera dipetakan ke titik grid terdekat (`cameras.weather_grid_id`). Ambil setiap 30 menit.
 - Data yang dipakai: hujan saat ini (mm), total prakiraan 1, 3, 6 jam ke depan (mm), probabilitas hujan maksimum 3 jam ke depan.
 
+## 2b. Batas kecamatan (OpenStreetMap)
+
+- Batas 16 kecamatan Kota Semarang diambil dari OpenStreetMap lewat Overpass API pada 11 Okt 2026 (relasi `admin_level=6` di dalam area "Kota Semarang").
+- Disederhanakan dengan toleransi ±20 meter (7.546 titik menjadi 1.628) dan disimpan di `web/lib/geo/kecamatan-semarang.json` (36 KB).
+- Lisensi: **ODbL**, © kontributor OpenStreetMap. Atribusi tampil di pojok peta dan wajib dipertahankan.
+- Karena tiap poligon disederhanakan sendiri-sendiri, garis batas antar kecamatan bisa bergeser beberapa meter. Ini cukup untuk tampilan tingkat kota, bukan untuk keperluan administratif.
+
 ## 3. Data pendukung untuk laporan (bukan untuk sistem)
 
 Cari dan kutip dengan sumber yang jelas:
