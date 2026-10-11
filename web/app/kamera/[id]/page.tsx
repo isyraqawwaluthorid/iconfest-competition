@@ -75,7 +75,7 @@ async function CameraDetail({ params }: Pick<PageProps<"/kamera/[id]">, "params"
           <Badge status={healthOf(camera)} />
           {assessed ? <Badge status={camera.water_status ? WATER[camera.water_status] : NOT_ASSESSED} /> : null}
           {assessed && camera.risk_level ? <Badge status={RISK[camera.risk_level]} /> : null}
-          {counted && isOnline(camera) ? <Badge status={DENSITY[camera.density_level ?? "tidak_diketahui"]} /> : null}
+          {counted && isOnline(camera) ? <Badge status={densityBadge(camera.density_level)} /> : null}
           <FreshnessTag at={camera.last_checked_at} prefix="Diperiksa" />
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted">
@@ -134,6 +134,12 @@ async function CameraDetail({ params }: Pick<PageProps<"/kamera/[id]">, "params"
       </div>
     </>
   );
+}
+
+/** Di samping lencana status air, "Normal" saja membingungkan; sebut bahwa ini soal lalu lintas. */
+function densityBadge(level: keyof typeof DENSITY | null) {
+  const display = DENSITY[level ?? "tidak_diketahui"];
+  return { ...display, label: `Lalu lintas: ${display.label.toLowerCase()}` };
 }
 
 type TrafficCardProps = {

@@ -22,10 +22,11 @@ function mainStatus(camera: CameraOverview): StatusDisplay {
   return healthOf(camera);
 }
 
-/** Kamera lain dalam radius 1,5 km, untuk memeriksa apakah kondisi di sekitar lokasi ini serupa. */
+/** Kamera lain dalam radius 1,5 km yang punya gambar, untuk memeriksa apakah kondisi di sekitar lokasi ini serupa. */
 export function NearbyCameras({ camera, all }: { camera: CameraOverview; all: CameraOverview[] }) {
   const nearby = all
-    .filter((other) => other.id !== camera.id)
+    // Kamera yang belum pernah menghasilkan gambar tidak bisa menjadi bukti pembanding.
+    .filter((other) => other.id !== camera.id && other.latest_snapshot_path)
     .map((other) => ({ other, meters: distanceMeters(camera, other) }))
     .filter(({ meters }) => meters <= MAX_DISTANCE_M)
     .sort((a, b) => a.meters - b.meters)
