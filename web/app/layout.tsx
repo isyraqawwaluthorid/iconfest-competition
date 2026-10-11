@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 const NAV = [
   { href: "/", label: "Beranda" },
   { href: "/peta", label: "Peta" },
+  { href: "/mosaik", label: "Mosaik" },
 ];
 
 async function SystemBannerLoader() {
