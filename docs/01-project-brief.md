@@ -50,12 +50,14 @@ Satu platform dengan satu pipeline bersama dan beberapa modul analisis:
 | **Lalu lintas** | Lalu lintas (66 kamera) | YOLO hitung kendaraan + baseline per jam | "Simpang Kalibanteng 2× lebih padat dari biasanya untuk Jumat 17.00" |
 | **Ruang publik** | Pariwisata (9 kamera: Kota Lama, Lawang Sewu, Titik Nol) | YOLO hitung orang + baseline | "Kota Lama paling ramai Sabtu 19.00–21.00" |
 | **Sampah perairan** (tambahan) | Sungai, pompa | Bagian dari klasifikasi AI vision | "Sampah menumpuk di intake pompa X, bersihkan sebelum hujan" |
+| **Kualitas udara & emisi** (bertahap, lihat `12-emisi-kualitas-udara.md`) | Open-Meteo, stasiun PM2.5 BMKG; lalu lintas terpilih untuk emisi | Kualitas udara model + terukur dengan kategori ISPU. Estimasi emisi Tier 2 (Permen LH 12/2010) dari arus kendaraan, setelah uji kelayakan hitungan | "PM2.5 kategori Sedang; estimasi NOx di Simpang X 1,4× dari biasanya" |
 | **Kesehatan jaringan CCTV** | Semua | Cek stream | "9 kamera lalu lintas mati >24 jam" |
 
 **Insight lintas modul** (pembeda utama):
 - Hujan/genangan → lalu lintas. Ada **12 kamera yang sekaligus kamera lalu lintas dan titik genangan**, sehingga dampaknya terlihat dari kamera yang sama.
 - Sampah di pintu air + prakiraan hujan → risiko luapan lebih cepat.
 - Cuaca → keramaian ruang publik.
+- Rencana lanjutan: genangan → kendaraan tertahan → estimasi tambahan emisi dari antrean; emisi koridor → paparan di sekitar sekolah dan fasilitas kesehatan.
 
 ## Pengguna dan tindakan
 
@@ -78,7 +80,7 @@ Satu platform dengan satu pipeline bersama dan beberapa modul analisis:
 ## Karya terdahulu dan pembeda
 
 - **EcoTraffic GIS** (MAPID Catalyst 2026, Yogyakarta): menghitung kendaraan dari CCTV Jogja dengan YOLO11n, menghitung emisi, skoring AHP untuk prioritas koridor, rekomendasi AI. Fokus: **emisi lalu lintas** untuk perencana.
-- **Pembeda SemarSight:** fokus utama **air dan genangan** (peringatan dini hulu-hilir), **multi-modul dengan insight lintas modul**, kota berbeda, pengguna operasional (BPBD, PU, warga) selain perencana. Modul lalu lintas di SemarSight melayani insight lintas modul, bukan emisi.
+- **Pembeda SemarSight:** fokus utama **air dan genangan** (peringatan dini hulu-hilir), **multi-modul dengan insight lintas modul**, kota berbeda, pengguna operasional (BPBD, PU, warga) selain perencana. Modul lalu lintas di SemarSight pertama-tama melayani insight lintas modul; estimasi emisi adalah pengembangan lanjutan yang dihubungkan dengan genangan, fasilitas sensitif, dan kualitas udara terukur, dengan EcoTraffic GIS sebagai rujukan metode.
 - Referensi produk serupa di luar negeri untuk *state of the art* (cek dan kutip sendiri): sistem analitik video kota (smart city video analytics), pemantauan sungai berbasis kamera (camera-based river monitoring / image-based water level), Waze (data berbasis komunitas), Opower (perbandingan dengan baseline).
 
 ## Batasan yang disampaikan secara jujur

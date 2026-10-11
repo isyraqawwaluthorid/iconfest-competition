@@ -56,6 +56,16 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 - [ ] Cek ulang link deploy dari perangkat lain/jaringan seluler; cek repo publik dan bisa dibuka.
 - [ ] Kumpulkan: laporan, link repo, link deploy, video, scan surat orisinalitas.
 
+### Fitur tambahan (dari `11-feature-backlog.md` dan `12-emisi-kualitas-udara.md`)
+
+Dikerjakan hanya setelah target inti hari itu tercapai. Keputusan 11 Okt:
+
+- [x] Min 11: koreksi deteksi malam (posisi matahari, bukan kecerahan) dan halaman mosaik `/mosaik`
+- [ ] Sel 13: halaman jaringan CCTV (A7), peringatan dini BMKG (B2), prakiraan BMKG per kecamatan (B1), kartu "Kondisi luar ruang" (E1: udara, suhu terasa, UV, hujan)
+- [ ] Rab 14: halaman cara kerja AI (D1); lapisan rob dari Open-Meteo Marine jika waktu cukup
+- [ ] Setelah inti jadi: uji kelayakan hitungan arus dari klip (2–3 klip siang dan malam, hitung manual) sebelum memutuskan modul emisi (E2–E3)
+- Ditunda ke Fase 2: bot Telegram (C1), fasilitas OSM (B4), sinyal cahaya malam (A5), emisi penuh (E2–E8)
+
 ### Ukuran "progres ≥75%" yang realistis
 Pipeline end-to-end berjalan nyata (akuisisi → analisis → database → web), modul air dan lalu lintas aktif, insight dan peringatan muncul, deploy publik stabil. Yang boleh belum selesai: asisten AI, modul sampah penuh, analisis pompa IN/OUT, desain final.
 

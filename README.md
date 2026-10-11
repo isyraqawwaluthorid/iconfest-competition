@@ -29,7 +29,7 @@ Daftar tugas dan progres ada di [docs/10-tasklist.md](docs/10-tasklist.md).
 
 ## Dokumentasi
 
-Mulai dari [docs/01-project-brief.md](docs/01-project-brief.md) dan [docs/02-architecture.md](docs/02-architecture.md). Rencana harian ada di [docs/08-roadmap.md](docs/08-roadmap.md).
+Mulai dari [docs/01-project-brief.md](docs/01-project-brief.md) dan [docs/02-architecture.md](docs/02-architecture.md). Rencana harian ada di [docs/08-roadmap.md](docs/08-roadmap.md). Fitur tambahan yang dipertimbangkan, beserta hasil uji ketersediaan datanya, ada di [docs/11-feature-backlog.md](docs/11-feature-backlog.md) dan [docs/12-emisi-kualitas-udara.md](docs/12-emisi-kualitas-udara.md).
 
 ## Konfigurasi
 
@@ -46,7 +46,7 @@ npm run dev      # http://localhost:3000
 npm run lint && npm run build
 ```
 
-Halaman yang sudah ada: `/` (ringkasan), `/peta` (peta semua kamera dengan lapisan Kesehatan Kamera, Lalu Lintas, Air, Ruang Publik), dan `/kamera/[id]` (snapshot, status, grafik kepadatan 24 jam). Penanda peta berubah tanpa refresh lewat Supabase Realtime, dan banner muncul jika worker tidak terlihat lebih dari 15 menit.
+Halaman yang sudah ada: `/` (ringkasan), `/peta` (peta semua kamera dengan lapisan Kesehatan Kamera, Lalu Lintas, Air, Ruang Publik), `/mosaik` (grid snapshot terbaru semua kamera), dan `/kamera/[id]` (snapshot, status, grafik kepadatan 24 jam). Penanda peta berubah tanpa refresh lewat Supabase Realtime, dan banner muncul jika worker tidak terlihat lebih dari 15 menit.
 
 Tampilan saat ini adalah **desain placeholder**: semua warna, radius, dan font berasal dari token di `web/app/globals.css`.
 

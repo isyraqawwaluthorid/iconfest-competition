@@ -62,6 +62,8 @@ Tugas terjadwal lain:
 - **Laporan harian** (06.00 WIB): titik rawan, durasi surut, kejadian, anomali.
 - **Baseline** (setiap malam): hitung ulang median per kamera per jam-dalam-minggu.
 - **Sinkronisasi kamera** (harian): cek daftar kamera PANTAUSEMAR, tandai kamera baru/hilang.
+- **Kualitas udara** (60 menit, direncanakan): Open-Meteo (model) dan stasiun BMKG jika diizinkan → `air_quality_readings` (lihat `12-emisi-kualitas-udara.md`).
+- **Klip arus kendaraan dan estimasi emisi** (direncanakan, setelah uji kelayakan): klip 30 detik → YOLO + pelacakan → hitung lintas garis → `traffic_flows` → Tier 2 per jam → `emission_estimates`.
 
 ## Detail tiap tahap
 
@@ -74,7 +76,7 @@ Tugas terjadwal lain:
 - Simpan frame penuh ke disk lokal worker (dataset untuk evaluasi), unggah ke Storage hanya `latest/{camera_id}.jpg` (ditimpa) dan snapshot kejadian.
 
 ### ② Kualitas gambar
-- Kecerahan rata-rata (luminans), ketajaman (varians Laplacian), deteksi mode malam/IR (saturasi rendah).
+- Ketajaman (varians Laplacian), proporsi piksel gelap, mode IR (saturasi rendah). Malam ditentukan dari **posisi matahari**, bukan kecerahan, karena kamera memakai auto-exposure (lihat `05-worker-spec.md`).
 - Hasil: `good | fair | poor`. Pembacaan dari gambar `poor` ditandai keyakinan rendah.
 
 ### ③a Penganalisis lalu lintas dan keramaian (YOLO)

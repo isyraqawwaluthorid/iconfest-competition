@@ -20,6 +20,9 @@
 |---|---|---|
 | `/` | **Denyut Kota** | Ringkasan kondisi saat ini: kartu angka (kamera live, status air ≥ waspada, titik padat, hujan), insight AI terbaru, peringatan aktif, peta mini |
 | `/peta` | Peta | Peta penuh semua kamera; filter modul (Air / Lalu Lintas / Ruang Publik / Kesehatan Kamera); klik marker → panel kamera |
+| `/mosaik` | Semarang Saat Ini | Grid snapshot terbaru semua kamera dari Storage (bukan video live), saringan modul, hanya kamera aktif, cari nama |
+| `/udara` | Kualitas Udara (direncanakan) | Kartu "Kondisi luar ruang": kualitas udara (model Open-Meteo, terukur BMKG jika ada akses) dengan label sumber dan kategori ISPU, suhu terasa, indeks UV, hujan; grafik 24 jam + prakiraan 48 jam |
+| `/emisi` | Emisi (setelah uji kelayakan) | Peta estimasi emisi per kamera, arus per jenis kendaraan, kotak "Metode & asumsi" (lihat `12-emisi-kualitas-udara.md`) |
 | `/air` | Air & Genangan | Daftar kamera air diurutkan risiko; **diagram hulu → hilir** per sistem sungai; hujan per grid; kejadian aktif |
 | `/lalu-lintas` | Lalu Lintas | Peta kepadatan; daftar anomali; grafik tren per kamera (hari ini vs baseline) |
 | `/ruang-publik` | Ruang Publik | Keramaian kawasan wisata; pola per jam; "waktu terbaik berkunjung" |

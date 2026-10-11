@@ -110,6 +110,8 @@ def process_camera(cam):
 
 Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh menghentikan siklus. Catat error ke log dan ke `health_checks.error`.
 
+**Gangguan jaringan worker bukan kamera mati.** Kegagalan dibedakan menjadi dua: server CCTV menjawab dengan kode HTTP (mis. 404, stream memang tidak ada) dan tidak ada jawaban sama sekali (koneksi diputus, timeout). Jika kamera tanpa jawaban melebihi 40% dalam satu siklus, penyebabnya hampir pasti jaringan di sisi worker; kegagalan itu tidak ditulis ke `health_checks` maupun `camera_status`, dan jumlahnya dicatat di heartbeat (`unreachable`). Latar belakang: pada 11 Okt worker berjalan lewat hotspot yang memutus koneksi, dan tiga siklus mencatat 71–103 kamera "mati" palsu.
+
 ## Akuisisi (`acquisition.py`)
 
 - `ffmpeg -nostdin -loglevel error -rw_timeout 15000000 -user_agent "<UA>" -i URL -frames:v 1 -f image2pipe -vcodec mjpeg -` → baca bytes dari stdout → `cv2.imdecode`. Bungkus `subprocess.run(timeout=FRAME_TIMEOUT_SECONDS)`.
@@ -125,9 +127,11 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 
 ## Kualitas (`quality.py`)
 
-- `brightness` = rata-rata kanal V (HSV). `sharpness` = varians Laplacian pada grayscale. `saturation` = rata-rata kanal S.
-- `is_night` = brightness < 70 **atau** saturasi < 20 (mode IR hitam-putih).
-- `poor` jika brightness < 35 atau sharpness < 30; `fair` jika brightness < 70 atau sharpness < 80; selain itu `good`. Kalibrasi ambang dari sampel nyata pada hari pertama.
+- `brightness` = rata-rata kanal V (HSV). `sharpness` = varians Laplacian pada grayscale. `saturation` = rata-rata kanal S. `dark_pct` = proporsi piksel dengan luminans < 25.
+- **`is_night` berdasarkan posisi matahari, bukan kecerahan:** ketinggian matahari di Semarang < 0° (rumus pendekatan NOAA; 11 Okt: terbit 05.22, terbenam 17.29 WIB). Kamera memakai auto-exposure, sehingga kecerahan rata-rata frame malam (median 102) hampir sama dengan siang (median 127). Aturan lama `brightness < 70` hanya mengenali 28 dari 139 kamera pada pukul 21–23 WIB.
+- `is_ir` (mode inframerah hitam-putih) = saturasi rata-rata < 15.
+- `poor` jika sharpness < 30 atau `dark_pct` > 60%; `fair` jika sharpness < 80 atau `dark_pct` > 35% atau `is_ir`; selain itu `good`.
+- Kalibrasi 11 Okt pada arsip (139 kamera malam, 137 siang): malam 115 `good`, 23 `fair`, 1 `poor`; siang 136 `good`, 1 `fair`. Ketajaman terendah yang teramati (persentil 5) adalah 441, jauh di atas ambang, jadi ambang ketajaman hanya menangkap gambar yang benar-benar buram.
 
 ## Lalu lintas dan keramaian (`analyzers/traffic.py`)
 

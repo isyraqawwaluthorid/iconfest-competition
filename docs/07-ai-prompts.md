@@ -80,6 +80,11 @@ Aturan WAJIB:
   (mis. "2,1× dari biasanya"), BUKAN jumlah kendaraan absolut.
 - Status air adalah penilaian visual, bukan pengukuran tinggi air; jangan menyebut cm.
 - Jika data terbatas atau baseline masih sementara, katakan dengan jelas.
+- Untuk kualitas udara (jika ada di facts), sebut sumbernya dan apakah model atau terukur,
+  serta kategori ISPU.
+- Emisi (jika ada di facts) adalah ESTIMASI Tier 2 (faktor emisi Permen LH 12/2010 + asumsi
+  konsumsi BBM), bukan pengukuran. Jangan menyimpulkan emisi satu lokasi menyebabkan
+  perubahan PM2.5 kota.
 - Jika tidak ada yang penting, overall_level="aman" dan items berisi ringkasan singkat.
 - Bahasa Indonesia yang mudah dipahami orang awam. Waktu dalam WIB.
 ```

@@ -55,7 +55,8 @@ Per kategori (10 Okt): genangan 13/14, kantor 12/12, lalin 57/66, pompa 62/64, p
 
 **Temuan berguna:**
 - **12 kamera berkategori lalin sekaligus genangan** (mis. JRAKAH, SP. AKPOL, Jembatan Mberok, SIMPANG LIMA 1 360, Tugumuda 3, Bawah Tol X3W_IN). Ideal untuk insight genangan → lalu lintas dari kamera yang sama.
-- Banyak kamera pompa/sungai berpasangan **`-IN` / `-OUT`** (mis. Banger-IN / Banger-Out, Progo-IN / Progo-OUT, KP.Kali-IN / KP.Kali-OUT). Kemungkinan sisi masuk dan keluar rumah pompa: bisa dipakai untuk analisis kerja pompa (fitur final).
+- **14 pasang kamera pompa/sungai `-IN` / `-OUT`** lengkap (mis. Banger, Progo, KP.Kali, Kartini, Trimulyo). Kemungkinan sisi masuk dan keluar rumah pompa: bisa dipakai untuk analisis kerja pompa (fitur A4 di `11-feature-backlog.md`). Perlu verifikasi manual.
+- Piksel stream bisa dibaca canvas browser (CORS tidak membuat canvas *tainted*), tetapi memutar banyak stream bersamaan di browser lambat. Tampilan multi-kamera memakai snapshot.
 - Kamera pariwisata berada di kawasan Kota Lama, Lawang Sewu, dan Titik Nol.
 
 ### Seed data

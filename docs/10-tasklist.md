@@ -33,7 +33,8 @@ Tujuan: data historis mulai terkumpul malam ini. Belum ada YOLO dan AI.
 - [x] **T1.9 [K]** Unit test: `quality.assess`, dHash/frozen. *Bukti:* `pytest` hijau.
 - [x] **T1.10 [K]** Uji `--once` terhadap 3 kamera nyata, lalu semua kamera aktif. *Bukti:* `camera_status` terisi, snapshot ada di Storage, baris `health_checks` bertambah.
 - [ ] **T1.11 [M]** Biarkan worker berjalan di laptop semalaman (matikan mode tidur). *Bukti:* frame lokal bertambah tiap 5 menit.
-- [ ] **T1.12 [K]** Setelah data semalam terkumpul: kalibrasi ambang `quality` (banyak adegan malam berlampu jalan masih terbaca `is_night = false`).
+- [x] **T1.12 [K]** Kalibrasi `quality` dari arsip siang dan malam: `is_night` sekarang dari posisi matahari, kualitas dari ketajaman, proporsi gelap, dan mode IR.
+- [x] **T1.15 [K]** Gangguan jaringan worker tidak dicatat sebagai kamera mati (ambang 40% kamera tanpa jawaban server); catatan palsu dari periode hotspot 11 Okt dibersihkan.
 - [x] **T1.14 [K]** Perbaiki deteksi beku: aturan dHash menandai 43 kamera hidup sebagai beku pada malam pertama; diganti sidik gambar persis sama (0 positif palsu pada 1.848 pasangan frame arsip).
 - [ ] **T1.13 [K]** Retensi frame: kecualikan file yang direferensikan `labels` atau `events` (belum perlu sebelum 24 Okt, saat frame pertama berumur 14 hari).
 
@@ -51,6 +52,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T2.7 [K]** `/peta`: peta Leaflet (dynamic import, `ssr: false`), marker dari `v_camera_overview`, filter modul, legenda.
 - [x] **T2.8 [K]** `/kamera/[id]`: snapshot terbaru, status, grafik kepadatan vs baseline, keadaan offline ("Offline sejak HH:MM").
 - [x] **T2.9 [K]** Realtime `camera_status` + `SystemBanner` (worker tidak terlihat > 15 menit) + `FreshnessTag`.
+- [x] **T2.13 [K]** Halaman `/mosaik`: grid snapshot terbaru semua kamera, saringan modul, hanya aktif, cari nama.
 - [ ] **T2.10 [M+K]** Deploy pertama ke Vercel; isi env di dashboard Vercel. *Bukti:* link publik menampilkan peta dengan data nyata; tidak ada secret di bundle client.
 - [ ] **T2.11 [M]** Pilih 15–20 kamera air unggulan dan beberapa kamera lalu lintas unggulan (siang hari); tandai `is_featured`.
 
@@ -105,6 +107,17 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 
 - [ ] **T7.1 [M]** Cek link deploy dari perangkat lain dan jaringan seluler; cek repo publik bisa dibuka.
 - [ ] **T7.2 [M]** Kumpulkan laporan, link repo, link deploy, video, scan surat orisinalitas.
+
+## Fitur tambahan terpilih
+
+Dari `11-feature-backlog.md` dan `12-emisi-kualitas-udara.md`. Dikerjakan setelah target inti hari itu tercapai.
+
+- [ ] **TX.1 [K]** Halaman jaringan CCTV: ketersediaan per kamera dan per dinas, kamera mati lebih dari 24 jam (Selasa).
+- [ ] **TX.2 [K]** Peringatan dini BMKG (nowcast) sebagai banner dan prakiraan BMKG per kecamatan (Selasa).
+- [ ] **TX.3 [K]** Kartu "Kondisi luar ruang": kualitas udara, suhu terasa, UV, hujan dari Open-Meteo (Selasa).
+- [ ] **TX.4 [K]** Halaman "Cara Kerja AI" (Rabu, setelah modul air jadi).
+- [ ] **TX.5 [K]** Lapisan rob dari Open-Meteo Marine (Rabu, jika waktu cukup).
+- [ ] **TX.6 [K]** Uji kelayakan hitungan arus dari klip video (2–3 klip siang dan malam, hitung manual) sebelum memutuskan modul emisi.
 
 ## Ditunda sampai setelah penyisihan (17–25 Okt)
 
