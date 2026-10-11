@@ -34,10 +34,59 @@ class Database:
         )
         return [CameraRow.model_validate(row) for row in response.data]
 
-    def failure_counts(self) -> dict[str, int]:
-        """Jumlah kegagalan berturut-turut per kamera sebelum siklus ini."""
-        response = self._client.table("camera_status").select("camera_id, consecutive_failures").execute()
-        return {row["camera_id"]: row["consecutive_failures"] for row in response.data}
+    def status_snapshot(self) -> dict[str, dict[str, Any]]:
+        """Keadaan `camera_status` sebelum siklus ini: kegagalan berturut-turut dan status air terkonfirmasi."""
+        response = (
+            self._client.table("camera_status")
+            .select("camera_id, consecutive_failures, water_status, water_status_since")
+            .execute()
+        )
+        return {row["camera_id"]: row for row in response.data}
+
+    def latest_water_call_times(self) -> dict[str, datetime]:
+        """Waktu panggilan AI terakhir per kamera, agar restart tidak memicu panggilan serentak."""
+        response = (
+            self._client.table("water_readings")
+            .select("camera_id, captured_at")
+            .order("captured_at", desc=True)
+            .limit(PAGE_SIZE)
+            .execute()
+        )
+        latest: dict[str, datetime] = {}
+        for row in response.data:
+            latest.setdefault(row["camera_id"], datetime.fromisoformat(row["captured_at"]))
+        return latest
+
+    def water_calls_since(self, start: datetime) -> int:
+        response = (
+            self._client.table("water_readings")
+            .select("id", count="exact")
+            .gte("captured_at", start.isoformat())
+            .limit(1)
+            .execute()
+        )
+        return response.count or 0
+
+    def recent_water_readings(self, camera_id: str, limit: int) -> list[dict[str, Any]]:
+        """Pembacaan AI terbaru satu kamera, terurut dari yang paling baru."""
+        response = (
+            self._client.table("water_readings")
+            .select("status, road_flood, confidence, quality, raw, captured_at")
+            .eq("camera_id", camera_id)
+            .eq("source", "live")
+            .order("captured_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+        return response.data
+
+    def insert_water_reading(self, row: dict[str, Any]) -> None:
+        if self.dry_run:
+            return
+        self._client.table("water_readings").insert(row).execute()
+
+    def download_object(self, path: str) -> bytes:
+        return self._client.storage.from_(self._bucket).download(path)
 
     def recent_traffic(self, since: datetime) -> list[dict[str, Any]]:
         """Pembacaan lalu lintas `live` sejak `since`, urut waktu, untuk mengisi ulang baseline bergulir."""

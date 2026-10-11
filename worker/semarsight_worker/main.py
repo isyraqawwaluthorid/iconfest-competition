@@ -25,6 +25,7 @@ from .config import Settings, get_settings
 from .db import Database
 from .fusion import baseline
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
+from .water_pipeline import WaterPipeline
 
 log = logging.getLogger("semarsight_worker")
 
@@ -35,7 +36,11 @@ OUTAGE_SHARE = 0.4  # porsi kamera tanpa jawaban server yang menandakan gangguan
 
 
 def process_camera(
-    cam: CameraRow, previous: FrameState | None, settings: Settings, database: Database
+    cam: CameraRow,
+    previous: FrameState | None,
+    settings: Settings,
+    database: Database,
+    water_pipeline: WaterPipeline,
 ) -> CameraResult:
     """Ambil dan nilai satu frame. Kegagalan apa pun berakhir sebagai hasil `dead`, bukan exception."""
     checked_at = datetime.now(timezone.utc)
@@ -72,6 +77,12 @@ def process_camera(
                 )
             except Exception:  # noqa: BLE001 - kamera tetap live walau penghitungan gagal
                 log.exception("%s: penghitungan YOLO gagal", cam.name)
+
+        if water_pipeline.eligible(cam):
+            try:
+                result.water = water_pipeline.observe(cam, grab.frame, result.quality, checked_at)
+            except Exception:  # noqa: BLE001 - kamera tetap live walau penilaian air gagal
+                log.exception("%s: penilaian air gagal", cam.name)
         return result
     except Exception as exc:  # noqa: BLE001 - satu kamera tidak boleh menghentikan siklus
         log.exception("%s: error tak terduga", cam.name)
@@ -83,6 +94,7 @@ def run_cycle(
     database: Database,
     frame_states: dict[str, FrameState],
     history: baseline.RollingHistory,
+    water_pipeline: WaterPipeline,
     *,
     only: list[str] | None = None,
     limit: int | None = None,
@@ -91,11 +103,14 @@ def run_cycle(
     started = time.monotonic()
 
     cameras = _select_cameras(database.active_cameras(), only, limit)
-    failures = database.failure_counts()
+    before = database.status_snapshot()
 
     with ThreadPoolExecutor(max_workers=settings.max_concurrency) as pool:
         results = list(
-            pool.map(lambda cam: process_camera(cam, frame_states.get(cam.id), settings, database), cameras)
+            pool.map(
+                lambda cam: process_camera(cam, frame_states.get(cam.id), settings, database, water_pipeline),
+                cameras,
+            )
         )
 
     for result in results:
@@ -114,7 +129,17 @@ def run_cycle(
 
     database.insert_health_checks([_health_row(r) for r in recordable])
     database.insert_traffic_readings([_traffic_row(r, settings.yolo_model) for r in recordable if r.traffic])
-    database.upsert_camera_status([_status_row(r, failures.get(r.camera.id, 0)) for r in recordable])
+    try:
+        water_updates = water_pipeline.commit(recordable, before)
+    except Exception:  # noqa: BLE001 - kegagalan modul air tidak boleh menahan status kamera lain
+        log.exception("penyimpanan pembacaan air gagal")
+        water_updates = {}
+    database.upsert_camera_status(
+        [
+            _status_row(r, before.get(r.camera.id, {}).get("consecutive_failures", 0)) | water_updates.get(r.camera.id, {})
+            for r in recordable
+        ]
+    )
 
     stats = CycleStats(
         started_at=started_at,
@@ -124,12 +149,12 @@ def run_cycle(
         dead=sum(r.health == "dead" for r in recordable),
         unreachable=len(unreachable),
     )
-    housekeeping.heartbeat(database, stats)
+    housekeeping.heartbeat(database, stats, ai_calls_today=water_pipeline.calls_today)
     log.info(
-        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d%s, %d dihitung YOLO) dalam %.1f detik%s",
+        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d%s, %d dihitung YOLO, %d dinilai AI) dalam %.1f detik%s",
         stats.total, stats.live, stats.frozen, stats.dead,
         f" tak-terjangkau={stats.unreachable}" if stats.unreachable else "",
-        sum(r.traffic is not None for r in recordable),
+        sum(r.traffic is not None for r in recordable), sum(r.water is not None for r in recordable),
         stats.duration_ms / 1000, " [dry-run]" if database.dry_run else "",
     )  # fmt: skip
     return stats
@@ -316,10 +341,14 @@ def main(argv: list[str] | None = None) -> int:
     frame_states = acquisition.load_frame_states(state_path)
     history = baseline.RollingHistory()
     seed_history(history, database)
+    water_pipeline = WaterPipeline(settings, database)
+    log.info("modul air: penilaian AI %s", f"aktif ({settings.openai_vision_model})" if water_pipeline.enabled else "nonaktif")
 
     def cycle() -> None:
         try:
-            run_cycle(settings, database, frame_states, history, only=args.only_camera, limit=args.limit)
+            run_cycle(
+                settings, database, frame_states, history, water_pipeline, only=args.only_camera, limit=args.limit
+            )
         except Exception:  # noqa: BLE001 - siklus berikutnya harus tetap berjalan
             log.exception("siklus gagal")
         finally:

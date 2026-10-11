@@ -42,6 +42,7 @@ class Settings:
     yolo_model: str
     yolo_conf: float
 
+    openai_api_key: str
     ai_vision_enabled: bool
     ai_daily_call_cap: int
     openai_vision_model: str
@@ -71,6 +72,7 @@ def get_settings() -> Settings:
         timezone=_get("TIMEZONE", "Asia/Jakarta"),
         yolo_model=_get("YOLO_MODEL", "yolo11n.pt"),
         yolo_conf=float(_get("YOLO_CONF", "0.25")),
+        openai_api_key=_get("OPENAI_API_KEY", ""),
         ai_vision_enabled=_get_bool("AI_VISION_ENABLED", True),
         ai_daily_call_cap=int(_get("AI_DAILY_CALL_CAP", "3000")),
         openai_vision_model=_get("OPENAI_VISION_MODEL", ""),

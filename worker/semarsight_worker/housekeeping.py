@@ -35,7 +35,7 @@ def keep_system_awake() -> bool:
     return True
 
 
-def heartbeat(database: Database, stats: CycleStats) -> None:
+def heartbeat(database: Database, stats: CycleStats, *, ai_calls_today: int = 0) -> None:
     """Tulis tanda hidup worker; web menampilkan banner jika tanda ini terlalu lama."""
     database.set_system_status(
         "worker",
@@ -45,6 +45,7 @@ def heartbeat(database: Database, stats: CycleStats) -> None:
             "cycle_ms": stats.duration_ms,
             "cameras": {"live": stats.live, "frozen": stats.frozen, "dead": stats.dead},
             "unreachable": stats.unreachable,
+            "ai_calls_today": ai_calls_today,
             "version": __version__,
         },
     )
