@@ -8,9 +8,7 @@ Worker adalah jantung sistem: mengambil frame, menganalisis, menyimpan, dan memb
 ```
 opencv-python-headless
 numpy
-scikit-image          # SSIM
 ultralytics           # YOLO11n (lisensi AGPL-3.0; aman untuk repo publik lomba)
-openai
 supabase
 httpx
 pydantic
@@ -19,6 +17,8 @@ apscheduler
 pytest
 ```
 Paket sistem: **ffmpeg**.
+
+Dua paket dari rancangan awal tidak dipakai: SSIM dihitung langsung dengan OpenCV (tanpa `scikit-image`), dan OpenAI dipanggil lewat `httpx` ke endpoint Responses (tanpa SDK `openai`), sehingga daftar dependensi tetap pendek.
 
 ## Konfigurasi (`config.py`, dari env)
 
@@ -66,6 +66,8 @@ semarsight_worker/
 │   ├── upstream.py    # propagasi peringatan hulu → hilir, belajar jeda
 │   ├── cross_module.py# genangan/hujan → lalu lintas, hujan → keramaian, sampah + hujan
 │   └── events.py      # buka/perbarui/tutup kejadian
+├── water_pipeline.py  # alur modul air per siklus: pemicu, panggilan AI, penghalusan
+├── prompts/           # prompt AI sebagai berkas teks
 ├── alerts.py          # upsert/resolve peringatan (satu aktif per jenis+kamera)
 ├── insights.py        # insight situasi 15 menit + laporan harian (LLM teks)
 └── housekeeping.py    # retensi frame, heartbeat worker
@@ -158,24 +160,31 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 Kamera air baru diproses jika `roi` terisi. Kalibrasi dilakukan di halaman admin (lihat `06-web-spec.md`).
 
 ### Deteksi perubahan
-- Potong ROI dari frame (bounding box poligon, area di luar poligon di-mask), resize ke 256 px lebar, grayscale.
-- `change_vs_last = 1 - SSIM(roi_now, roi_last_ai_call)`; `change_vs_ref = 1 - SSIM(roi_now, roi_reference)` (referensi siang/malam sesuai `is_night`).
+- **Area pengamatan** = selubung cembung dari titik area air dan titik semua garis acuan. Garis acuan sering digambar di dinding tepat di luar area air, dan dinding itulah tempat air naik.
+- Potong ke kotak pembatas area pengamatan (bagian di luar poligon tidak ikut dihitung), resize ke 256 px lebar, grayscale.
+- `change = 1 - SSIM(area sekarang, area saat AI terakhir dipanggil)`.
+- **Ambang perubahan per kamera:** `max(WATER_CHANGE_THRESHOLD, 2 × median skor terakhir kamera itu)`, dan baru berlaku setelah ada 6 skor. Uji 11 Okt pada 16 kamera unggulan: riak air dan bayangan membuat median skor berkisar 0,04 sampai 0,29, sehingga ambang tunggal 0,12 akan memanggil AI pada 57% siklus.
 - `should_call_ai` mengembalikan trigger pertama yang terpenuhi:
-  1. `change` jika `change_vs_last ≥ WATER_CHANGE_THRESHOLD`
+  1. `change` jika skor perubahan ≥ ambang kamera itu
   2. `rain` jika hujan grid > `RAIN_TRIGGER_MM` dan sudah ≥ `WATER_RAIN_HEARTBEAT_MINUTES` sejak panggilan terakhir
   3. `heartbeat` jika sudah ≥ `WATER_HEARTBEAT_MINUTES`
 - Hormati `AI_DAILY_CALL_CAP` (hitung dari `water_readings` hari ini).
 
 ### Klasifikasi AI vision
-- Gambar 1: ROI saat ini dengan **garis acuan digambar di atasnya** (warna dan label kecil: N, W, S, A), lebar maks. 512 px, JPEG kualitas 80.
+- Gambar 1: area pengamatan saat ini dengan **garis acuan digambar di atasnya** (semi-transparan agar tepi air tetap terlihat; label N, W, S, A digeser supaya tidak bertumpuk), lebar 512 px, JPEG kualitas 80.
 - Gambar 2: foto referensi kondisi normal dengan garis yang sama.
 - Teks: kartu kamera (`water_kind`, `calibration_notes`, nama sungai) dan kualitas gambar.
 - Panggil OpenAI dengan **structured outputs (JSON schema)** sesuai `07-ai-prompts.md`. Validasi dengan Pydantic. Gagal/timeout → simpan `status = tidak_dapat_dinilai`, jangan ulangi lebih dari 1 kali.
-- Simpan `raw` JSON dan nama model.
+- Simpan `raw` JSON (jawaban dan pemakaian token) serta nama model.
+- Foto referensi dipilih sesuai waktu (siang atau malam) dan jatuh ke yang satunya bila belum ada.
+- Alur per siklus ada di `water_pipeline.py`: `observe` di thread tiap kamera, `commit` sekali per siklus.
+- Uji 11 Okt (siang, 16 kamera unggulan): seluruhnya dinilai `normal` dengan keyakinan 0,68–0,91, ±1.400 token masuk dan ±300 token keluar per panggilan, atau ±$0,0003 per panggilan dengan `gpt-6-luna`.
 
 ### Penghalusan (`fusion/smoothing.py`)
 Urutan level: normal(0) < waspada(1) < siaga(2) < awas(3).
 - Abaikan pembacaan dengan `confidence < 0.5` atau kualitas `poor` → set `needs_verification = true`, status terkonfirmasi tidak berubah.
+- Abaikan juga pembacaan yang bertentangan dengan dirinya sendiri: status di atas normal tetapi air dinilai sama atau lebih rendah dari foto referensi. Pada uji pertama, dua kamera dengan garis acuan yang sangat rapat sempat dinilai waspada dan siaga padahal kondisinya sama dengan referensi.
+- Status pertama: satu pembacaan `normal` cukup; status di atas normal tetap butuh dua pembacaan.
 - **Naik:** jika 2 pembacaan valid terakhir ≥ level baru → konfirmasi level terendah dari keduanya.
 - **Turun:** jika 3 pembacaan valid terakhir < level sekarang → turunkan ke level tertinggi dari ketiganya.
 - Kamera `water_kind = jalan` memakai `road_flood` dengan aturan sama (tidak_tergenang < ringan < sedang < tinggi). Pemetaan ke status umum: ringan → waspada, sedang → siaga, tinggi → awas.

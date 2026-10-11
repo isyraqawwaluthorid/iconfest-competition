@@ -22,12 +22,12 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 - [x] Halaman `/peta` (marker dari `v_camera_overview`, filter modul) dan `/kamera/[id]` (snapshot, status, grafik kepadatan).
 - [x] Realtime `camera_status`; banner status sistem.
 - [ ] **Deploy pertama ke Vercel.**
-- [ ] Pilih 15–20 kamera air unggulan (siang hari, sudut jelas, ada benda tetap sebagai acuan) dan beberapa kamera lalu lintas unggulan.
+- [x] Pilih 15–20 kamera air unggulan (siang hari, sudut jelas, ada benda tetap sebagai acuan) dan beberapa kamera lalu lintas unggulan.
 
 ### Senin 12 Okt — Modul air
 - [x] Halaman admin: login, `/admin/kamera`, **`/admin/kalibrasi/[id]`** (ROI, garis acuan, referensi siang/malam).
-- [ ] Kalibrasi kamera unggulan (±5 menit/kamera).
-- [ ] Deteksi perubahan (SSIM) + klasifikasi AI vision (schema) + penghalusan + `water_readings`.
+- [x] Kalibrasi kamera unggulan (±5 menit/kamera).
+- [x] Deteksi perubahan (SSIM) + klasifikasi AI vision (schema) + penghalusan + `water_readings`.
 - [ ] Ingest Open-Meteo per grid.
 - [ ] Uji klasifikasi pada sampel **siang dan malam** sejak awal; sesuaikan prompt dan ambang.
 
