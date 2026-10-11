@@ -14,6 +14,22 @@
 - Video live (opsional): `hls.js` langsung ke URL stream (CORS PANTAUSEMAR terbuka). Default yang ditampilkan adalah **snapshot**, bukan video.
 - Semua teks UI dalam Bahasa Indonesia. Simpan label status dan warna di satu file (`lib/status.ts`) agar konsisten.
 
+## Arah visual: insight dulu, kamera sebagai bukti (keputusan 11 Okt)
+
+Pengguna tidak datang untuk menonton CCTV; mereka datang untuk tahu wilayah mana yang bermasalah dan harus berbuat apa. Halaman publik disusun dalam tiga lapis: insight di depan, rincian wilayah di tengah, kamera sebagai bukti di belakang.
+
+1. **Satuan utama di peta adalah kecamatan (16), bukan titik kamera.** Titik kamera menjadi lapisan tambahan yang mati secara bawaan.
+2. **Bentuk visual mengikuti jenis data:** nilai per wilayah → choropleth; intensitas di titik ukur → heatmap radius kecil atau lingkaran proporsional; hubungan hulu–hilir → garis alir; pola waktu → heatmap jam × hari.
+3. **Kartu insight berpola Kondisi → Penyebab → Dampak → Tindakan**, sesuai bentuk `insights` (temuan, bukti, rekomendasi per audiens).
+4. **Tampilan saling terhubung:** memilih kecamatan di peta mengisi panel wilayah (tren 24 jam, temuan, jumlah titik pantau, tautan "lihat buktinya").
+5. **Empat zona layar:** peta utama 50–70%, grafik pendukung 20–30%, kontrol 10–20%, lalu legenda dan keterangan.
+6. **Jujur soal cakupan.** Sebaran kamera sangat tidak merata (74 dari 146 di Semarang Utara/Tengah; Mijen dan Tembalang nol). Kecamatan tanpa titik pantau tampil sebagai "tidak terpantau", bukan "aman". Warna heatmap di antara titik ukur adalah perkiraan dan diberi keterangan di legenda.
+7. Palet aman buta warna, maksimal 5–7 kelas, legenda menyebut satuan, sumber, dan waktu data.
+
+Menu utama berisi halaman insight (Beranda, Peta, Air, Lalu Lintas, Riwayat). `/kamera/[id]` dan `/mosaik` masuk kelompok sekunder "Sumber data". Halaman yang sudah berjalan (peta titik kamera, mosaik, detail kamera) tetap dipakai sebagai lapisan bukti; Beranda dan Peta dibangun ulang mengikuti arah ini.
+
+Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan, dan agregat per kecamatan.
+
 ## Halaman publik
 
 | Rute | Nama | Isi utama |

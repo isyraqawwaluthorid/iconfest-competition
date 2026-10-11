@@ -109,6 +109,18 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T7.1 [M]** Cek link deploy dari perangkat lain dan jaringan seluler; cek repo publik bisa dibuka.
 - [ ] **T7.2 [M]** Kumpulkan laporan, link repo, link deploy, video, scan surat orisinalitas.
 
+## Arah visual: insight dulu (keputusan 11 Okt)
+
+Lihat `06-web-spec.md`. Kamera menjadi lapisan bukti; Beranda dan Peta dibangun ulang per wilayah.
+
+- [ ] **TV.1 [K]** Data batas 16 kecamatan (GeoJSON) di `data/`, dengan sumber dan lisensinya.
+- [ ] **TV.2 [K]** Pemetaan kamera → kecamatan dan agregat per kecamatan (risiko air, indeks kepadatan, jumlah titik pantau).
+- [ ] **TV.3 [K]** Peta tematik: choropleth risiko air, lapisan kepadatan (heatmap radius kecil atau lingkaran proporsional), hujan per wilayah; titik kamera sebagai lapisan tambahan.
+- [ ] **TV.4 [K]** Panel wilayah: tren 24 jam, temuan, jumlah titik pantau, tautan "lihat buktinya".
+- [ ] **TV.5 [K]** Beranda insight: kalimat kondisi kota, peta kecamatan, kartu insight Kondisi → Penyebab → Dampak → Tindakan (menggantikan cakupan T4.9).
+- [ ] **TV.6 [K]** Heatmap jam × hari di `/lalu-lintas` (bagian dari T5.1).
+- [ ] **TV.7 [K]** Menu utama berisi halaman insight; `/kamera` dan `/mosaik` pindah ke kelompok "Sumber data".
+
 ## Fitur tambahan terpilih
 
 Dari `11-feature-backlog.md` dan `12-emisi-kualitas-udara.md`. Dikerjakan setelah target inti hari itu tercapai.
