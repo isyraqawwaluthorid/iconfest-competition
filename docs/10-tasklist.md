@@ -58,9 +58,9 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 
 ## Fase 3 — Modul air (Senin 12 Okt)
 
-- [ ] **T3.1 [K]** Admin: `/admin/login`, middleware cookie sesi, `/api/admin/login`.
-- [ ] **T3.2 [K]** `/admin/kamera`: tabel kamera + edit inline (`/api/admin/cameras/[id]`, validasi Zod).
-- [ ] **T3.3 [K]** `/admin/kalibrasi/[id]`: canvas ROI poligon, garis acuan N/W/S/A, simpan referensi siang/malam, catatan (`/api/admin/calibration/[id]`). Koordinat ternormalisasi 0..1.
+- [x] **T3.1 [K]** Admin: `/admin/login`, middleware cookie sesi, `/api/admin/login`.
+- [x] **T3.2 [K]** `/admin/kamera`: tabel kamera + edit inline (`/api/admin/cameras/[id]`, validasi Zod).
+- [x] **T3.3 [K]** `/admin/kalibrasi/[id]`: canvas ROI poligon, garis acuan N/W/S/A, simpan referensi siang/malam, catatan (`/api/admin/calibration/[id]`). Koordinat ternormalisasi 0..1.
 - [ ] **T3.4 [M]** Kalibrasi kamera unggulan (±5 menit per kamera).
 - [ ] **T3.5 [K]** `analyzers/water.py`: `change_score()` (SSIM di ROI), `should_call_ai()` (change / rain / heartbeat), batas `AI_DAILY_CALL_CAP`.
 - [x] **T3.6 [M+K]** Pilih model OpenAI dari dokumentasi terbaru, isi `OPENAI_VISION_MODEL` dan `OPENAI_TEXT_MODEL`. Dipilih `gpt-6-luna` untuk keduanya (input gambar + structured outputs, $0,10 / $0,50 per 1 juta token). Uji 10 Okt: gambar 512×290 dihitung ±190 token, jadi satu panggilan modul air ±$0,0002 dan 2.000 panggilan per hari ±$0,4. Akurasi diuji di T3.10; cadangan untuk kasus sulit: naikkan `reasoning.effort`, lalu `gpt-6.1-sol`.

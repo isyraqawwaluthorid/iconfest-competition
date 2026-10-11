@@ -48,6 +48,8 @@ npm run lint && npm run build
 
 Halaman yang sudah ada: `/` (ringkasan), `/peta` (peta semua kamera dengan lapisan Kesehatan Kamera, Lalu Lintas, Air, Ruang Publik), `/mosaik` (grid snapshot terbaru semua kamera), dan `/kamera/[id]` (snapshot, status, grafik kepadatan 24 jam). Penanda peta berubah tanpa refresh lewat Supabase Realtime, dan banner muncul jika worker tidak terlihat lebih dari 15 menit.
 
+Halaman admin (`/admin/kamera` dan `/admin/kalibrasi/[id]`) dipakai untuk menandai kamera unggulan dan mengkalibrasi kamera air: area air, garis acuan normal/waspada/siaga/awas, dan foto referensi. Untuk itu `web/.env.local` juga perlu `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, dan `ADMIN_SESSION_SECRET`. Keempatnya hanya dibaca di server dan tidak pernah dikirim ke browser.
+
 Tampilan saat ini adalah **desain placeholder**: semua warna, radius, dan font berasal dari token di `web/app/globals.css`.
 
 ## Menjalankan worker

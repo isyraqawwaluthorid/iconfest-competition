@@ -39,7 +39,7 @@ Komponen global:
 
 ## Halaman admin (dilindungi `ADMIN_PASSWORD`)
 
-Middleware sederhana: cookie sesi setelah memasukkan password di `/admin/login`. Semua aksi tulis lewat route handler dengan service role.
+`proxy.ts` (nama baru middleware di Next.js 16) mengarahkan semua `/admin/*` dan `/api/admin/*` ke `/admin/login` jika tidak ada sesi. Sesi adalah cookie `httpOnly` berisi waktu kedaluwarsa (12 jam) yang ditandatangani HMAC-SHA256 dengan `ADMIN_SESSION_SECRET`. Setiap route handler dan halaman admin memeriksa ulang sesi itu sendiri, tidak hanya mengandalkan proxy. Semua aksi tulis lewat route handler dengan service role, dan masukannya divalidasi Zod (`lib/admin/schemas.ts`).
 
 | Rute | Fungsi |
 |---|---|

@@ -25,7 +25,7 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 - [ ] Pilih 15–20 kamera air unggulan (siang hari, sudut jelas, ada benda tetap sebagai acuan) dan beberapa kamera lalu lintas unggulan.
 
 ### Senin 12 Okt — Modul air
-- [ ] Halaman admin: login, `/admin/kamera`, **`/admin/kalibrasi/[id]`** (ROI, garis acuan, referensi siang/malam).
+- [x] Halaman admin: login, `/admin/kamera`, **`/admin/kalibrasi/[id]`** (ROI, garis acuan, referensi siang/malam).
 - [ ] Kalibrasi kamera unggulan (±5 menit/kamera).
 - [ ] Deteksi perubahan (SSIM) + klasifikasi AI vision (schema) + penghalusan + `water_readings`.
 - [ ] Ingest Open-Meteo per grid.
