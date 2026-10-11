@@ -422,6 +422,7 @@ def main(argv: list[str] | None = None) -> int:
         next_run_time=datetime.now(timezone.utc),
         max_instances=1,
         coalesce=True,
+        misfire_grace_time=None,  # setelah mesin tertidur, jalankan satu kali segera saat terbangun
     )
     scheduler.add_job(
         refresh_weather,
@@ -430,6 +431,7 @@ def main(argv: list[str] | None = None) -> int:
         args=[database, weather],
         max_instances=1,
         coalesce=True,
+        misfire_grace_time=None,
     )
     scheduler.add_job(
         housekeeping.prune_evidence,
