@@ -30,6 +30,8 @@ log = logging.getLogger("semarsight_worker")
 
 FRAME_STATE_FILE = "_state/frame_states.json"
 COUNTING_MODULES = {"traffic", "crowd"}
+OUTAGE_MIN_CAMERAS = 10
+OUTAGE_SHARE = 0.4  # porsi kamera tanpa jawaban server yang menandakan gangguan jaringan worker
 
 
 def process_camera(
@@ -54,7 +56,7 @@ def process_camera(
         if health != "live":
             return result
 
-        result.quality = quality.assess(grab.frame)
+        result.quality = quality.assess(grab.frame, checked_at)
         try:
             path = storage.latest_path(cam.id)
             database.upload_snapshot(path, storage.encode_latest(grab.frame))
@@ -103,24 +105,48 @@ def run_cycle(
             result.traffic = _evaluate_traffic(result, history)
         log.debug("%-32s %-6s %5s ms %s", result.camera.name[:32], result.health, result.latency_ms, _detail(result))
 
-    database.insert_health_checks([_health_row(r) for r in results])
-    database.insert_traffic_readings([_traffic_row(r, settings.yolo_model) for r in results if r.traffic])
-    database.upsert_camera_status([_status_row(r, failures.get(r.camera.id, 0)) for r in results])
+    recordable, unreachable = split_unreachable(results)
+    if unreachable:
+        log.warning(
+            "jaringan worker bermasalah: %d dari %d kamera tidak terjangkau; tidak dicatat sebagai kamera mati",
+            len(unreachable), len(results),
+        )  # fmt: skip
+
+    database.insert_health_checks([_health_row(r) for r in recordable])
+    database.insert_traffic_readings([_traffic_row(r, settings.yolo_model) for r in recordable if r.traffic])
+    database.upsert_camera_status([_status_row(r, failures.get(r.camera.id, 0)) for r in recordable])
 
     stats = CycleStats(
         started_at=started_at,
         duration_ms=int((time.monotonic() - started) * 1000),
-        live=sum(r.health == "live" for r in results),
-        frozen=sum(r.health == "frozen" for r in results),
-        dead=sum(r.health == "dead" for r in results),
+        live=sum(r.health == "live" for r in recordable),
+        frozen=sum(r.health == "frozen" for r in recordable),
+        dead=sum(r.health == "dead" for r in recordable),
+        unreachable=len(unreachable),
     )
     housekeeping.heartbeat(database, stats)
     log.info(
-        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d, %d dihitung YOLO) dalam %.1f detik%s",
-        stats.total, stats.live, stats.frozen, stats.dead, sum(r.traffic is not None for r in results),
+        "siklus selesai: %d kamera (live=%d frozen=%d dead=%d%s, %d dihitung YOLO) dalam %.1f detik%s",
+        stats.total, stats.live, stats.frozen, stats.dead,
+        f" tak-terjangkau={stats.unreachable}" if stats.unreachable else "",
+        sum(r.traffic is not None for r in recordable),
         stats.duration_ms / 1000, " [dry-run]" if database.dry_run else "",
     )  # fmt: skip
     return stats
+
+
+def split_unreachable(results: list[CameraResult]) -> tuple[list[CameraResult], list[CameraResult]]:
+    """Pisahkan kegagalan akibat jaringan worker dari hasil yang layak dicatat.
+
+    Kamera yang gagal tanpa jawaban dari server (koneksi diputus, timeout) biasanya hanya segelintir
+    per siklus. Jika jumlahnya melewati `OUTAGE_SHARE` dari semua kamera, penyebabnya hampir pasti
+    jaringan di sisi worker, sehingga kegagalan itu tidak dicatat sebagai kamera mati.
+    """
+    no_answer = [r for r in results if r.health == "dead" and not acquisition.server_answered(r.error)]
+    if len(results) < OUTAGE_MIN_CAMERAS or len(no_answer) <= OUTAGE_SHARE * len(results):
+        return results, []
+    unreachable_ids = {id(r) for r in no_answer}
+    return [r for r in results if id(r) not in unreachable_ids], no_answer
 
 
 def seed_history(history: baseline.RollingHistory, database: Database) -> None:
@@ -188,7 +214,7 @@ def _detail(result: CameraResult) -> str:
 
 
 def _quality_label(q: QualityResult | None) -> str:
-    return f"{q.quality}{'/malam' if q.is_night else ''}" if q else ""
+    return f"{q.quality}{'/malam' if q.is_night else ''}{'/IR' if q.is_ir else ''}" if q else ""
 
 
 def _health_row(result: CameraResult) -> dict[str, Any]:

@@ -33,9 +33,11 @@ class CameraRow(BaseModel):
 class QualityResult:
     quality: Quality
     is_night: bool
+    is_ir: bool
     brightness: float
     sharpness: float
     saturation: float
+    dark_pct: float
 
 
 @dataclass(frozen=True)
@@ -82,7 +84,8 @@ class CycleStats:
     live: int
     frozen: int
     dead: int
+    unreachable: int = 0  # gagal karena jaringan worker, bukan karena kameranya; tidak dicatat sebagai mati
 
     @property
     def total(self) -> int:
-        return self.live + self.frozen + self.dead
+        return self.live + self.frozen + self.dead + self.unreachable

@@ -23,6 +23,7 @@ def heartbeat(database: Database, stats: CycleStats) -> None:
             "cycle_started_at": stats.started_at.isoformat(),
             "cycle_ms": stats.duration_ms,
             "cameras": {"live": stats.live, "frozen": stats.frozen, "dead": stats.dead},
+            "unreachable": stats.unreachable,
             "version": __version__,
         },
     )

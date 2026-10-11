@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 
 RW_TIMEOUT_MICROSECONDS = 15_000_000
 FINGERPRINT_SIZE = (160, 90)
+SERVER_RESPONSE_MARKER = "Server returned"  # awalan pesan ffmpeg saat server membalas dengan kode HTTP
 FROZEN_CYCLES = 3  # berapa siklus berturut-turut gambar sama sebelum dinyatakan beku
 
 
@@ -52,6 +53,11 @@ def grab_frame(stream_url: str, *, timeout_seconds: int, user_agent: str) -> Gra
     if frame is None:
         return GrabResult(None, latency_ms, "frame tidak bisa di-decode")
     return GrabResult(frame, latency_ms)
+
+
+def server_answered(error: str | None) -> bool:
+    """Apakah kegagalan ini jawaban dari server CCTV (mis. 404), bukan putusnya jaringan di sisi worker."""
+    return error is not None and SERVER_RESPONSE_MARKER in error
 
 
 def fingerprint(frame: np.ndarray) -> int:
