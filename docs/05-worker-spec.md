@@ -192,8 +192,14 @@ Urutan level: normal(0) < waspada(1) < siaga(2) < awas(3).
 ### Tren (`fusion/trend.py`)
 Bandingkan level terkonfirmasi sekarang dengan 30 dan 60 menit lalu: naik ≥ 2 level dalam 60 menit atau ≥ 1 level dalam 30 menit → `naik_cepat`; naik ≥ 1 level dalam 60 menit → `naik`; turun → `turun`; selain itu `stabil`.
 
+Level pembanding diambil dari pembacaan AI valid terakhir pada atau sebelum titik waktu itu, asal umurnya tidak lebih dari 45 menit dari titik tersebut. Jika tidak ada pembanding sama sekali, tren adalah `tidak_diketahui`.
+
 ### Risiko (`fusion/risk.py`)
-Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status.risk_components` agar bisa ditampilkan.
+Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status.risk_components` agar bisa ditampilkan: nilai tiap komponen, `weights`, dan `inputs` (status, tren, status hulu, mm hujan 3 jam ke depan).
+
+- Batas level: skor < 0,30 `rendah`; < 0,55 `sedang`; < 0,75 `tinggi`; selebihnya `sangat_tinggi`. Lokasi yang status airnya belum terkonfirmasi tidak diberi skor.
+- Tren dan risiko dihitung ulang **setiap siklus** untuk kamera air yang hidup, bukan hanya saat AI dipanggil, karena keduanya bergantung pada waktu dan prakiraan hujan. Riwayat level disimpan di memori worker, jadi penghitungan ulang ini tidak menambah panggilan AI maupun kueri database.
+- Komponen hulu bernilai 0 sampai `river_links` diisi.
 
 ### Hulu → hilir (`fusion/upstream.py`)
 - Untuk setiap `river_links`: jika status hulu ≥ waspada dan naik, buat/perbarui peringatan `upstream_warning` pada kamera hilir: "Hulu {nama} {status}; perkiraan dampak di {hilir} dalam {lag} menit". `lag = learned_lag_minutes ?? default_lag_minutes`.
@@ -210,6 +216,11 @@ Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status
 
 ## Cuaca (`sources/openmeteo.py`)
 Setiap 30 menit: untuk tiap titik di `weather_grid`, ambil data Open-Meteo (lihat `03-data-sources.md`), hitung `precip_now_mm`, `next_1h/3h/6h`, `prob_max_3h`, simpan. Hujan ≥ 10 mm dalam 3 jam ke depan → peringatan `heavy_rain` (info/waspada).
+
+- Kesembilan titik diambil dalam **satu permintaan** (lintang dan bujur dipisah koma), dengan `timeformat=unixtime` agar tidak ada tafsir zona waktu. Dijalankan juga sekali saat worker mulai.
+- "N jam ke depan" = jumlah N slot per jam pertama yang waktunya setelah saat ini. Potongan 12 jam ke depan disimpan di kolom `hourly`.
+- Hasil terbaru disimpan di memori dan dipakai modul air: pemicu hujan memakai nilai terbesar antara hujan saat ini dan 1 jam ke depan di titik grid kamera (`cameras.weather_grid_id`); skor risiko memakai prakiraan 3 jam.
+- Jika Open-Meteo gagal dijawab, worker tetap berjalan dengan data cuaca terakhir.
 
 ## Insight (`insights.py`)
 - **Situasi (15 menit):** kumpulkan fakta ringkas (kamera dengan status ≥ waspada, tren naik, peringatan aktif, anomali lalu lintas, hujan per grid, kamera mati). Jika tidak ada perubahan berarti dari insight terakhir, jangan panggil LLM (hemat).

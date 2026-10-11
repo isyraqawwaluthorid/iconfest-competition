@@ -30,6 +30,7 @@ class CameraRow(BaseModel):
     stream_url: str
     is_featured: bool = False
     traffic_roi: dict | None = None
+    weather_grid_id: str | None = None
     # kalibrasi modul air (diisi lewat halaman admin)
     water_kind: str | None = None
     river_system: str | None = None

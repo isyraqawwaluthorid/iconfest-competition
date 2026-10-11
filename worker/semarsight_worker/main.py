@@ -25,6 +25,7 @@ from .config import Settings, get_settings
 from .db import Database
 from .fusion import baseline
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
+from .sources import openmeteo
 from .water_pipeline import WaterPipeline
 
 log = logging.getLogger("semarsight_worker")
@@ -172,6 +173,35 @@ def split_unreachable(results: list[CameraResult]) -> tuple[list[CameraResult], 
         return results, []
     unreachable_ids = {id(r) for r in no_answer}
     return [r for r in results if id(r) not in unreachable_ids], no_answer
+
+
+def refresh_weather(database: Database, weather: dict[str, openmeteo.GridWeather]) -> None:
+    """Ambil hujan saat ini dan prakiraan untuk tiap titik grid, simpan, dan perbarui salinan di memori."""
+    try:
+        readings = openmeteo.fetch_grid_weather(database.weather_grid(), datetime.now(timezone.utc))
+        database.insert_weather_readings(
+            [
+                {
+                    "grid_id": r.grid_id,
+                    "precip_now_mm": r.precip_now_mm,
+                    "precip_next_1h_mm": r.precip_next_1h_mm,
+                    "precip_next_3h_mm": r.precip_next_3h_mm,
+                    "precip_next_6h_mm": r.precip_next_6h_mm,
+                    "precip_prob_max_3h": r.precip_prob_max_3h,
+                    "hourly": r.hourly,
+                }
+                for r in readings
+            ]
+        )
+        weather.update({r.grid_id: r for r in readings})
+        wettest = max(readings, key=lambda r: r.precip_next_3h_mm, default=None)
+        if wettest:
+            log.info(
+                "cuaca diperbarui: %d wilayah, hujan 3 jam ke depan paling tinggi %.1f mm (%s)",
+                len(readings), wettest.precip_next_3h_mm, wettest.grid_id,
+            )  # fmt: skip
+    except Exception:  # noqa: BLE001 - tanpa cuaca, worker tetap jalan dengan data cuaca terakhir
+        log.exception("pembaruan cuaca gagal")
 
 
 def seed_history(history: baseline.RollingHistory, database: Database) -> None:
@@ -341,7 +371,9 @@ def main(argv: list[str] | None = None) -> int:
     frame_states = acquisition.load_frame_states(state_path)
     history = baseline.RollingHistory()
     seed_history(history, database)
-    water_pipeline = WaterPipeline(settings, database)
+    weather: dict[str, openmeteo.GridWeather] = {}
+    refresh_weather(database, weather)
+    water_pipeline = WaterPipeline(settings, database, weather)
     log.info("modul air: penilaian AI %s", f"aktif ({settings.openai_vision_model})" if water_pipeline.enabled else "nonaktif")
 
     def cycle() -> None:
@@ -370,6 +402,14 @@ def main(argv: list[str] | None = None) -> int:
         "interval",
         seconds=settings.cycle_seconds,
         next_run_time=datetime.now(timezone.utc),
+        max_instances=1,
+        coalesce=True,
+    )
+    scheduler.add_job(
+        refresh_weather,
+        "interval",
+        minutes=settings.weather_interval_minutes,
+        args=[database, weather],
         max_instances=1,
         coalesce=True,
     )

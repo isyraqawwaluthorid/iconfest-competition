@@ -21,14 +21,15 @@ import numpy as np
 from .analyzers import water
 from .config import Settings
 from .db import Database
-from .fusion import smoothing
+from .fusion import risk, smoothing, trend
 from .models import CameraResult, CameraRow, QualityResult, VisionResult
+from .sources.openmeteo import GridWeather
 
 log = logging.getLogger(__name__)
 
 WIB = ZoneInfo("Asia/Jakarta")
 RECENT_SCORES = 12  # skor perubahan terakhir yang dipakai untuk mengenali variasi normal kamera
-READINGS_FOR_SMOOTHING = 6
+READINGS_FOR_SMOOTHING = 16  # cukup untuk menjangkau 60 menit ke belakang saat pemicu sedang rapat
 REFERENCE_CACHE_SECONDS = 3600
 
 
@@ -43,12 +44,14 @@ class WaterObservation:
 
 
 class WaterPipeline:
-    def __init__(self, settings: Settings, database: Database) -> None:
+    def __init__(self, settings: Settings, database: Database, weather: dict[str, GridWeather]) -> None:
         self._settings = settings
         self._database = database
+        self._weather = weather  # cuaca terbaru per titik grid; diisi oleh job cuaca
         self._last_call: dict[str, datetime] = {}
         self._last_view: dict[str, water.RegionView] = {}
         self._scores: dict[str, deque[float]] = defaultdict(lambda: deque(maxlen=RECENT_SCORES))
+        self._levels: dict[str, list[tuple[datetime, int]]] = {}  # riwayat level per kamera, terbaru dulu
         self._references: dict[str, tuple[float, np.ndarray | None]] = {}
         self._lock = threading.Lock()
         self._calls_day: date | None = None
@@ -83,11 +86,12 @@ class WaterPipeline:
         if previous is None:
             self._last_view[cam.id] = view  # pembanding awal sampai ada panggilan AI pertama
         scores = self._scores[cam.id]
+        local_weather = self._weather.get(cam.weather_grid_id or "")
         trigger = water.should_call_ai(
             now=at,
             last_call_at=self._last_call.get(cam.id),
             change=change,
-            rain_mm=None,  # diisi setelah data cuaca terhubung
+            rain_mm=local_weather.rain_for_trigger_mm if local_weather else None,
             change_threshold=water.change_threshold_for(settings.water_change_threshold, list(scores)),
             heartbeat_minutes=settings.water_heartbeat_minutes,
             rain_heartbeat_minutes=settings.water_rain_heartbeat_minutes,
@@ -138,30 +142,69 @@ class WaterPipeline:
                     "raw": observation.raw,
                 }
             )
-            readings = [
-                smoothing.Reading(
-                    status=row["status"],
-                    road_flood=row["road_flood"],
-                    confidence=row["confidence"] or 0.0,
-                    quality=row["quality"],
-                    change_vs_reference=((row.get("raw") or {}).get("output") or {}).get("change_vs_reference"),
-                )
-                for row in self._database.recent_water_readings(cam.id, READINGS_FOR_SMOOTHING)
-            ]
+            readings = self._load_readings(cam)
             before = previous_status.get(cam.id, {})
             confirmed, needs_verification = smoothing.confirm_water_status(before.get("water_status"), readings, cam.water_kind)
+
             update: dict[str, Any] = {
                 "water_status": confirmed,
                 "road_flood": vision.road_flood,
                 "trash": vision.trash,
                 "water_confidence": vision.confidence,
                 "needs_verification": needs_verification,
-            }
+            } | self._outlook(cam, confirmed, result.checked_at)
             if confirmed != before.get("water_status"):
                 update["water_status_since"] = result.checked_at.isoformat()
                 log.info("%s: status air %s -> %s", cam.name, before.get("water_status"), confirmed)
             updates[cam.id] = update
+
+        # Tren dan risiko bergantung pada waktu dan prakiraan hujan, jadi dihitung ulang setiap siklus
+        # walau AI tidak dipanggil. Kamera yang sedang mati dilewati: status airnya sudah tidak segar.
+        for result in results:
+            cam = result.camera
+            if cam.id in updates or result.health != "live" or not self.eligible(cam):
+                continue
+            confirmed = previous_status.get(cam.id, {}).get("water_status")
+            if confirmed is None:
+                continue
+            if cam.id not in self._levels:
+                self._load_readings(cam)
+            updates[cam.id] = self._outlook(cam, confirmed, result.checked_at)
         return updates
+
+    def _load_readings(self, cam: CameraRow) -> list[smoothing.Reading]:
+        """Pembacaan AI terbaru kamera ini (terbaru dulu); sekaligus menyegarkan riwayat level untuk tren."""
+        rows = self._database.recent_water_readings(cam.id, READINGS_FOR_SMOOTHING)
+        readings = [
+            smoothing.Reading(
+                status=row["status"],
+                road_flood=row["road_flood"],
+                confidence=row["confidence"] or 0.0,
+                quality=row["quality"],
+                change_vs_reference=((row.get("raw") or {}).get("output") or {}).get("change_vs_reference"),
+            )
+            for row in rows
+        ]
+        self._levels[cam.id] = [
+            (datetime.fromisoformat(row["captured_at"]), level)
+            for row, reading in zip(rows, readings, strict=True)
+            if (level := smoothing.level_of(reading, cam.water_kind)) is not None
+        ]
+        return readings
+
+    def _outlook(self, cam: CameraRow, confirmed: str | None, at: datetime) -> dict[str, Any]:
+        """Tren dan skor risiko satu lokasi dari status terkonfirmasi, riwayat level, dan prakiraan hujan."""
+        confirmed_level = smoothing.LEVELS.index(confirmed) if confirmed in smoothing.LEVELS else None
+        water_trend = trend.water_trend(confirmed_level, self._levels.get(cam.id, []), at)
+        local_weather = self._weather.get(cam.weather_grid_id or "")
+        # Kondisi hulu masih kosong sampai hubungan hulu-hilir (river_links) diisi.
+        assessed = risk.risk_score(confirmed, water_trend, None, local_weather.precip_next_3h_mm if local_weather else None)
+        return {
+            "water_trend": water_trend,
+            "risk_score": assessed.score if assessed else None,
+            "risk_level": assessed.level if assessed else None,
+            "risk_components": assessed.components if assessed else None,
+        }
 
     def _take_call_slot(self, at: datetime) -> bool:
         """Jatah panggilan AI harian (hari kalender WIB). Dihitung ulang dari database saat hari berganti."""

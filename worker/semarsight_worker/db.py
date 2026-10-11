@@ -14,6 +14,7 @@ from supabase import Client, create_client
 
 from .config import Settings
 from .models import CameraRow
+from .sources.openmeteo import GridPoint
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +34,15 @@ class Database:
             self._client.table("cameras").select("*").eq("is_active", True).order("source_link_id").execute()
         )
         return [CameraRow.model_validate(row) for row in response.data]
+
+    def weather_grid(self) -> list[GridPoint]:
+        response = self._client.table("weather_grid").select("id, lat, lng").order("id").execute()
+        return [GridPoint(id=row["id"], lat=row["lat"], lng=row["lng"]) for row in response.data]
+
+    def insert_weather_readings(self, rows: list[dict[str, Any]]) -> None:
+        if not rows or self.dry_run:
+            return
+        self._client.table("weather_readings").insert(rows).execute()
 
     def status_snapshot(self) -> dict[str, dict[str, Any]]:
         """Keadaan `camera_status` sebelum siklus ini: kegagalan berturut-turut dan status air terkonfirmasi."""

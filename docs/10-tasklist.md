@@ -66,14 +66,14 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T3.6 [M+K]** Pilih model OpenAI dari dokumentasi terbaru, isi `OPENAI_VISION_MODEL` dan `OPENAI_TEXT_MODEL`. Dipilih `gpt-6-luna` untuk keduanya (input gambar + structured outputs, $0,10 / $0,50 per 1 juta token). Uji 10 Okt: gambar 512×290 dihitung ±190 token, jadi satu panggilan modul air ±$0,0002 dan 2.000 panggilan per hari ±$0,4. Akurasi diuji di T3.10; cadangan untuk kasus sulit: naikkan `reasoning.effort`, lalu `gpt-6.1-sol`.
 - [x] **T3.7 [K]** `classify_with_ai()`: gambar ROI + garis acuan + referensi, structured outputs sesuai `ai/schemas/water_vision.schema.json`, validasi Pydantic, gagal → `tidak_dapat_dinilai`.
 - [x] **T3.8 [K]** `fusion/smoothing.py`: konfirmasi naik (2 pembacaan), turun (3 pembacaan), keyakinan rendah → `needs_verification`. Unit test.
-- [ ] **T3.9 [K]** `sources/openmeteo.py`: ingest per `weather_grid` tiap 30 menit; peringatan `heavy_rain`.
+- [x] **T3.9 [K]** `sources/openmeteo.py`: ingest per `weather_grid` tiap 30 menit. Selesai 11 Okt: 9 titik dalam satu permintaan, tersimpan di `weather_readings`, dan pemicu hujan modul air sudah aktif. Peringatan `heavy_rain` dikerjakan bersama T4.2.
 - [ ] **T3.10 [K]** Uji klasifikasi siang dan malam; sesuaikan prompt dan ambang. Siang selesai 11 Okt (16 kamera, semua `normal`, prompt dan gambar anotasi disesuaikan); **malam belum diuji**.
 - [ ] **T3.11 [M]** Simpan foto referensi malam untuk 16 kamera unggulan (setelah gelap, satu klik per kamera). *Bukti:* `water_readings` terisi dengan status dan alasan yang masuk akal.
 
 ## Fase 4 — Fusi + insight (Selasa 13 Okt)
 
-- [ ] **T4.1 [K]** `fusion/trend.py` dan `fusion/risk.py` (komponen dan bobot disimpan di `risk_components`). Unit test.
-- [ ] **T4.2 [K]** `alerts.py`: `upsert_alert` / `resolve_alert`, satu aktif per (jenis, kamera), teks dari template.
+- [x] **T4.1 [K]** `fusion/trend.py` dan `fusion/risk.py` (komponen dan bobot disimpan di `risk_components`). Unit test. Selesai 11 Okt: tren dan risiko dihitung ulang tiap siklus untuk kamera air yang hidup; komponen hulu masih 0 sampai T4.3.
+- [ ] **T4.2 [K]** `alerts.py`: `upsert_alert` / `resolve_alert`, satu aktif per (jenis, kamera), teks dari template. Termasuk `heavy_rain` (hujan ≥ 10 mm dalam 3 jam ke depan, per titik grid).
 - [ ] **T4.3 [K]** `/admin/sungai` + `/api/admin/river-links`; `fusion/upstream.py` (peringatan hulu → hilir, belajar jeda).
 - [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan.
 - [ ] **T4.5 [K]** `fusion/events.py`: buka, perbarui puncak, tutup kejadian.
