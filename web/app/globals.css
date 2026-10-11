@@ -88,3 +88,27 @@ body {
   stroke: var(--text);
   stroke-width: 3;
 }
+
+/* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
+.calib-roi {
+  fill: color-mix(in srgb, var(--primary) 22%, transparent);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+.calib-dot {
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+.calib-roi-dot { stroke: var(--primary); }
+.calib-line {
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.level-normal .calib-line, .level-normal .calib-dot { stroke: var(--status-normal); }
+.level-waspada .calib-line, .level-waspada .calib-dot { stroke: var(--status-waspada); }
+.level-siaga .calib-line, .level-siaga .calib-dot { stroke: var(--status-siaga); }
+.level-awas .calib-line, .level-awas .calib-dot { stroke: var(--status-awas); }
+.calib-swatch.level-normal { background: var(--status-normal); }
+.calib-swatch.level-waspada { background: var(--status-waspada); }
+.calib-swatch.level-siaga { background: var(--status-siaga); }
+.calib-swatch.level-awas { background: var(--status-awas); }
