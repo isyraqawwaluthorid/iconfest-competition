@@ -32,13 +32,12 @@ def level_of(reading: Reading, water_kind: str | None) -> int | None:
     if reading.confidence < MIN_CONFIDENCE or reading.quality == "poor":
         return None
     if water_kind == "jalan":
-        return ROAD_FLOOD_LEVEL.get(reading.road_flood)
-    if reading.status not in LEVELS:
-        return None
-    level = LEVELS.index(reading.status)
-    if level > 0 and reading.change_vs_reference in NOT_HIGHER_THAN_REFERENCE:
-        # Jawaban yang bertentangan dengan dirinya sendiri: status di atas normal, tetapi air
-        # dinilai tidak lebih tinggi dari foto referensi kondisi normal. Tidak dipakai.
+        level = ROAD_FLOOD_LEVEL.get(reading.road_flood)
+    else:
+        level = LEVELS.index(reading.status) if reading.status in LEVELS else None
+    if level and reading.change_vs_reference in NOT_HIGHER_THAN_REFERENCE:
+        # Jawaban yang bertentangan dengan dirinya sendiri: status di atas normal (atau jalan
+        # tergenang), tetapi kondisinya dinilai sama dengan foto referensi normal. Tidak dipakai.
         return None
     return level
 

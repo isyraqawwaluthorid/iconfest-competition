@@ -13,9 +13,14 @@ Tugasmu:
    - mencapai/melewati S, belum A → "siaga"
    - mencapai/melewati A atau meluap → "awas"
 2. Jika kamera memperlihatkan jalan, nilai genangan di badan jalan:
-   tidak_tergenang / genangan_ringan (permukaan jalan basah-menggenang tipis) /
+   tidak_tergenang (kering, atau hanya basah dan mengilap tanpa air yang menggenang) /
+   genangan_ringan (ada lapisan air yang jelas menggenang di sebagian lajur; roda memercikkan air) /
    genangan_sedang (menutupi sebagian besar lajur, kendaraan melambat) /
    genangan_tinggi (kendaraan kecil sulit lewat). Jika jalan tidak terlihat: "tidak_relevan".
+   Aspal basah yang memantulkan lampu kendaraan pada malam hari bukan genangan.
+   Kamera jalan biasanya tidak punya garis acuan. Tanpa garis, status mengikuti genangan di jalan:
+   tidak_tergenang → "normal", ringan → "waspada", sedang → "siaga", tinggi → "awas".
+   Tidak adanya garis bukan alasan menurunkan confidence.
 3. Nilai sampah yang terlihat di permukaan air atau di pintu air.
 4. Bandingkan dengan Gambar 2 jika ada; jika tidak ada, change_vs_reference="tidak_dapat_dinilai".
 

@@ -65,3 +65,10 @@ def test_raised_status_that_matches_the_normal_reference_is_not_trusted():
 def test_road_cameras_use_the_road_flood_scale():
     readings = [_r("normal", road_flood="genangan_sedang"), _r("normal", road_flood="genangan_tinggi")]
     assert confirm_water_status("normal", readings, "jalan") == ("siaga", False)
+
+
+def test_flooded_road_that_looks_like_the_normal_reference_is_not_trusted():
+    shiny = Reading("normal", "genangan_ringan", 0.8, "good", change_vs_reference="sama")
+    assert confirm_water_status("normal", [shiny, shiny], "jalan") == ("normal", True)
+    flooded = Reading("normal", "genangan_ringan", 0.8, "good", change_vs_reference="sedikit_lebih_tinggi")
+    assert confirm_water_status("normal", [flooded, flooded], "jalan") == ("waspada", False)
