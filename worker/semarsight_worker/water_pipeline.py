@@ -64,6 +64,7 @@ class WaterPipeline:
         )
         if self.enabled:
             self._last_call = database.latest_water_call_times()
+            self._count_calls(datetime.now(WIB))  # agar detak worker langsung melaporkan angka yang benar
 
     @property
     def calls_today(self) -> int:
@@ -208,17 +209,21 @@ class WaterPipeline:
 
     def _take_call_slot(self, at: datetime) -> bool:
         """Jatah panggilan AI harian (hari kalender WIB). Dihitung ulang dari database saat hari berganti."""
-        today = at.astimezone(WIB).date()
         with self._lock:
-            if today != self._calls_day:
-                start = datetime(today.year, today.month, today.day, tzinfo=WIB)
-                self._calls_today = self._database.water_calls_since(start)
-                self._calls_day = today
+            self._count_calls(at)
             if self._calls_today >= self._settings.ai_daily_call_cap:
                 log.warning("batas harian panggilan AI (%d) tercapai", self._settings.ai_daily_call_cap)
                 return False
             self._calls_today += 1
             return True
+
+    def _count_calls(self, at: datetime) -> None:
+        """Pada pergantian hari (atau saat worker baru mulai), hitung ulang panggilan hari ini dari database."""
+        today = at.astimezone(WIB).date()
+        if today != self._calls_day:
+            start = datetime(today.year, today.month, today.day, tzinfo=WIB)
+            self._calls_today = self._database.water_calls_since(start)
+            self._calls_day = today
 
     def _reference(self, cam: CameraRow, is_night: bool) -> np.ndarray | None:
         """Foto referensi kondisi normal yang sesuai waktu (siang atau malam), dengan cadangan yang satunya."""

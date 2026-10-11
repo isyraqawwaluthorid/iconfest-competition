@@ -159,6 +159,11 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 ### Kalibrasi (prasyarat)
 Kamera air baru diproses jika `roi` terisi. Kalibrasi dilakukan di halaman admin (lihat `06-web-spec.md`).
 
+Tiga pelajaran dari salah baca sore 11 Okt (keduanya dikonfirmasi normal dari gambarnya):
+- **Area pengamatan cukup di sekitar benda acuan, bukan seluruh permukaan air.** Gambar yang dikirim ke AI selalu selebar 512 px, jadi area yang lebar membuat dinding acuan tampak kecil dan garis hanya berjarak beberapa piksel. Di Banger-SD-IN, garis lama memberi awas, awas, siaga pada tiga frame berturut-turut; setelah area dipersempit ke dinding turap dan garis dijadikan tiga (Normal sedikit di atas muka air biasa, Siaga dekat puncak dinding, Awas di daratan), lima dari lima frame dinilai normal.
+- **Garis Waspada boleh dihilangkan** bila ruangnya sempit: air yang melewati Normal tetapi belum mencapai Siaga sudah dinilai waspada.
+- **Busa pompa bukan kenaikan air.** Di Semarang Indah_OUT busa saat pompa menyala menutupi tepi dan terbaca awas lalu waspada. Prompt kini menyebut busa secara khusus; pada enam frame yang sama hasilnya normal, lima di antaranya dengan keyakinan di bawah 0,5 sehingga tidak mengubah status dan ditandai perlu verifikasi.
+
 ### Deteksi perubahan
 - **Area pengamatan** = selubung cembung dari titik area air dan titik semua garis acuan. Garis acuan sering digambar di dinding tepat di luar area air, dan dinding itulah tempat air naik.
 - Potong ke kotak pembatas area pengamatan (bagian di luar poligon tidak ikut dihitung), resize ke 256 px lebar, grayscale.
@@ -232,6 +237,20 @@ Setiap 30 menit: untuk tiap titik di `weather_grid`, ambil data Open-Meteo (liha
 - `upsert_alert(type, camera_id, level, title, message, audience, data)`: jika ada yang aktif untuk (type, camera) → perbarui; jika tidak → buat.
 - `resolve_alert(type, camera_id)`: set `is_active=false`, `resolved_at=now()`.
 - Teks peringatan dibuat dari **template** (bukan LLM) agar cepat dan konsisten. LLM dipakai untuk ringkasan di level insight.
+
+Implementasinya berupa penyelarasan sekali per siklus (`alerts.sync`): aturan menghitung daftar peringatan yang seharusnya aktif dari `camera_status` dan cuaca terbaru, lalu selisihnya ditulis. Yang baru disisipkan, yang level atau teksnya berubah diperbarui, yang syaratnya tidak lagi terpenuhi ditutup. Isi yang sama tidak ditulis ulang, agar Realtime tidak ramai. Jenis di luar daftar di bawah tidak disentuh.
+
+| Jenis | Syarat | Level | Audiens |
+|---|---|---|---|
+| `water_rising` | status air terkonfirmasi ≥ waspada (kamera pompa/sungai terkalibrasi) | sama dengan status | bpbd, pu, warga |
+| `road_flooded` | sama, untuk kamera `water_kind = jalan` | sama dengan status | bpbd, dishub, warga |
+| `heavy_rain` | prakiraan 3 jam ke depan ≥ 10 mm di salah satu titik grid; satu peringatan untuk seluruh kota yang menyebut wilayahnya | info; waspada jika ≥ 20 mm | bpbd, pu, warga |
+| `trash_blockage` | sampah `banyak` di pompa/sungai **dan** prakiraan 3 jam ≥ 10 mm di wilayahnya | siaga | pu |
+| `camera_offline` | kamera unggulan gagal dibaca 6 siklus berturut-turut (± 30 menit) | info | (operator) |
+
+- `heavy_rain` yang sudah aktif baru ditutup setelah prakiraan turun di bawah 7 mm, agar tidak kedap-kedip di sekitar ambang.
+- Kegagalan akibat jaringan worker tidak menaikkan hitungan gagal kamera, jadi tidak memunculkan `camera_offline`.
+- Belum dibuat: `upstream_warning` (menunggu `river_links`), `traffic_anomaly` dan `crowd_anomaly` (menunggu baseline matang), `worker_offline` (dinilai di sisi web dari detak worker).
 
 ## Housekeeping
 - Heartbeat: upsert `system_status` key `worker` dengan `last_seen`, durasi siklus, jumlah kamera live/frozen/dead, panggilan AI hari ini.

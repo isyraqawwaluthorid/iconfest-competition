@@ -26,6 +26,9 @@ Aturan:
   pilih level terendah yang masih sesuai dengan yang terlihat dan turunkan confidence.
 - Hanya nilai apa yang benar-benar terlihat. Jangan menebak.
 - Pantulan lampu, bayangan, atau hujan di lensa bukan kenaikan air.
+- Busa putih, buih, atau pusaran (misalnya saat pompa menyala) bukan kenaikan air, walaupun menumpuk
+  di tepi atau menutupi garis acuan. Nilai dari batas air pada dinding atau benda tetap yang masih
+  terlihat; jika batas itu tertutup busa seluruhnya, turunkan confidence dan jangan memilih level tinggi.
 - Jika gambar terlalu gelap, buram, tertutup, atau area air tidak terlihat:
   image_usable=false, status="tidak_dapat_dinilai", confidence ≤ 0.3.
 - Malam hari atau mode inframerah: turunkan confidence.

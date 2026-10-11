@@ -39,6 +39,9 @@ class FakeDatabase:
     def latest_water_call_times(self) -> dict:
         return {}
 
+    def water_calls_since(self, start: datetime) -> int:
+        return 7
+
     def recent_water_readings(self, camera_id: str, limit: int) -> list[dict]:
         self.reads += 1
         return self.rows[:limit]
@@ -93,6 +96,10 @@ def test_risk_follows_the_rain_forecast_between_ai_readings():
     assert "water_status" not in wet  # status resmi hanya berubah lewat pembacaan AI
     assert database.reads == 1  # riwayat level cukup dibaca sekali
     assert database.inserted == []
+
+
+def test_calls_made_earlier_today_are_counted_from_the_start():
+    assert WaterPipeline(SETTINGS, FakeDatabase([]), {}).calls_today == 7
 
 
 def test_no_outlook_for_dead_uncalibrated_or_unconfirmed_cameras():
