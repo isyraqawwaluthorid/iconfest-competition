@@ -1,7 +1,9 @@
 "use client";
 
-import { CircleMarker, MapContainer, Polygon, TileLayer, Tooltip } from "react-leaflet";
-import { CITY_BOUNDS, districtOf } from "@/lib/geo/districts";
+import L from "leaflet";
+import { useMemo } from "react";
+import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, Tooltip } from "react-leaflet";
+import { CITY_BOUNDS, districtOf, DISTRICTS, shortName } from "@/lib/geo/districts";
 import { themeDisplay, type DistrictSummary, type Theme } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, WATER } from "@/lib/status";
 import type { CameraOverview } from "@/lib/types";
@@ -16,8 +18,23 @@ type Props = {
 
 /** Peta tematik per kecamatan. Hanya dirender di browser (lihat InsightView). */
 export default function ThematicMap({ summaries, theme, sources, selected, onSelect }: Props) {
+  const labels = useMemo(
+    () =>
+      DISTRICTS.map((district) => ({
+        district,
+        icon: L.divIcon({ className: "district-label", html: `<span>${shortName(district.name)}</span>`, iconSize: [0, 0] }),
+      })),
+    [],
+  );
+
   return (
-    <MapContainer bounds={CITY_BOUNDS} scrollWheelZoom className="h-full w-full rounded-token">
+    <MapContainer
+      bounds={CITY_BOUNDS}
+      boundsOptions={{ padding: [4, 4] }}
+      zoomSnap={0.25}
+      scrollWheelZoom
+      className="thematic-map h-full w-full rounded-token"
+    >
       <TileLayer
         attribution='&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -40,6 +57,9 @@ export default function ThematicMap({ summaries, theme, sources, selected, onSel
           </Polygon>
         );
       })}
+      {labels.map(({ district, icon }) => (
+        <Marker key={district.name} position={district.center} icon={icon} interactive={false} keyboard={false} />
+      ))}
       {sources.map((camera) => {
         const status =
           theme === "risk"

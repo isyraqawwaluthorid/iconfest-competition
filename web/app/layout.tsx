@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
+import { NavLinks } from "@/components/system/NavLinks";
 import { SystemBanner } from "@/components/system/SystemBanner";
+import { SystemChip } from "@/components/system/SystemChip";
 import { getWorkerHeartbeat } from "@/lib/queries";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 
 export const metadata: Metadata = {
   title: { default: "SemarSight", template: "%s · SemarSight" },
@@ -11,50 +17,57 @@ export const metadata: Metadata = {
     "CCTV publik Kota Semarang sebagai sensor kota: kondisi air, kepadatan lalu lintas, dan keramaian ruang publik.",
 };
 
-const NAV = [{ href: "/", label: "Beranda" }];
-// Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.
-const SOURCES = [
-  { href: "/kamera", label: "Kamera" },
-  { href: "/mosaik", label: "Mosaik" },
-];
+async function SystemStatus() {
+  // Status sistem tidak boleh menjatuhkan halaman: jika gagal dibaca, anggap belum ada heartbeat.
+  const heartbeat = await getWorkerHeartbeat().catch(() => null);
+  return <SystemChip initial={heartbeat} />;
+}
 
 async function SystemBannerLoader() {
-  // Banner tidak boleh menjatuhkan halaman: jika status sistem gagal dibaca, anggap belum ada heartbeat.
   const heartbeat = await getWorkerHeartbeat().catch(() => null);
   return <SystemBanner initial={heartbeat} />;
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className="h-full antialiased">
+    <html lang="id" className={`${inter.variable} ${jakarta.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <header className="border-b border-border bg-surface">
-          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
-            <Link href="/" className="text-lg font-semibold">
-              SemarSight
-            </Link>
-            <nav aria-label="Navigasi utama" className="flex flex-wrap items-center gap-4 text-sm">
-              {NAV.map((item) => (
-                <Link key={item.href} href={item.href} className="font-medium hover:text-primary">
-                  {item.label}
-                </Link>
-              ))}
-              <span className="text-xs text-muted">Sumber data:</span>
-              {SOURCES.map((item) => (
-                <Link key={item.href} href={item.href} className="text-muted hover:text-primary">
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+        <header className="sticky top-0 z-[1100] border-b border-border bg-surface">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 lg:px-8">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <Link href="/" className="flex items-center gap-2.5">
+                <span aria-hidden className="flex h-9 w-9 items-center justify-center rounded-control bg-primary text-on-primary">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" />
+                    <circle cx="12" cy="12" r="2.8" />
+                  </svg>
+                </span>
+                <span className="flex flex-col leading-none">
+                  <span className="font-display text-lg font-extrabold tracking-tight text-primary">SemarSight</span>
+                  <span className="label-caps mt-1 text-[10px] text-muted">Sensor kota Semarang</span>
+                </span>
+              </Link>
+              <Suspense fallback={null}>
+                <SystemStatus />
+              </Suspense>
+            </div>
+            <Suspense fallback={null}>
+              <NavLinks />
+            </Suspense>
           </div>
         </header>
         <Suspense fallback={null}>
           <SystemBannerLoader />
         </Suspense>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
-        <footer className="border-t border-border px-4 py-4 text-center text-xs text-muted">
-          Sumber CCTV: PANTAUSEMAR, Pemerintah Kota Semarang. Angka di situs ini adalah perkiraan dari gambar, bukan
-          pengukuran resmi.
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 lg:px-8">{children}</main>
+        <footer className="border-t border-border bg-surface">
+          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted lg:px-8">
+            <p>
+              <span className="font-display font-bold text-primary">SemarSight</span> · CCTV: PANTAUSEMAR, Pemerintah
+              Kota Semarang · Peta: OpenStreetMap · Cuaca: Open-Meteo
+            </p>
+            <p>Angka di situs ini adalah perkiraan dari gambar, bukan pengukuran resmi. Tanpa pengenalan wajah atau pelat nomor.</p>
+          </div>
         </footer>
       </body>
     </html>

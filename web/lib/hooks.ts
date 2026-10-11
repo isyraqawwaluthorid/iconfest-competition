@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { getActiveAlerts } from "./queries";
 import { getSupabase } from "./supabase/public";
 import type { Alert, CameraOverview, CameraStatusRow, WorkerHeartbeat } from "./types";
@@ -28,11 +28,12 @@ function mergeStatus(camera: CameraOverview, row: CameraStatusRow): CameraOvervi
 /** Daftar kamera yang ikut berubah saat worker memperbarui `camera_status` (Supabase Realtime). */
 export function useLiveCameras(initial: CameraOverview[]): CameraOverview[] {
   const [cameras, setCameras] = useState(initial);
+  const channelId = useId();
 
   useEffect(() => {
     const supabase = getSupabase();
     const channel = supabase
-      .channel("camera-status")
+      .channel(`camera-status-${channelId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "camera_status" }, (payload) => {
         const row = payload.new as CameraStatusRow;
         if (!row?.camera_id) return;
@@ -42,7 +43,7 @@ export function useLiveCameras(initial: CameraOverview[]): CameraOverview[] {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [channelId]);
 
   return cameras;
 }
@@ -50,11 +51,12 @@ export function useLiveCameras(initial: CameraOverview[]): CameraOverview[] {
 /** Peringatan aktif; daftar dimuat ulang setiap kali worker membuat, mengubah, atau menutup peringatan. */
 export function useLiveAlerts(initial: Alert[]): Alert[] {
   const [alerts, setAlerts] = useState(initial);
+  const channelId = useId();
 
   useEffect(() => {
     const supabase = getSupabase();
     const channel = supabase
-      .channel("alerts")
+      .channel(`alerts-${channelId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "alerts" }, () => {
         // Jika gagal dimuat ulang, daftar terakhir tetap ditampilkan.
         getActiveAlerts().then(setAlerts, () => undefined);
@@ -63,7 +65,7 @@ export function useLiveAlerts(initial: Alert[]): Alert[] {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [channelId]);
 
   return alerts;
 }
@@ -71,11 +73,13 @@ export function useLiveAlerts(initial: Alert[]): Alert[] {
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */
 export function useWorkerHeartbeat(initial: WorkerHeartbeat | null): WorkerHeartbeat | null {
   const [heartbeat, setHeartbeat] = useState(initial);
+  // Nama kanal harus unik per pemakai: Supabase menolak langganan kedua pada kanal bernama sama.
+  const channelId = useId();
 
   useEffect(() => {
     const supabase = getSupabase();
     const channel = supabase
-      .channel("system-status")
+      .channel(`system-status-${channelId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "system_status" }, (payload) => {
         const row = payload.new as { key?: string; value?: WorkerHeartbeat };
         if (row?.key === "worker" && row.value) setHeartbeat(row.value);
@@ -84,7 +88,7 @@ export function useWorkerHeartbeat(initial: WorkerHeartbeat | null): WorkerHeart
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [channelId]);
 
   return heartbeat;
 }

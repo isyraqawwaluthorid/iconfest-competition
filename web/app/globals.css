@@ -2,25 +2,41 @@
 @import "leaflet/dist/leaflet.css";
 
 /*
- * Design tokens (placeholder).
+ * Design tokens.
  * Semua warna, radius, dan font di aplikasi berasal dari variabel di bawah ini.
  * Untuk mengganti tampilan, cukup ubah nilainya di sini; komponen tidak memakai kode warna langsung.
+ * Tiap status punya tiga warna: warna utama (titik, garis, peta), latar lembut, dan teks di atas latar itu.
  */
 :root {
   --bg: #f7f7f8;
   --surface: #ffffff;
+  --surface-muted: #f4f4f5;
   --text: #18181b;
-  --muted: #71717a;
+  --muted: #5f6270;
   --border: #e4e4e7;
   --primary: #2563eb;
+  --primary-strong: #1d4ed8;
+  --primary-soft: #dbeafe;
   --on-primary: #ffffff;
 
   --status-normal: #16a34a;
+  --status-normal-bg: #dcfce7;
+  --status-normal-text: #14532d;
   --status-waspada: #ca8a04;
+  --status-waspada-bg: #fef9c3;
+  --status-waspada-text: #713f12;
   --status-siaga: #ea580c;
+  --status-siaga-bg: #ffedd5;
+  --status-siaga-text: #7c2d12;
   --status-awas: #dc2626;
+  --status-awas-bg: #fee2e2;
+  --status-awas-text: #7f1d1d;
   --status-unknown: #a1a1aa;
   --status-offline: #52525b;
+  --neutral-bg: #f4f4f5;
+  --neutral-text: #3f3f46;
+  --info-bg: #dbeafe;
+  --info-text: #1e40af;
 
   --density-lancar: var(--status-normal);
   --density-normal: var(--primary);
@@ -28,34 +44,29 @@
   --density-padat: var(--status-awas);
 
   /* Peta tematik: wilayah tanpa data dan skala hujan (makin gelap makin lebat). */
-  --untracked: #71717a;
+  --untracked: #a1a1aa;
   --rain-0: #e0f2fe;
   --rain-1: #7dd3fc;
   --rain-2: #0ea5e9;
   --rain-3: #0369a1;
   --rain-4: #1e1b4b;
 
-  --radius: 8px;
-  --font-sans: system-ui, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0b0c;
-    --surface: #18181b;
-    --text: #f4f4f5;
-    --muted: #a1a1aa;
-    --border: #27272a;
-  }
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 1px 2px rgba(24, 24, 27, 0.04);
+  --shadow-float: 0 4px 12px -2px rgba(24, 24, 27, 0.08);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
   --color-on-primary: var(--on-primary);
   --color-status-normal: var(--status-normal);
   --color-status-waspada: var(--status-waspada);
@@ -74,12 +85,51 @@
   --color-rain-3: var(--rain-3);
   --color-rain-4: var(--rain-4);
   --radius-token: var(--radius);
+  --radius-control: var(--radius-sm);
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+/* Label kecil huruf besar untuk judul bagian dan keterangan sumber. */
+.label-caps {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/*
+ * Lencana status dan panel berwarna: latar lembut + teks gelap sesuai status.
+ * `tone-*` diisi dari lib/status.ts, jadi warna status hanya ditentukan di satu tempat.
+ */
+.tint { background: var(--neutral-bg); color: var(--neutral-text); --tone: var(--status-unknown); }
+.tint.tone-normal, .tint.tone-density-lancar { background: var(--status-normal-bg); color: var(--status-normal-text); --tone: var(--status-normal); }
+.tint.tone-waspada, .tint.tone-density-ramai { background: var(--status-waspada-bg); color: var(--status-waspada-text); --tone: var(--status-waspada); }
+.tint.tone-siaga { background: var(--status-siaga-bg); color: var(--status-siaga-text); --tone: var(--status-siaga); }
+.tint.tone-awas, .tint.tone-density-padat { background: var(--status-awas-bg); color: var(--status-awas-text); --tone: var(--status-awas); }
+.tint.tone-density-normal { background: var(--info-bg); color: var(--info-text); --tone: var(--primary); }
+.tint.tone-offline { --tone: var(--status-offline); }
+.tint-dot { background: var(--tone); }
+/* Garis kiri berwarna pada kartu yang mewakili satu tingkat status. */
+.accent-left { border-left: 4px solid var(--tone, var(--border)); }
+
+/* Arsiran untuk "tidak terpantau": dipakai di legenda; di peta memakai pola SVG yang setara. */
+.swatch-untracked {
+  background: repeating-linear-gradient(45deg, var(--untracked) 0 2px, var(--neutral-bg) 2px 5px);
 }
 
 /* Warna penanda peta mengikuti token; `data-tone` diisi dari lib/status.ts. */
@@ -104,12 +154,22 @@ body {
 }
 
 /* Peta tematik: satu poligon per kecamatan, diwarnai menurut tema yang dipilih. */
+.thematic-map .leaflet-tile-pane {
+  /* Peta dasar diredam agar warna wilayah yang menjadi pusat perhatian. */
+  filter: grayscale(1) opacity(0.45);
+}
+.thematic-map.leaflet-container {
+  background: var(--surface-muted);
+  font-family: inherit;
+}
 .district {
   stroke: var(--surface);
   stroke-width: 1.5;
-  fill-opacity: 0.6;
+  fill-opacity: 0.55;
   cursor: pointer;
+  transition: fill-opacity 120ms;
 }
+.district:hover { fill-opacity: 0.75; }
 .district.tone-normal { fill: var(--status-normal); }
 .district.tone-waspada { fill: var(--status-waspada); }
 .district.tone-siaga { fill: var(--status-siaga); }
@@ -119,22 +179,39 @@ body {
 .district.tone-density-normal { fill: var(--density-normal); }
 .district.tone-density-ramai { fill: var(--density-ramai); }
 .district.tone-density-padat { fill: var(--density-padat); }
-.district.tone-rain-0 { fill: var(--rain-0); }
-.district.tone-rain-1 { fill: var(--rain-1); }
-.district.tone-rain-2 { fill: var(--rain-2); }
-.district.tone-rain-3 { fill: var(--rain-3); }
-.district.tone-rain-4 { fill: var(--rain-4); }
+.district.tone-rain-0 { fill: var(--rain-0); fill-opacity: 0.8; }
+.district.tone-rain-1 { fill: var(--rain-1); fill-opacity: 0.8; }
+.district.tone-rain-2 { fill: var(--rain-2); fill-opacity: 0.8; }
+.district.tone-rain-3 { fill: var(--rain-3); fill-opacity: 0.8; }
+.district.tone-rain-4 { fill: var(--rain-4); fill-opacity: 0.8; }
 .district.tone-untracked {
-  fill: var(--untracked);
-  fill-opacity: 0.3;
+  fill: url(#untracked-stripes);
+  fill-opacity: 0.9;
   stroke: var(--untracked);
-  stroke-dasharray: 5 5;
 }
 .district.is-selected {
-  stroke: var(--text);
-  stroke-width: 3;
-  fill-opacity: 0.75;
+  stroke: var(--primary-strong);
+  stroke-width: 3.5;
+  fill-opacity: 0.8;
 }
+/* Nama kecamatan di atas poligon; tidak menangkap klik agar poligon di bawahnya tetap bisa dipilih. */
+.district-label {
+  background: none;
+  border: none;
+  pointer-events: none;
+}
+.district-label span {
+  display: block;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-shadow: 0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface);
+}
+
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {
   fill: color-mix(in srgb, var(--primary) 22%, transparent);

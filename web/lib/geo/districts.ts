@@ -19,12 +19,26 @@ function toDistrict(feature: Feature): District {
   const { geometry } = feature;
   const source = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
   const polygons = source.map((rings) => rings.map((ring) => ring.map(([lng, lat]): LatLng => [lat, lng])));
-  const outline = polygons[0][0];
-  const center: LatLng = [
-    outline.reduce((sum, p) => sum + p[0], 0) / outline.length,
-    outline.reduce((sum, p) => sum + p[1], 0) / outline.length,
-  ];
-  return { name: feature.properties.name, polygons, center };
+  return { name: feature.properties.name, polygons, center: centroid(polygons[0][0]) };
+}
+
+/** Titik berat poligon (rumus luas bertanda), dipakai untuk menaruh nama wilayah dan mencari titik cuaca terdekat. */
+function centroid(ring: LatLng[]): LatLng {
+  let area = 0;
+  let lat = 0;
+  let lng = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const cross = ring[j][1] * ring[i][0] - ring[i][1] * ring[j][0];
+    area += cross;
+    lat += (ring[j][0] + ring[i][0]) * cross;
+    lng += (ring[j][1] + ring[i][1]) * cross;
+  }
+  return [lat / (3 * area), lng / (3 * area)];
+}
+
+/** Nama pendek untuk label di peta: "Semarang Utara" menjadi "Smg. Utara". */
+export function shortName(name: string): string {
+  return name.replace(/^Semarang /, "Smg. ");
 }
 
 export const DISTRICTS: District[] = (collection.features as unknown as Feature[]).map(toDistrict);

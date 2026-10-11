@@ -154,6 +154,60 @@ export function themeSources(cameras: CameraOverview[], theme: Theme): CameraOve
   return [];
 }
 
+function wettestGrid(weather: GridWeather[]): GridWeather | null {
+  return weather.reduce<GridWeather | null>(
+    (max, grid) => (max === null || grid.precip_next_3h_mm > max.precip_next_3h_mm ? grid : max),
+    null,
+  );
+}
+
+export type CityStat = { id: "water" | "rain" | "traffic" | "coverage"; label: string; value: string; unit: string; hint: string; tone: Tone };
+
+/** Empat angka utama kota: satu angka per pertanyaan, dengan keterangan singkat di bawahnya. */
+export function cityStats(cameras: CameraOverview[], weather: GridWeather[], summaries: DistrictSummary[]): CityStat[] {
+  const waterSites = cameras.filter(hasWaterStatus);
+  const elevated = waterSites.filter((cam) => isElevated(cam.water_status));
+  const trafficSites = cameras.filter(hasDensity);
+  const busy = trafficSites.filter((cam) => cam.density_level === "ramai" || cam.density_level === "padat");
+  const wettest = wettestGrid(weather);
+  const tracked = summaries.filter((s) => s.waterSites.length > 0).length;
+  const rainMm = wettest?.precip_next_3h_mm ?? null;
+  return [
+    {
+      id: "water",
+      label: "Lokasi air waspada ke atas",
+      value: waterSites.length > 0 ? String(elevated.length) : "–",
+      unit: waterSites.length > 0 ? `/ ${waterSites.length} lokasi` : "",
+      hint: waterSites.length === 0 ? "Belum ada lokasi yang dinilai" : elevated.length === 0 ? "Semua lokasi normal" : listNames(elevated.map((c) => c.name), 2),
+      tone: elevated.length > 0 ? "waspada" : "normal",
+    },
+    {
+      id: "rain",
+      label: "Hujan 3 jam ke depan",
+      value: rainMm == null ? "–" : formatNumber(rainMm, 1),
+      unit: rainMm == null ? "" : "mm",
+      hint: wettest ? `Tertinggi di ${wettest.name}` : "Data hujan belum tersedia",
+      tone: rainMm != null && rainMm >= 10 ? "waspada" : "normal",
+    },
+    {
+      id: "traffic",
+      label: "Titik lebih padat dari biasanya",
+      value: trafficSites.length > 0 ? String(busy.length) : "–",
+      unit: trafficSites.length > 0 ? `/ ${trafficSites.length} titik` : "",
+      hint: "Dibanding kebiasaan tiap titik",
+      tone: "density-normal",
+    },
+    {
+      id: "coverage",
+      label: "Kecamatan dengan lokasi air terpantau",
+      value: String(tracked),
+      unit: `/ ${summaries.length} kecamatan`,
+      hint: tracked < summaries.length ? `${summaries.length - tracked} kecamatan belum terpantau` : "Semua kecamatan terpantau",
+      tone: "unknown",
+    },
+  ];
+}
+
 export type CitySituation = {
   tone: Tone;
   headline: string;
@@ -170,12 +224,7 @@ export function citySituation(cameras: CameraOverview[], weather: GridWeather[])
   const waterSites = cameras.filter(hasWaterStatus);
   const elevated = waterSites.filter((cam) => isElevated(cam.water_status));
   const rising = waterSites.filter((cam) => cam.water_trend === "naik" || cam.water_trend === "naik_cepat");
-  const trafficSites = cameras.filter(hasDensity);
-  const busy = trafficSites.filter((cam) => cam.density_level === "ramai" || cam.density_level === "padat");
-  const wettest = weather.reduce<GridWeather | null>(
-    (max, grid) => (max === null || grid.precip_next_3h_mm > max.precip_next_3h_mm ? grid : max),
-    null,
-  );
+  const wettest = wettestGrid(weather);
 
   const points: string[] = [];
   if (waterSites.length === 0) {
@@ -197,14 +246,6 @@ export function citySituation(cameras: CameraOverview[], weather: GridWeather[])
     points.push(`Hujan ringan diprakirakan dalam 3 jam ke depan, paling banyak ${formatNumber(wettest.precip_next_3h_mm, 1)} mm di ${wettest.name}.`);
   } else {
     points.push("Tidak ada hujan berarti yang diprakirakan dalam 3 jam ke depan.");
-  }
-
-  if (trafficSites.length > 0) {
-    points.push(
-      busy.length === 0
-        ? `Lalu lintas di ${trafficSites.length} titik pantau tidak lebih padat dari biasanya.`
-        : `${busy.length} dari ${trafficSites.length} titik lalu lintas lebih padat dari kebiasaannya.`,
-    );
   }
 
   const worst = elevated.some((c) => c.water_status === "awas")

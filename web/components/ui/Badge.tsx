@@ -1,10 +1,12 @@
-import { TONE_BG, type StatusDisplay } from "@/lib/status";
+import type { StatusDisplay } from "@/lib/status";
 
 /** Status selalu tampil sebagai titik warna + teks, tidak pernah warna saja. */
 export function Badge({ status }: { status: StatusDisplay }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-token border border-border bg-surface px-2 py-0.5 text-xs font-medium">
-      <span aria-hidden className={`h-2.5 w-2.5 rounded-full ${TONE_BG[status.tone]}`} />
+    <span
+      className={`tint tone-${status.tone} inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] leading-none font-bold tracking-wide whitespace-nowrap uppercase`}
+    >
+      <span aria-hidden className="tint-dot h-2 w-2 rounded-full" />
       {status.label}
     </span>
   );

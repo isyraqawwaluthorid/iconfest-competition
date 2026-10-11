@@ -8,10 +8,10 @@ import { isOnline } from "@/lib/status";
 
 export default function HomePage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">Denyut Kota Semarang</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted">
+        <h1 className="text-3xl font-extrabold">Denyut Kota Semarang</h1>
+        <p className="mt-1 max-w-2xl text-muted">
           Kondisi air, lalu lintas, dan hujan per kecamatan, dibaca dari CCTV publik setiap 5 menit dan digabung dengan
           prakiraan cuaca.
         </p>

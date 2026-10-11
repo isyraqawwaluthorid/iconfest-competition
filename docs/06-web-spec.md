@@ -120,25 +120,23 @@ web/
 └── ...
 ```
 
-## Desain placeholder
+## Desain
 
-Desainer sedang menyiapkan UI final. Untuk sekarang:
+Sejak 11 Okt tampilan dikerjakan langsung di repo ini (tidak lagi menunggu desainer). Gaya visual mengambil acuan dari rancangan "SemarSight Command Center" yang dibuat di Stitch, dengan isi tiap layar dikurangi: satu layar menjawab satu pertanyaan, rincian muncul setelah kecamatan dipilih.
 
-1. **Semua warna, radius, spasi, dan font lewat CSS variables** di `globals.css`, dipetakan ke Tailwind (`theme.extend.colors` memakai `var(--...)`). Komponen tidak boleh memakai kode warna langsung. Desainer nanti cukup mengganti token.
-   ```css
-   :root {
-     --bg: #f7f7f8; --surface: #ffffff; --text: #18181b; --muted: #71717a; --border: #e4e4e7;
-     --primary: #2563eb;
-     --status-normal: #16a34a; --status-waspada: #ca8a04; --status-siaga: #ea580c; --status-awas: #dc2626;
-     --status-unknown: #a1a1aa; --status-offline: #52525b;
-     --radius: 8px; --font-sans: system-ui, sans-serif;
-   }
-   @media (prefers-color-scheme: dark) { :root { --bg: #0b0b0c; --surface: #18181b; --text: #f4f4f5; --muted: #a1a1aa; --border: #27272a; } }
-   ```
-2. **Komponen UI primitif sederhana** di `components/ui/`, tanpa library desain berat. Desainer nanti mengganti isi komponen ini tanpa menyentuh halaman.
-3. **Status tidak boleh hanya dibedakan warna:** selalu ada label teks (dan ikon jika ada). Penting untuk keterbacaan orang awam (rubrik UI/UX).
-4. **Mobile-first:** semua halaman bisa dipakai di layar 360 px; peta dan panel kamera berganti menjadi tampilan bertumpuk.
-5. **Setiap komponen data wajib punya empat keadaan:** memuat (skeleton), kosong (penjelasan + kenapa), error (pesan + coba lagi), dan data usang/offline (penanda kesegaran).
+Yang diambil dari acuan: huruf (Plus Jakarta Sans untuk judul dan angka, Inter untuk teks), biru `#2563eb` sebagai warna utama, kartu putih bergaris tipis dengan sudut 12 px, lencana status berbentuk pil, panel berwarna lembut dengan garis kiri sesuai status, label kecil huruf besar, dan arsiran diagonal untuk wilayah tidak terpantau.
+
+Yang sengaja **tidak** diambil, karena datanya tidak kita punya: tinggi air dalam cm, kecepatan dalam km/jam, jumlah dan debit pompa, kualitas udara, identitas petugas, dan tanda "diverifikasi petugas". Semua angka di layar harus berasal dari data yang benar-benar dikumpulkan sistem.
+
+1. **Semua warna, radius, bayangan, dan font lewat CSS variables** di `globals.css`, dipetakan ke Tailwind lewat `@theme inline`. Komponen tidak memakai kode warna langsung.
+   - Tiap status punya tiga warna: warna utama (titik, garis, peta), latar lembut (`--status-*-bg`), dan teks di atas latar itu (`--status-*-text`).
+   - Kelas `tint tone-*` memberi latar dan teks sesuai status; `accent-left` menambah garis kiri; `label-caps` untuk label kecil huruf besar.
+   - Font dimuat lewat `next/font` (di-host sendiri, tanpa permintaan ke Google saat halaman dibuka).
+2. **Komponen UI primitif** di `components/ui/` (Card, Badge, Button, Stat, Icon, EmptyState, ErrorState, Skeleton), tanpa library desain. Ikon berupa SVG garis sederhana dan hanya hiasan; makna selalu ada di teks.
+3. **Status tidak boleh hanya dibedakan warna:** selalu ada label teks. Wilayah tidak terpantau diberi arsiran, bukan sekadar abu-abu.
+4. **Hanya tema terang.** Peta dasar OpenStreetMap berwarna terang dan diredam (abu-abu, transparan) agar warna wilayah menonjol; tema gelap otomatis dihapus karena bertabrakan dengan peta.
+5. **Mobile-first:** semua halaman bisa dipakai di layar 360 px; peta dan panel berganti menjadi tampilan bertumpuk.
+6. **Setiap komponen data wajib punya empat keadaan:** memuat (skeleton), kosong (penjelasan + kenapa), error (pesan + coba lagi), dan data usang/offline (penanda kesegaran).
 
 ## Kriteria penerimaan web untuk penyisihan
 
