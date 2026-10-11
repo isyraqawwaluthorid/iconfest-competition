@@ -19,7 +19,7 @@ from typing import Any
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from . import acquisition, housekeeping, quality, storage
+from . import acquisition, alerts, housekeeping, quality, storage
 from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
@@ -96,6 +96,7 @@ def run_cycle(
     frame_states: dict[str, FrameState],
     history: baseline.RollingHistory,
     water_pipeline: WaterPipeline,
+    weather: dict[str, openmeteo.GridWeather],
     *,
     only: list[str] | None = None,
     limit: int | None = None,
@@ -103,7 +104,8 @@ def run_cycle(
     started_at = datetime.now(timezone.utc)
     started = time.monotonic()
 
-    cameras = _select_cameras(database.active_cameras(), only, limit)
+    all_cameras = database.active_cameras()
+    cameras = _select_cameras(all_cameras, only, limit)
     before = database.status_snapshot()
 
     with ThreadPoolExecutor(max_workers=settings.max_concurrency) as pool:
@@ -141,6 +143,10 @@ def run_cycle(
             for r in recordable
         ]
     )
+    try:
+        alerts.sync(database, all_cameras, weather)
+    except Exception:  # noqa: BLE001 - peringatan disusun ulang pada siklus berikutnya
+        log.exception("pembaruan peringatan gagal")
 
     stats = CycleStats(
         started_at=started_at,
@@ -379,8 +385,9 @@ def main(argv: list[str] | None = None) -> int:
     def cycle() -> None:
         try:
             run_cycle(
-                settings, database, frame_states, history, water_pipeline, only=args.only_camera, limit=args.limit
-            )
+                settings, database, frame_states, history, water_pipeline, weather,
+                only=args.only_camera, limit=args.limit,
+            )  # fmt: skip
         except Exception:  # noqa: BLE001 - siklus berikutnya harus tetap berjalan
             log.exception("siklus gagal")
         finally:

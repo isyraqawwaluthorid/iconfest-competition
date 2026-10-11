@@ -73,7 +73,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 ## Fase 4 — Fusi + insight (Selasa 13 Okt)
 
 - [x] **T4.1 [K]** `fusion/trend.py` dan `fusion/risk.py` (komponen dan bobot disimpan di `risk_components`). Unit test. Selesai 11 Okt: tren dan risiko dihitung ulang tiap siklus untuk kamera air yang hidup; komponen hulu masih 0 sampai T4.3.
-- [ ] **T4.2 [K]** `alerts.py`: `upsert_alert` / `resolve_alert`, satu aktif per (jenis, kamera), teks dari template. Termasuk `heavy_rain` (hujan ≥ 10 mm dalam 3 jam ke depan, per titik grid).
+- [x] **T4.2 [K]** `alerts.py`: satu aktif per (jenis, kamera), teks dari template. Selesai 11 Okt: `water_rising`, `road_flooded`, `heavy_rain`, `trash_blockage`, `camera_offline`, diselaraskan tiap siklus; jalur tulis diuji ke database dengan hujan buatan (buat, perbarui, tutup). `upstream_warning` ikut T4.3; `traffic_anomaly` dan `crowd_anomaly` ikut T4.6.
 - [ ] **T4.3 [K]** `/admin/sungai` + `/api/admin/river-links`; `fusion/upstream.py` (peringatan hulu → hilir, belajar jeda).
 - [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan.
 - [ ] **T4.5 [K]** `fusion/events.py`: buka, perbarui puncak, tutup kejadian.

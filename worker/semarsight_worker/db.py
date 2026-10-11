@@ -36,8 +36,8 @@ class Database:
         return [CameraRow.model_validate(row) for row in response.data]
 
     def weather_grid(self) -> list[GridPoint]:
-        response = self._client.table("weather_grid").select("id, lat, lng").order("id").execute()
-        return [GridPoint(id=row["id"], lat=row["lat"], lng=row["lng"]) for row in response.data]
+        response = self._client.table("weather_grid").select("id, name, lat, lng").order("id").execute()
+        return [GridPoint(id=row["id"], lat=row["lat"], lng=row["lng"], name=row["name"] or "") for row in response.data]
 
     def insert_weather_readings(self, rows: list[dict[str, Any]]) -> None:
         if not rows or self.dry_run:
@@ -137,6 +137,44 @@ class Database:
             batches[frozenset(row)].append(row)
         for batch in batches.values():
             self._client.table("camera_status").upsert(batch, on_conflict="camera_id").execute()
+
+    def alert_inputs(self) -> dict[str, dict[str, Any]]:
+        """Keadaan `camera_status` setelah siklus ini, sebatas kolom yang dipakai aturan peringatan."""
+        response = (
+            self._client.table("camera_status")
+            .select(
+                "camera_id, consecutive_failures, last_live_at, water_status, water_status_since, water_trend, "
+                "road_flood, trash, risk_level"
+            )
+            .execute()
+        )
+        return {row["camera_id"]: row for row in response.data}
+
+    def active_alerts(self, types: tuple[str, ...]) -> list[dict[str, Any]]:
+        response = (
+            self._client.table("alerts")
+            .select("id, type, camera_id, level, title, message")
+            .eq("is_active", True)
+            .eq("source", "live")
+            .in_("type", list(types))
+            .execute()
+        )
+        return response.data
+
+    def insert_alerts(self, rows: list[dict[str, Any]]) -> None:
+        if not rows or self.dry_run:
+            return
+        self._client.table("alerts").insert(rows).execute()
+
+    def update_alert(self, alert_id: str, fields: dict[str, Any]) -> None:
+        if self.dry_run:
+            return
+        self._client.table("alerts").update(fields).eq("id", alert_id).execute()
+
+    def resolve_alerts(self, alert_ids: list[str], at: datetime) -> None:
+        if not alert_ids or self.dry_run:
+            return
+        self._client.table("alerts").update({"is_active": False, "resolved_at": at.isoformat()}).in_("id", alert_ids).execute()
 
     def upload_snapshot(self, path: str, jpeg: bytes) -> None:
         if self.dry_run:

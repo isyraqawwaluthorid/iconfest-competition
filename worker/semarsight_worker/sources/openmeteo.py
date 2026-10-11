@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Any
 
@@ -18,6 +18,7 @@ class GridPoint:
     id: str
     lat: float
     lng: float
+    name: str = ""
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,7 @@ class GridWeather:
     precip_next_6h_mm: float
     precip_prob_max_3h: float | None
     hourly: list[dict[str, Any]]
+    grid_name: str = ""  # nama wilayah, untuk teks peringatan
 
     @property
     def rain_for_trigger_mm(self) -> float:
@@ -90,4 +92,7 @@ def fetch_grid_weather(points: list[GridPoint], now: datetime) -> list[GridWeath
     response.raise_for_status()
     body = response.json()
     payloads = body if isinstance(body, list) else [body]  # satu titik dijawab sebagai objek, bukan daftar
-    return [summarize(point.id, payload, now) for point, payload in zip(points, payloads, strict=True)]
+    return [
+        replace(summarize(point.id, payload, now), grid_name=point.name)
+        for point, payload in zip(points, payloads, strict=True)
+    ]
