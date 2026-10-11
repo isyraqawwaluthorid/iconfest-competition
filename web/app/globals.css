@@ -98,6 +98,27 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+/* Wadah halaman biasa. Beranda tidak memakainya karena petanya memenuhi layar. */
+.page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding: 1.5rem 1rem;
+}
+@media (min-width: 1024px) {
+  .page { padding-inline: 2rem; }
+}
+
+/* Panel yang mengambang di atas peta. Di atas lapisan dan kontrol Leaflet (z-index hingga 1000). */
+.map-panel {
+  z-index: 1001;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(6px);
+}
+
 h1, h2, h3 {
   font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   letter-spacing: -0.015em;

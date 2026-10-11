@@ -22,7 +22,7 @@ const NO_CALIBRATION: Calibration = { lines: [], referenceDay: null, referenceNi
 
 export default function CameraPage({ params }: PageProps<"/kamera/[id]">) {
   return (
-    <div className="space-y-5">
+    <div className="page space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <Link href="/" className="font-medium text-primary hover:underline">
           ← Kembali ke Beranda

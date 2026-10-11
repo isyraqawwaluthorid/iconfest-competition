@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Semarang Saat Ini" };
 
 export default function MosaicPage() {
   return (
-    <div className="space-y-4">
+    <div className="page space-y-4">
       <div>
         <h1 className="text-2xl font-semibold">Semarang saat ini</h1>
         <p className="mt-1 text-sm text-muted">

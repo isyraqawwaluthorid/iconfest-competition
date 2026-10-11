@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Admin", robots: { index: false, foll
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
-    <div className="space-y-4">
+    <div className="page space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-token border border-border bg-surface px-3 py-2">
         <nav aria-label="Navigasi admin" className="flex items-center gap-4 text-sm">
           <span className="font-semibold">Admin</span>

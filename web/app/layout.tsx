@@ -33,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="id" className={`${inter.variable} ${jakarta.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-[1100] border-b border-border bg-surface">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 lg:px-8">
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-2.5 lg:px-6">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               <Link href="/" className="flex items-center gap-2.5">
                 <span aria-hidden className="flex h-9 w-9 items-center justify-center rounded-control bg-primary text-on-primary">
@@ -59,9 +59,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <SystemBannerLoader />
         </Suspense>
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 lg:px-8">{children}</main>
+        <main className="flex flex-1 flex-col">{children}</main>
         <footer className="border-t border-border bg-surface">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted lg:px-8">
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2.5 text-xs text-muted lg:px-6">
             <p>
               <span className="font-display font-bold text-primary">SemarSight</span> · CCTV: PANTAUSEMAR, Pemerintah
               Kota Semarang · Peta: OpenStreetMap · Cuaca: Open-Meteo

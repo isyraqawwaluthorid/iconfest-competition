@@ -121,7 +121,7 @@ Arsitektur sengaja memisahkan sumber (`worker/semarsight_worker/sources/`) agar 
 - **Tidak ada pengenalan wajah dan tidak ada pembacaan pelat nomor.** YOLO hanya menghitung objek per kelas.
 - **Retensi:**
   - Frame penuh di disk worker: maksimal 14 hari, lalu dihapus otomatis kecuali yang dipakai untuk label evaluasi atau snapshot kejadian.
-  - Supabase Storage: hanya snapshot terbaru per kamera (ditimpa) dan snapshot kejadian.
+  - Supabase Storage: snapshot terbaru per kamera (ditimpa), snapshot kejadian, dan **gambar bukti penilaian AI** untuk kamera air unggulan (`readings/{camera_id}/{waktu}.jpg`, lebar maks. 960 px). Gambar bukti dihapus otomatis setelah **3 hari**; tujuannya agar setiap penilaian AI bisa diperiksa orang, bukan untuk arsip.
   - Angka agregat (jumlah, status, skor) disimpan tanpa batas.
 - **Beban server sumber:** satu frame per kamera per 5 menit, konkurensi terbatas.
 - **Izin:** kirim email permohonan izin pemanfaatan data ke Diskominfo Kota Semarang dan lampirkan buktinya di laporan. Cantumkan atribusi "Sumber: PANTAUSEMAR, Pemerintah Kota Semarang" di website.

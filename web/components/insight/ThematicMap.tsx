@@ -1,8 +1,18 @@
 "use client";
 
 import L from "leaflet";
-import { useMemo } from "react";
-import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, Tooltip } from "react-leaflet";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  AttributionControl,
+  CircleMarker,
+  MapContainer,
+  Marker,
+  Polygon,
+  TileLayer,
+  Tooltip,
+  useMap,
+  ZoomControl,
+} from "react-leaflet";
 import { CITY_BOUNDS, districtOf, DISTRICTS, shortName } from "@/lib/geo/districts";
 import { themeDisplay, type DistrictSummary, type Theme } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, WATER } from "@/lib/status";
@@ -16,6 +26,33 @@ type Props = {
   onSelect: (district: string) => void;
 };
 
+const WIDE_SCREEN = 1024;
+
+/**
+ * Ruang yang disisakan untuk panel yang mengambang di atas peta pada layar lebar, agar wilayah
+ * yang dibingkai tidak tertutup panel. Di layar sempit panel berada di bawah peta.
+ */
+function framing(): L.FitBoundsOptions {
+  const wide = typeof window !== "undefined" && window.innerWidth >= WIDE_SCREEN;
+  return wide ? { paddingTopLeft: [400, 76], paddingBottomRight: [420, 56] } : { padding: [8, 8] };
+}
+
+/** Menggeser peta ke kecamatan yang dipilih, atau kembali ke seluruh kota saat pilihan dilepas. */
+function Focus({ selected }: { selected: string | null }) {
+  const map = useMap();
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true; // bingkai awal sudah diatur MapContainer
+      return;
+    }
+    const district = DISTRICTS.find((d) => d.name === selected);
+    const bounds = district ? L.latLngBounds(district.polygons.flatMap((polygon) => polygon[0])) : L.latLngBounds(CITY_BOUNDS);
+    map.flyToBounds(bounds, { ...framing(), maxZoom: 13.5, duration: 0.6 });
+  }, [map, selected]);
+  return null;
+}
+
 /** Peta tematik per kecamatan. Hanya dirender di browser (lihat InsightView). */
 export default function ThematicMap({ summaries, theme, sources, selected, onSelect }: Props) {
   const labels = useMemo(
@@ -26,19 +63,26 @@ export default function ThematicMap({ summaries, theme, sources, selected, onSel
       })),
     [],
   );
+  const initialFraming = useMemo(() => framing(), []);
 
   return (
     <MapContainer
       bounds={CITY_BOUNDS}
-      boundsOptions={{ padding: [4, 4] }}
+      boundsOptions={initialFraming}
       zoomSnap={0.25}
+      zoomControl={false}
+      attributionControl={false}
       scrollWheelZoom
-      className="thematic-map h-full w-full rounded-token"
+      className="thematic-map h-full w-full"
     >
       <TileLayer
         attribution='&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      {/* Pojok kiri bawah adalah satu-satunya pojok yang tidak tertutup panel. */}
+      <AttributionControl position="bottomleft" />
+      <ZoomControl position="bottomleft" />
+      <Focus selected={selected} />
       {summaries.map((summary) => {
         const { name, polygons } = summary.district;
         const display = themeDisplay(summary, theme);

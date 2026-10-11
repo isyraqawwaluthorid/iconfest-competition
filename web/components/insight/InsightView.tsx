@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Stat } from "@/components/ui/Stat";
+import { districtOf } from "@/lib/geo/districts";
 import { useLiveAlerts, useLiveCameras } from "@/lib/hooks";
 import {
   citySituation,
@@ -20,10 +19,9 @@ import {
   themeLegend,
   themeSources,
   THEMES,
-  type CityStat,
   type Theme,
 } from "@/lib/insight";
-import { ALERT, DENSITY, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER } from "@/lib/status";
+import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
 import { formatTimeWib } from "@/lib/time";
 import type { Alert, CameraOverview, GridWeather } from "@/lib/types";
 import { DistrictPanel } from "./DistrictPanel";
@@ -31,20 +29,26 @@ import { DistrictPanel } from "./DistrictPanel";
 // Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
 const ThematicMap = dynamic(() => import("./ThematicMap"), {
   ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
+  loading: () => <Skeleton className="h-full w-full rounded-none" />,
 });
 
-const TOP_COUNT = 5;
-const STAT_ICON: Record<CityStat["id"], IconName> = { water: "droplet", rain: "rain", traffic: "car", coverage: "map" };
+const TOP_COUNT = 6;
+type Tab = "alerts" | "water" | "traffic";
 
 type Props = { initialCameras: CameraOverview[]; initialAlerts: Alert[]; weather: GridWeather[] };
 
-/** Beranda: kondisi kota lebih dulu (ringkasan, angka utama, peta tematik), kamera hanya sebagai sumber data. */
+/**
+ * Beranda: peta memenuhi layar dan semua ringkasan mengambang di atasnya sebagai panel.
+ * Kiri: kondisi kota. Kanan: peringatan dan peringkat, atau rincian kecamatan yang dipilih.
+ * Di layar sempit, panel turun ke bawah peta.
+ */
 export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
   const cameras = useLiveCameras(initialCameras);
   const alerts = useLiveAlerts(initialAlerts);
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("alerts");
+  const [summaryOpen, setSummaryOpen] = useState(true);
 
   const summaries = useMemo(() => summarizeDistricts(cameras, weather), [cameras, weather]);
   const situation = useMemo(() => citySituation(cameras, weather), [cameras, weather]);
@@ -65,9 +69,19 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
     .filter(hasDensity)
     .sort((a, b) => (b.density_index ?? 0) - (a.density_index ?? 0))
     .slice(0, TOP_COUNT);
+  const showOnMap = (camera: CameraOverview) => {
+    const district = districtOf(camera.lat, camera.lng);
+    if (district) setSelected(district);
+  };
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "alerts", label: `Peringatan (${alerts.length})` },
+    { id: "water", label: "Risiko air" },
+    { id: "traffic", label: "Lalu lintas" },
+  ];
 
   return (
-    <div className="space-y-5">
+    <div className="relative flex flex-1 flex-col lg:min-h-[40rem]">
       {/* Pola arsiran untuk kecamatan tanpa sumber data; dirujuk dari CSS peta lewat url(#untracked-stripes). */}
       <svg aria-hidden width="0" height="0" className="absolute">
         <defs>
@@ -78,189 +92,231 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
         </defs>
       </svg>
 
-      <section aria-label="Kondisi kota sekarang" className={`tint tone-${situation.tone} accent-left rounded-token p-5`}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="label-caps">Kondisi kota sekarang</p>
-          <FreshnessTag at={latest} />
+      <section aria-label="Peta kondisi per kecamatan" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
+        <ThematicMap summaries={summaries} theme={theme} sources={sources} selected={selected} onSelect={setSelected} />
+
+        <div
+          role="group"
+          aria-label="Tema peta"
+          className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 gap-1 overflow-x-auto p-1"
+        >
+          {THEMES.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={item.id === theme}
+              onClick={() => setTheme(item.id)}
+              className={`rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
+                item.id === theme ? "bg-primary font-semibold text-on-primary" : "font-medium text-muted hover:bg-surface-muted hover:text-text"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
-        <h2 className="mt-1 text-2xl font-extrabold">{situation.headline}</h2>
-        <p className="mt-1 max-w-3xl">{situation.points.join(" ")}</p>
       </section>
 
-      <section aria-label="Angka utama" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Stat
-            key={stat.id}
-            label={stat.label}
-            value={stat.value}
-            unit={stat.unit}
-            hint={stat.hint}
-            icon={<Icon name={STAT_ICON[stat.id]} />}
-          />
-        ))}
-      </section>
-
-      <Card>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold">Peta kondisi per kecamatan</h2>
-            <p className="mt-0.5 text-sm text-muted">{activeTheme.explain}</p>
-          </div>
-          <div className="inline-flex flex-wrap gap-1 rounded-control bg-surface-muted p-1" role="group" aria-label="Tema peta">
-            {THEMES.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={item.id === theme}
-                onClick={() => setTheme(item.id)}
-                className={`rounded-[6px] px-3 py-1.5 text-sm transition-colors ${
-                  item.id === theme ? "bg-surface font-semibold text-primary shadow-card" : "font-medium text-muted hover:text-text"
-                }`}
-              >
+      {/* Legenda: mengambang di tengah bawah peta pada layar lebar, tepat di bawah peta pada layar sempit. */}
+      <div className="px-3 pt-3 lg:absolute lg:bottom-3 lg:left-1/2 lg:z-[1001] lg:w-max lg:max-w-[calc(100%-48rem)] lg:-translate-x-1/2 lg:p-0">
+        <div className="map-panel relative px-3 py-2">
+          <ul className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs" aria-label="Keterangan warna wilayah">
+            {themeLegend(theme).map((item) => (
+              <li key={item.label} className="flex items-center gap-1.5">
+                <span
+                  aria-hidden
+                  className={`h-3 w-3 rounded-[3px] border border-border ${item.tone === "untracked" ? "swatch-untracked" : TONE_BG[item.tone]}`}
+                />
                 {item.label}
-              </button>
+              </li>
             ))}
-          </div>
+          </ul>
+          <p className="mt-1 text-center text-[11px] text-muted">{activeTheme.explain}</p>
         </div>
+      </div>
 
-        <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_23rem]">
-          <div>
-            <div className="h-[56vh] min-h-80 overflow-hidden rounded-token border border-border lg:h-[34rem]">
-              <ThematicMap summaries={summaries} theme={theme} sources={sources} selected={selected} onSelect={setSelected} />
+      <div className="p-3 lg:absolute lg:top-3 lg:left-3 lg:w-[22rem] lg:p-0">
+        <section aria-label="Kondisi kota sekarang" className="map-panel relative overflow-hidden">
+          <div className={`tint tone-${situation.tone} p-4`}>
+            <div className="flex items-center justify-between gap-2">
+              <p className="label-caps">Kondisi kota sekarang</p>
+              <button
+                type="button"
+                onClick={() => setSummaryOpen((open) => !open)}
+                aria-expanded={summaryOpen}
+                aria-label={summaryOpen ? "Ciutkan ringkasan" : "Buka ringkasan"}
+                className="-m-1 rounded-control p-1 hover:bg-surface/60"
+              >
+                <Icon name={summaryOpen ? "chevron-up" : "chevron-down"} size={18} />
+              </button>
             </div>
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted" aria-label="Keterangan warna wilayah">
-              {themeLegend(theme).map((item) => (
-                <li key={item.label} className="flex items-center gap-1.5">
-                  <span
-                    aria-hidden
-                    className={`h-3 w-3 rounded-[3px] border border-border ${
-                      item.tone === "untracked" ? "swatch-untracked" : TONE_BG[item.tone]
-                    }`}
-                  />
-                  {item.label}
-                </li>
-              ))}
-            </ul>
+            <h1 className="mt-1 text-xl leading-tight font-extrabold">{situation.headline}</h1>
+            {summaryOpen ? <p className="mt-1.5 text-sm">{situation.points.join(" ")}</p> : null}
           </div>
+          {summaryOpen ? (
+            <div className="p-4">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {stats.map((stat) => (
+                  <div key={stat.id}>
+                    <dt className="text-[11px] leading-tight font-semibold text-muted">{stat.label}</dt>
+                    <dd className="mt-0.5 flex items-baseline gap-1">
+                      <span className="font-display text-2xl font-bold tabular-nums">{stat.value}</span>
+                      <span className="text-xs text-muted">{stat.unit}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border pt-3 text-xs text-muted">
+                <FreshnessTag at={latest} />
+                <span>
+                  {cameras.filter(isOnline).length} dari {cameras.length} kamera aktif ·{" "}
+                  <Link href="/kamera" className="text-primary hover:underline">
+                    lihat
+                  </Link>
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </section>
+      </div>
 
-          <aside className="lg:max-h-[37rem] lg:overflow-y-auto">
-            {selectedSummary ? (
+      <div className="p-3 pt-0 lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[23rem] lg:p-0">
+        <aside className="map-panel relative flex flex-col overflow-hidden lg:max-h-full">
+          {selectedSummary ? (
+            <div className="overflow-y-auto p-4">
               <DistrictPanel summary={selectedSummary} onClose={() => setSelected(null)} />
-            ) : (
-              <AlertList alerts={alerts} />
-            )}
-          </aside>
-        </div>
-      </Card>
-
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Card title="Lokasi air menurut risiko">
-          {riskiest.length === 0 ? (
-            <p className="text-sm text-muted">Belum ada lokasi air yang dinilai.</p>
+            </div>
           ) : (
-            <ol className="divide-y divide-border text-sm">
-              {riskiest.map((site, index) => (
-                <RankRow
-                  key={site.id}
-                  rank={index + 1}
-                  href={`/kamera/${site.id}`}
-                  name={site.name}
-                  detail={`${site.water_status ? WATER[site.water_status].label : NOT_ASSESSED.label}${
-                    site.water_trend ? `, ${TREND_LABEL[site.water_trend]}` : ""
-                  }${site.risk_score != null ? ` · skor ${formatNumber(site.risk_score, 2)}` : ""}`}
-                  badge={site.risk_level ? <Badge status={RISK[site.risk_level]} /> : null}
-                />
-              ))}
-            </ol>
+            <>
+              <div role="tablist" aria-label="Isi panel" className="flex gap-1 border-b border-border p-1.5">
+                {tabs.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={item.id === tab}
+                    onClick={() => setTab(item.id)}
+                    className={`flex-1 rounded-control px-2 py-1.5 text-sm transition-colors ${
+                      item.id === tab ? "bg-primary-soft font-semibold text-primary-strong" : "font-medium text-muted hover:bg-surface-muted hover:text-text"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <div className="overflow-y-auto p-4 text-sm">
+                {tab === "alerts" ? <AlertList alerts={alerts} /> : null}
+                {tab === "water" ? (
+                  <Ranking
+                    empty="Belum ada lokasi air yang dinilai."
+                    note="Skor 0–1 dari status air (40%), tren (20%), kondisi hulu (20%), dan prakiraan hujan 3 jam (20%). Bukan pengukuran tinggi air."
+                    rows={riskiest.map((site) => ({
+                      camera: site,
+                      detail: `${site.water_status ? WATER[site.water_status].label : NOT_ASSESSED.label}${
+                        site.water_trend ? `, ${TREND_LABEL[site.water_trend]}` : ""
+                      }${site.risk_score != null ? ` · skor ${formatNumber(site.risk_score, 2)}` : ""}`,
+                      status: site.risk_level ? RISK[site.risk_level] : NOT_ASSESSED,
+                    }))}
+                    onShow={showOnMap}
+                  />
+                ) : null}
+                {tab === "traffic" ? (
+                  <Ranking
+                    empty="Belum ada titik lalu lintas yang punya pembanding."
+                    note="Indeks kepadatan relatif: jumlah kendaraan pada gambar terakhir dibanding median titik itu sendiri."
+                    rows={busiest.map((site) => ({
+                      camera: site,
+                      detail: `${formatNumber(site.density_index ?? 0, 2)}× kebiasaan · ${site.vehicle_count ?? 0} kendaraan`,
+                      status: DENSITY[site.density_level ?? "tidak_diketahui"],
+                    }))}
+                    onShow={showOnMap}
+                  />
+                ) : null}
+                <p className="mt-4 rounded-control border border-dashed border-border p-3 text-xs text-muted">
+                  Ketuk satu kecamatan di peta untuk melihat kondisi air, lalu lintas, dan hujannya.
+                </p>
+              </div>
+            </>
           )}
-          <p className="mt-3 text-xs text-muted">
-            Skor 0–1 dari status air (40%), tren (20%), kondisi hulu (20%), dan prakiraan hujan 3 jam (20%). Bukan
-            pengukuran tinggi air.
-          </p>
-        </Card>
-
-        <Card title="Lalu lintas paling padat dibanding kebiasaannya">
-          {busiest.length === 0 ? (
-            <p className="text-sm text-muted">Belum ada titik lalu lintas yang punya pembanding.</p>
-          ) : (
-            <ol className="divide-y divide-border text-sm">
-              {busiest.map((site, index) => (
-                <RankRow
-                  key={site.id}
-                  rank={index + 1}
-                  href={`/kamera/${site.id}`}
-                  name={site.name}
-                  detail={`${formatNumber(site.density_index ?? 0, 2)}× kebiasaan · ${site.vehicle_count ?? 0} kendaraan terdeteksi`}
-                  badge={<Badge status={DENSITY[site.density_level ?? "tidak_diketahui"]} />}
-                />
-              ))}
-            </ol>
-          )}
-          <p className="mt-3 text-xs text-muted">
-            Indeks kepadatan relatif: jumlah kendaraan pada gambar terakhir dibanding median titik itu sendiri.
-          </p>
-        </Card>
+        </aside>
       </div>
     </div>
   );
 }
 
 function AlertList({ alerts }: { alerts: Alert[] }) {
-  return (
-    <div className="space-y-4 text-sm">
-      <div>
-        <p className="label-caps flex items-center gap-1.5 text-muted">
-          <Icon name="alert" size={14} /> Peringatan aktif
+  if (alerts.length === 0) {
+    return (
+      <div className="tint tone-normal accent-left rounded-control p-3">
+        <p className="font-semibold">Tidak ada peringatan aktif</p>
+        <p className="mt-1 text-xs">
+          Peringatan muncul otomatis saat status air naik, hujan lebat diprakirakan, atau lokasi unggulan tidak
+          terpantau.
         </p>
-        {alerts.length === 0 ? (
-          <div className="tint tone-normal accent-left mt-2 rounded-control p-3">
-            <p className="font-semibold">Tidak ada peringatan aktif</p>
-            <p className="mt-1 text-xs">
-              Peringatan muncul otomatis saat status air naik, hujan lebat diprakirakan, atau lokasi unggulan tidak
-              terpantau.
-            </p>
-          </div>
-        ) : (
-          <ul className="mt-2 space-y-2">
-            {alerts.map((alert) => (
-              <li key={alert.id} className={`tint tone-${ALERT[alert.level].tone} accent-left rounded-control p-3`}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-bold uppercase">{ALERT[alert.level].label}</span>
-                  <span className="text-xs">sejak {formatTimeWib(alert.created_at)}</span>
-                </div>
-                {alert.camera_id ? (
-                  <Link href={`/kamera/${alert.camera_id}`} className="mt-1 block font-semibold underline-offset-2 hover:underline">
-                    {alert.title}
-                  </Link>
-                ) : (
-                  <p className="mt-1 font-semibold">{alert.title}</p>
-                )}
-                <p className="mt-0.5 text-xs">{alert.message}</p>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
-      <p className="rounded-control border border-dashed border-border p-3 text-muted">
-        Ketuk satu kecamatan di peta untuk melihat kondisi air, lalu lintas, dan hujannya.
-      </p>
-    </div>
+    );
+  }
+  return (
+    <ul className="space-y-2">
+      {alerts.map((alert) => (
+        <li key={alert.id} className={`tint tone-${ALERT[alert.level].tone} accent-left rounded-control p-3`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-bold uppercase">{ALERT[alert.level].label}</span>
+            <span className="text-xs">sejak {formatTimeWib(alert.created_at)}</span>
+          </div>
+          {alert.camera_id ? (
+            <Link href={`/kamera/${alert.camera_id}`} className="mt-1 block font-semibold underline-offset-2 hover:underline">
+              {alert.title}
+            </Link>
+          ) : (
+            <p className="mt-1 font-semibold">{alert.title}</p>
+          )}
+          <p className="mt-0.5 text-xs">{alert.message}</p>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-function RankRow(props: { rank: number; href: string; name: string; detail: string; badge: React.ReactNode }) {
+type RankingProps = {
+  rows: { camera: CameraOverview; detail: string; status: StatusDisplay }[];
+  empty: string;
+  note: string;
+  onShow: (camera: CameraOverview) => void;
+};
+
+/** Daftar peringkat lokasi. Nama membuka bukti visualnya; tombol pin menyorot kecamatannya di peta. */
+function Ranking({ rows, empty, note, onShow }: RankingProps) {
+  if (rows.length === 0) return <p className="text-muted">{empty}</p>;
   return (
-    <li className="flex items-center gap-3 py-2.5">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-muted tabular-nums">
-        {props.rank}
-      </span>
-      <div className="min-w-0 flex-1">
-        <Link href={props.href} className="font-semibold underline-offset-2 hover:text-primary hover:underline">
-          {props.name}
-        </Link>
-        <p className="text-xs text-muted tabular-nums">{props.detail}</p>
-      </div>
-      {props.badge}
-    </li>
+    <>
+      <ol className="divide-y divide-border">
+        {rows.map(({ camera, detail, status }, index) => (
+          <li key={camera.id} className="flex items-center gap-2.5 py-2.5">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-muted tabular-nums">
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <Link href={`/kamera/${camera.id}`} className="block truncate font-semibold underline-offset-2 hover:text-primary hover:underline">
+                {camera.name}
+              </Link>
+              <p className="text-xs text-muted tabular-nums">{detail}</p>
+              <div className="mt-1">
+                <Badge status={status} />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onShow(camera)}
+              aria-label={`Tunjukkan ${camera.name} di peta`}
+              title="Tunjukkan di peta"
+              className="shrink-0 rounded-control border border-border p-1.5 text-muted hover:border-primary hover:text-primary"
+            >
+              <Icon name="pin" size={16} />
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 text-xs text-muted">{note}</p>
+    </>
   );
 }

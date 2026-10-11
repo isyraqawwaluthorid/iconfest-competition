@@ -37,6 +37,8 @@ Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan
 - **Kecamatan tanpa sumber data** untuk tema yang dilihat diberi warna abu-abu bergaris putus dan label "Tidak terpantau". Saat ini lokasi air baru terpantau di 9 dari 16 kecamatan.
 - **Pemetaan kamera → kecamatan** dihitung di web (titik-dalam-poligon di `lib/geo/districts.ts`), tanpa kolom baru di database.
 - **Peta titik kamera pindah ke `/kamera`** dan, bersama `/mosaik`, masuk kelompok "Sumber data" di menu. `/peta` dialihkan ke `/kamera`.
+- **Tata letak peta penuh (11 Okt malam):** di layar lebar peta memenuhi seluruh area di bawah header dan semua isi lain mengambang di atasnya sebagai panel. Kiri atas: kondisi kota dan empat angka utama (bisa diciutkan). Tengah atas: pilihan tema. Kanan: tab Peringatan, Risiko air, dan Lalu lintas, yang berganti menjadi rincian kecamatan saat satu wilayah dipilih. Tengah bawah: legenda. Memilih kecamatan, atau menekan tombol pin di daftar peringkat, menggeser peta ke wilayah itu. Di layar sempit peta berada di atas dan panel bertumpuk di bawahnya.
+- **Halaman kamera menjadi ruang bukti visual:** gambar terakhir, hasil penilaian AI, pembanding kondisi normal dan sekarang, gambar-gambar yang dinilai AI sebelumnya (disimpan worker selama 3 hari), rincian skor risiko per komponen, dan kamera terdekat.
 - Belum dibangun: tren 24 jam di panel wilayah, kartu insight Kondisi → Penyebab → Dampak → Tindakan dari LLM, garis alir hulu–hilir, heatmap jam × hari.
 
 ## Halaman publik

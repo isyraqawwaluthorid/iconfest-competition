@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Kamera sumber data" };
 
 export default function CameraIndexPage() {
   return (
-    <div className="space-y-4">
+    <div className="page space-y-4">
       <div>
         <h1 className="text-2xl font-semibold">Kamera sumber data</h1>
         <p className="mt-1 text-sm text-muted">
