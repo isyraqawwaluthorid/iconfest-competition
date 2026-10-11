@@ -63,9 +63,10 @@ def process_camera(
             return result
 
         result.quality = quality.assess(grab.frame, checked_at)
+        jpeg = storage.encode_latest(grab.frame)
         try:
             path = storage.latest_path(cam.id)
-            database.upload_snapshot(path, storage.encode_latest(grab.frame))
+            database.upload_snapshot(path, jpeg)
             result.snapshot_path = path
         except Exception as exc:  # noqa: BLE001 - unggahan gagal tidak boleh membatalkan pembacaan
             result.error = f"unggah snapshot gagal: {exc}"[:300]
@@ -84,6 +85,14 @@ def process_camera(
                 result.water = water_pipeline.observe(cam, grab.frame, result.quality, checked_at)
             except Exception:  # noqa: BLE001 - kamera tetap live walau penilaian air gagal
                 log.exception("%s: penilaian air gagal", cam.name)
+            if result.water is not None:
+                try:
+                    # Gambar yang dinilai ikut disimpan, supaya setiap penilaian bisa diperiksa orang.
+                    path = storage.evidence_path(cam.id, checked_at)
+                    database.upload_snapshot(path, jpeg)
+                    result.evidence_path = path
+                except Exception as exc:  # noqa: BLE001 - penilaian tetap dicatat walau buktinya gagal diunggah
+                    log.warning("%s: unggah gambar bukti gagal: %s", cam.name, exc)
         return result
     except Exception as exc:  # noqa: BLE001 - satu kamera tidak boleh menghentikan siklus
         log.exception("%s: error tak terduga", cam.name)
@@ -421,6 +430,13 @@ def main(argv: list[str] | None = None) -> int:
         args=[database, weather],
         max_instances=1,
         coalesce=True,
+    )
+    scheduler.add_job(
+        housekeeping.prune_evidence,
+        "interval",
+        hours=24,
+        next_run_time=datetime.now(timezone.utc),
+        args=[database, housekeeping.EVIDENCE_RETENTION_DAYS],
     )
     scheduler.add_job(
         housekeeping.prune_frames,

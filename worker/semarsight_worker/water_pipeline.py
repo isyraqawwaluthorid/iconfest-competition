@@ -138,7 +138,7 @@ class WaterPipeline:
                     "change_score": observation.change,
                     "quality": result.quality.quality if result.quality else None,
                     "is_night": result.quality.is_night if result.quality else None,
-                    "snapshot_path": str(result.local_path) if result.local_path else None,
+                    "snapshot_path": result.evidence_path,
                     "model": self._settings.openai_vision_model,
                     "raw": observation.raw,
                 }

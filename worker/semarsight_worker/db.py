@@ -185,6 +185,16 @@ class Database:
             file_options={"content-type": "image/jpeg", "cache-control": "60", "upsert": "true"},
         )
 
+    def list_objects(self, folder: str) -> list[str]:
+        """Nama isi satu folder Storage (berkas dan subfolder), tanpa menelusuri ke dalam."""
+        items = self._client.storage.from_(self._bucket).list(folder, {"limit": 1000})
+        return [item["name"] for item in items]
+
+    def remove_objects(self, paths: list[str]) -> None:
+        if not paths or self.dry_run:
+            return
+        self._client.storage.from_(self._bucket).remove(paths)
+
     def set_system_status(self, key: str, value: dict[str, Any]) -> None:
         if self.dry_run:
             return

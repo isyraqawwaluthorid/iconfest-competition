@@ -40,20 +40,34 @@ export async function getTrafficSeries(cameraId: string, hours = 24): Promise<Tr
 export async function getWaterReadings(cameraId: string, limit = 12): Promise<WaterReading[]> {
   const { data, error } = await getSupabase()
     .from("water_readings")
-    .select("captured_at, status, trash, water_position, confidence, reason, trigger, is_night")
+    .select("captured_at, snapshot_path, status, trash, water_position, confidence, reason, trigger, is_night")
     .eq("camera_id", cameraId)
     .eq("source", "live")
     .order("captured_at", { ascending: false })
     .limit(limit);
   if (error) throw new Error(`Gagal memuat penilaian air: ${error.message}`);
-  return data as WaterReading[];
+  // Penilaian lama mencatat lokasi berkas di mesin worker; hanya lokasi Storage yang bisa ditampilkan.
+  return (data as WaterReading[]).map((row) => ({
+    ...row,
+    snapshot_path: row.snapshot_path?.startsWith("readings/") ? row.snapshot_path : null,
+  }));
 }
 
-/** Garis acuan kalibrasi satu kamera air, untuk digambar di atas snapshot. */
-export async function getReferenceLines(cameraId: string): Promise<ReferenceLine[]> {
-  const { data, error } = await getSupabase().from("cameras").select("reference_lines").eq("id", cameraId).maybeSingle();
-  if (error) throw new Error(`Gagal memuat garis acuan: ${error.message}`);
-  return (data?.reference_lines as ReferenceLine[] | null) ?? [];
+export type Calibration = { lines: ReferenceLine[]; referenceDay: string | null; referenceNight: string | null };
+
+/** Kalibrasi satu kamera air: garis acuan untuk digambar di atas snapshot, dan foto referensi kondisi normal. */
+export async function getCalibration(cameraId: string): Promise<Calibration> {
+  const { data, error } = await getSupabase()
+    .from("cameras")
+    .select("reference_lines, reference_image_day, reference_image_night")
+    .eq("id", cameraId)
+    .maybeSingle();
+  if (error) throw new Error(`Gagal memuat kalibrasi: ${error.message}`);
+  return {
+    lines: (data?.reference_lines as ReferenceLine[] | null) ?? [],
+    referenceDay: data?.reference_image_day ?? null,
+    referenceNight: data?.reference_image_night ?? null,
+  };
 }
 
 const ALERT_RANK: Record<AlertLevel, number> = { awas: 0, siaga: 1, waspada: 2, info: 3 };

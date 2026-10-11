@@ -34,6 +34,15 @@ def latest_path(camera_id: str) -> str:
     return f"latest/{camera_id}.jpg"
 
 
+EVIDENCE_FOLDER = "readings"
+EVIDENCE_TIME_FORMAT = "%Y%m%dT%H%M%S"
+
+
+def evidence_path(camera_id: str, at: datetime) -> str:
+    """Lokasi di Storage untuk gambar yang dinilai AI, agar web bisa menampilkannya sebagai bukti."""
+    return f"{EVIDENCE_FOLDER}/{camera_id}/{at.strftime(EVIDENCE_TIME_FORMAT)}.jpg"
+
+
 def _encode_jpeg(frame: np.ndarray, quality: int) -> bytes:
     ok, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
     if not ok:

@@ -19,6 +19,8 @@ export type ReferenceLine = { level: ReferenceLevel; points: [[number, number], 
 /** Satu penilaian AI atas satu frame kamera air (tabel `water_readings`). */
 export type WaterReading = {
   captured_at: string;
+  /** Gambar yang dinilai, di Storage. Kosong untuk penilaian sebelum gambar bukti mulai disimpan. */
+  snapshot_path: string | null;
   status: WaterStatus;
   trash: TrashLevel;
   water_position: string | null;

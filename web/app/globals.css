@@ -126,6 +126,12 @@ h1, h2, h3 {
 .tint-dot { background: var(--tone); }
 /* Garis kiri berwarna pada kartu yang mewakili satu tingkat status. */
 .accent-left { border-left: 4px solid var(--tone, var(--border)); }
+/* Untuk kartu putih yang hanya butuh warna garisnya, tanpa latar berwarna. */
+.accent.tone-normal { --tone: var(--status-normal); }
+.accent.tone-waspada { --tone: var(--status-waspada); }
+.accent.tone-siaga { --tone: var(--status-siaga); }
+.accent.tone-awas { --tone: var(--status-awas); }
+.accent.tone-unknown { --tone: var(--status-unknown); }
 
 /* Arsiran untuk "tidak terpantau": dipakai di legenda; di peta memakai pola SVG yang setara. */
 .swatch-untracked {

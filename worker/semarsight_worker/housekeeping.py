@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from . import __version__
+from . import __version__, storage
 from .db import Database
 from .models import CycleStats
 
@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 ES_CONTINUOUS = 0x80000000
 ES_SYSTEM_REQUIRED = 0x00000001
+EVIDENCE_RETENTION_DAYS = 3  # gambar bukti penilaian AI di Storage; angka agregatnya tetap disimpan
 LOG_FILE = "_state/worker.log"
 LOG_MAX_BYTES = 2_000_000
 LOG_BACKUPS = 3
@@ -83,3 +84,27 @@ def prune_frames(frames_dir: Path, retention_days: int, today: date | None = Non
     if removed:
         log.info("retensi: %d folder frame lebih tua dari %s dihapus", removed, cutoff.isoformat())
     return removed
+
+
+def prune_evidence(database: Database, retention_days: int, now: datetime | None = None) -> int:
+    """Hapus gambar bukti di Storage yang lebih tua dari masa retensi. Kegagalan tidak menghentikan worker."""
+    cutoff = (now or datetime.now(timezone.utc)) - timedelta(days=retention_days)
+    stale: list[str] = []
+    try:
+        for camera_id in database.list_objects(storage.EVIDENCE_FOLDER):
+            folder = f"{storage.EVIDENCE_FOLDER}/{camera_id}"
+            for name in database.list_objects(folder):
+                try:
+                    taken = datetime.strptime(Path(name).stem, storage.EVIDENCE_TIME_FORMAT).replace(tzinfo=timezone.utc)
+                except ValueError:
+                    continue
+                if taken < cutoff:
+                    stale.append(f"{folder}/{name}")
+        for start in range(0, len(stale), 100):
+            database.remove_objects(stale[start : start + 100])
+    except Exception:  # noqa: BLE001 - dicoba lagi pada jadwal berikutnya
+        log.exception("retensi gambar bukti gagal")
+        return 0
+    if stale:
+        log.info("retensi: %d gambar bukti lebih tua dari %s dihapus", len(stale), cutoff.date().isoformat())
+    return len(stale)

@@ -3,6 +3,7 @@ import { isOnline } from "@/lib/status";
 import { snapshotUrl } from "@/lib/storage";
 import { formatDateTimeWib } from "@/lib/time";
 import type { CameraOverview, ReferenceLine } from "@/lib/types";
+import { LineOverlay } from "./EvidenceFrame";
 
 type Props = {
   camera: Pick<CameraOverview, "name" | "health" | "latest_snapshot_path" | "latest_snapshot_at" | "last_live_at">;
@@ -28,18 +29,7 @@ export function SnapshotView({ camera, lines = [] }: Props) {
               alt={`Snapshot kamera ${camera.name}`}
               className={`${withLines ? "block w-full" : "h-full w-full object-cover"} ${online ? "" : "opacity-60 grayscale"}`}
             />
-            {withLines ? (
-              <svg viewBox="0 0 1 1" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
-                {lines.map((line) => (
-                  <g key={line.level} className={`level-${line.level}`}>
-                    <line
-                      x1={line.points[0][0]} y1={line.points[0][1]} x2={line.points[1][0]} y2={line.points[1][1]}
-                      className="calib-line" vectorEffect="non-scaling-stroke"
-                    />
-                  </g>
-                ))}
-              </svg>
-            ) : null}
+            <LineOverlay lines={lines} />
           </>
         ) : (
           <p className="flex aspect-video items-center justify-center p-4 text-center text-sm text-muted">

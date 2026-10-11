@@ -128,6 +128,7 @@ class CameraResult:
     counts: Counts | None = None
     traffic: TrafficReading | None = None
     water: WaterObservation | None = None  # terisi jika AI dipanggil untuk kamera ini pada siklus ini
+    evidence_path: str | None = None  # gambar yang dinilai AI, di Storage
 
 
 @dataclass(frozen=True)
