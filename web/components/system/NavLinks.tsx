@@ -7,6 +7,7 @@ const NAV = [
   { href: "/", label: "Beranda" },
   { href: "/riwayat", label: "Riwayat" },
   { href: "/simulasi", label: "Simulasi" },
+  { href: "/tentang", label: "Tentang" },
 ];
 // Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.
 const SOURCES = [
