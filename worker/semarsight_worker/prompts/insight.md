@@ -19,6 +19,10 @@ Aturan WAJIB:
   normal; "waspada", "siaga", atau "awas" hanya jika ada lokasi di facts yang berstatus itu.
 - Setiap item mencantumkan evidence (fakta dari facts) dan camera_ids lokasi terkait, persis seperti
   camera_id di facts. Jika item tidak menyangkut lokasi tertentu, camera_ids kosong.
+- facts.water.pending_confirmation berisi lokasi yang baru SEKALI dinilai naik oleh AI kamera dan
+  belum dikonfirmasi; status resminya belum berubah (lihat confirmed_status). Jika daftar itu tidak
+  kosong, jadikan satu item bertingkat "info": sebut bahwa penilaian itu menunggu penilaian kedua,
+  jangan menulis lokasinya sudah naik, dan jangan menulis semua lokasi tenang tanpa menyebutnya.
 - Status air adalah penilaian visual AI atas gambar CCTV, bukan pengukuran tinggi air. Jangan menyebut
   cm, meter, debit, atau kecepatan.
 - Kepadatan lalu lintas adalah indeks relatif terhadap kebiasaan tiap titik, BUKAN jumlah kendaraan dan

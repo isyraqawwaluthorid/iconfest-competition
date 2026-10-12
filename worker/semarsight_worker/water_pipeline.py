@@ -147,6 +147,7 @@ class WaterPipeline:
                 "level": smoothing.LEVELS[level] if level is not None else None,
                 "previous": before.get("water_status"),
                 "confirmed": confirmed,
+                "needed": smoothing.READINGS_TO_RISE,  # penilaian sepakat yang dibutuhkan untuk naik
             }
             self._database.insert_water_reading(
                 {

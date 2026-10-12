@@ -46,6 +46,7 @@ TOP_RISK = 3
 TOP_TRAFFIC = 3
 
 ELEVATED = ("waspada", "siaga", "awas")
+LEVEL_ORDER = ("normal", *ELEVATED)
 RISING = ("naik", "naik_cepat")
 FLOODED = ("genangan_ringan", "genangan_sedang", "genangan_tinggi")
 RAIN_CLASS_BOUNDS = (1.0, 5.0, 10.0, 20.0)  # sama dengan kelas hujan di peta web
@@ -68,8 +69,13 @@ def build_facts(
     active_alerts: list[dict[str, Any]],
     now: datetime,
     links: list[Link] | None = None,
+    latest_readings: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Ringkas keadaan terbaru menjadi fakta untuk LLM. Hanya berisi yang benar-benar dikumpulkan sistem."""
+    """Ringkas keadaan terbaru menjadi fakta untuk LLM. Hanya berisi yang benar-benar dikumpulkan sistem.
+
+    `latest_readings`: penilaian AI terakhir per kamera beserta catatan penghalusannya (`smoothing`),
+    untuk menyebut lokasi yang baru sekali dinilai naik dan masih menunggu konfirmasi.
+    """
     links = links or []
     names = {cam.id: cam.name for cam in cameras}
 
@@ -102,6 +108,24 @@ def build_facts(
         if "water" in cam.modules and statuses.get(cam.id, {}).get("water_status")
     ]
     attention = [_water_fact(cam, status, area(cam), weather) | relations(cam) for cam, status in sites if _needs_attention(status)]
+    # Menunggu konfirmasi: penilaian terakhir dihitung aturan di atas status resmi, tetapi baru sekali.
+    pending = []
+    for cam, status in sites:
+        reading = (latest_readings or {}).get(cam.id) or {}
+        counted = (reading.get("smoothing") or {}).get("level")
+        if counted in LEVEL_ORDER and LEVEL_ORDER.index(counted) > LEVEL_ORDER.index(status["water_status"] if status["water_status"] in LEVEL_ORDER else "normal"):
+            pending.append(
+                {
+                    "camera_id": cam.id,
+                    "name": cam.name,
+                    "area": area(cam),
+                    "confirmed_status": status["water_status"],
+                    "ai_reading": counted,
+                    "ai_confidence": reading.get("confidence"),
+                    "at_wib": _wib(reading.get("captured_at")),
+                    "readings_needed": (reading.get("smoothing") or {}).get("needed"),
+                }
+            )
     ranked = sorted((site for site in sites if site[1].get("risk_score") is not None), key=lambda site: -site[1]["risk_score"])
     trash_heavy = [{"camera_id": cam.id, "name": cam.name, "area": area(cam)} for cam, status in sites if status.get("trash") == "banyak"]
 
@@ -162,11 +186,12 @@ def build_facts(
         "generated_at_wib": _wib(now),
         "scope": SCOPE,
         # Lokasi yang penilaiannya kurang yakin tetap masuk `attention` untuk disebut, tetapi tidak menaikkan tingkat kota.
-        "overall_level": _overall_level(by_status, rising, peak_rain, bool(active_alerts or featured_offline)),
+        "overall_level": _overall_level(by_status, rising, peak_rain, bool(pending or active_alerts or featured_offline)),
         "water": {
             "sites_monitored": len(sites),
             "by_status": dict(by_status),
             "rising": rising,
+            "pending_confirmation": pending,
             "attention": attention,
             "highest_risk": [
                 {
@@ -225,6 +250,7 @@ def signature(facts: dict[str, Any]) -> str:
                 [w["camera_id"], w["status"], w.get("trend") in RISING, w.get("road_flood"), bool(w.get("needs_verification"))]
                 for w in water.get("attention", [])
             ),
+            "pending": sorted([p["camera_id"], p["ai_reading"]] for p in water.get("pending_confirmation", [])),
             "trash": sorted(t["camera_id"] for t in water.get("trash_heavy", [])),
             "rain": sorted([a["area"], _rain_class(a["next_3h_mm"])] for a in facts.get("rain", {}).get("areas", [])),
             "traffic": sorted(t["camera_id"] for t in facts.get("traffic", {}).get("anomalies", [])),
@@ -363,7 +389,13 @@ class InsightWriter:
         if not self.enabled:
             return False
         facts = build_facts(
-            cameras, self._database.insight_inputs(), weather, self._database.active_alerts(alerts.MANAGED_TYPES), now, links
+            cameras,
+            self._database.insight_inputs(),
+            weather,
+            self._database.active_alerts(alerts.MANAGED_TYPES),
+            now,
+            links,
+            self._database.latest_water_outcomes(),
         )
         reason = self._reason(facts, now)
         if reason is None:

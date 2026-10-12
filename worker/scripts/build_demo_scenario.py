@@ -55,6 +55,15 @@ READINGS = [
       for minute in (95, 105, 115) for site in (UPSTREAM_SITE, DOWNSTREAM_SITE, ROAD_SITE)],
 ]  # fmt: skip
 
+# Alasan yang menyertai tiap penilaian buatan, meniru kalimat alasan AI kamera.
+REASONS = {
+    "normal": "Permukaan air kembali di bawah garis N, setinggi gambar referensi.",
+    "waspada": "Permukaan air tampak sedikit di atas garis N, lebih tinggi daripada gambar referensi.",
+    "siaga": "Permukaan air tampak mencapai garis S pada dinding, jelas lebih tinggi daripada gambar referensi.",
+    "genangan_ringan": "Lapisan air terlihat menggenang di sebagian lajur; roda kendaraan memercikkan air.",
+    "tidak_tergenang": "Badan jalan tampak kering, tidak ada air yang menggenang.",
+}
+
 # Langkah yang ditampilkan: (menit, keterangan untuk penonton, status terkonfirmasi yang diharapkan).
 STEPS = [
     (0, "Keadaan awal: semua lokasi air normal dan hujan belum diprakirakan.", {UPSTREAM_SITE: "normal"}),
@@ -126,6 +135,7 @@ def main() -> None:
                 {
                     "camera_id": cam.id, "captured_at": at.isoformat(), "status": status, "road_flood": road_flood, "confidence": confidence,
                     "level": smoothing.LEVELS[level] if level is not None else None, "previous": before, "confirmed": confirmed,
+                    "needed": smoothing.READINGS_TO_RISE, "reason": REASONS[road_flood if cam.water_kind == "jalan" else status],
                 }
             )  # fmt: skip
             statuses[cam.id] |= {"water_status": confirmed, "road_flood": road_flood, "water_confidence": confidence, "needs_verification": needs_verification}
@@ -168,7 +178,8 @@ def main() -> None:
         for name, status in expect.items():
             assert statuses[by_name[name].id]["water_status"] == status, f"menit {minute}: {name} = {statuses[by_name[name].id]['water_status']}, diharapkan {status}"
 
-        facts = insights.build_facts(cameras, statuses, weather, list(active.values()), at, links)
+        latest = {row["camera_id"]: row | {"smoothing": {"level": row["level"], "needed": row["needed"]}} for row in history}
+        facts = insights.build_facts(cameras, statuses, weather, list(active.values()), at, links, latest)
         current_signature = insights.signature(facts)
         if kept is not None:
             # Insight yang sudah diperiksa dipakai lagi; hanya sah bila susunan langkahnya tidak berubah.

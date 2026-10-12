@@ -174,6 +174,9 @@ class _FakeDatabase:
     def active_alerts(self, types: tuple[str, ...]) -> list[dict]:
         return []
 
+    def latest_water_outcomes(self) -> dict:
+        return {}
+
     def latest_insight(self, scope: str) -> dict | None:
         return self.latest
 
@@ -279,3 +282,25 @@ def test_an_unsure_reading_is_mentioned_but_does_not_raise_the_city_level():
     facts = _facts({"a": _status(needs_verification=True), "b": _status()})
     assert facts["overall_level"] == "aman"
     assert [site["name"] for site in facts["water"]["attention"]] == ["Pompa A"]
+
+
+def test_a_counted_first_raised_reading_is_reported_as_pending_confirmation():
+    cameras = [_camera("a", "Pompa A"), _camera("b", "Pompa B")]
+    statuses = {"a": _status(), "b": _status()}
+    latest = {
+        "a": {"captured_at": NOW.isoformat(), "status": "waspada", "confidence": 0.74, "smoothing": {"level": "waspada", "needed": 2}},
+        "b": {"captured_at": NOW.isoformat(), "status": "awas", "confidence": 0.55, "smoothing": {"level": None, "needed": 2}},
+    }
+    facts = insights.build_facts(cameras, statuses, _weather(), [], NOW, None, latest)
+    [pending] = facts["water"]["pending_confirmation"]
+    assert (pending["name"], pending["confirmed_status"], pending["ai_reading"], pending["readings_needed"]) == ("Pompa A", "normal", "waspada", 2)
+    assert facts["overall_level"] == "perlu_perhatian"
+    assert facts["water"]["by_status"] == {"normal": 2}  # status resmi belum berubah
+    assert insights.signature(facts) != insights.signature(_facts(statuses, cameras=cameras))
+
+
+def test_a_reading_at_the_confirmed_level_is_not_pending():
+    latest = {"a": {"captured_at": NOW.isoformat(), "status": "waspada", "confidence": 0.8, "smoothing": {"level": "waspada", "needed": 2}}}
+    statuses = {"a": _status(water_status="waspada"), "b": _status()}
+    facts = insights.build_facts([_camera("a", "Pompa A"), _camera("b", "Pompa B")], statuses, _weather(), [], NOW, None, latest)
+    assert facts["water"]["pending_confirmation"] == []

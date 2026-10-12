@@ -191,6 +191,23 @@ class Database:
         )
         return {row["camera_id"]: row for row in response.data}
 
+    def latest_water_outcomes(self) -> dict[str, dict[str, Any]]:
+        """Penilaian AI terakhir per kamera beserta catatan penghalusannya, untuk mengenali yang menunggu konfirmasi."""
+        response = (
+            self._client.table("water_readings")
+            .select("camera_id, captured_at, status, confidence, raw")
+            .eq("source", "live")
+            .order("captured_at", desc=True)
+            .limit(200)
+            .execute()
+        )
+        latest: dict[str, dict[str, Any]] = {}
+        for row in response.data:
+            if row["camera_id"] not in latest:
+                raw = row.pop("raw") or {}
+                latest[row["camera_id"]] = row | {"smoothing": raw.get("smoothing")}
+        return latest
+
     def latest_insight(self, scope: str) -> dict[str, Any] | None:
         response = (
             self._client.table("insights")
