@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Senin, 12 Oktober 2026, 15.20 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Senin, 12 Oktober 2026, 16.05 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -22,8 +22,8 @@ Cara membaca:
 | Fase 5 — Kelengkapan dan keandalan | 1 dari 8 | 1 | 6 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
-| Arah visual (TV) | 6 dari 7 | – | 1 | – |
-| **Jumlah inti** | **55 dari 87 (63%)** | **5** | **27** | |
+| Arah visual (TV) | 7 dari 8 | – | 1 | – |
+| **Jumlah inti** | **56 dari 88 (64%)** | **5** | **27** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -252,6 +252,7 @@ Lihat `06-web-spec.md`. Kamera menjadi lapisan bukti; beranda dan peta disusun p
 - [x] **TV.5 [K]** Beranda insight. Selesai 12 Okt: kalimat kondisi kota dari aturan, peta kecamatan, dan tab "Insight" berisi kartu Kondisi → Penyebab → Dampak → Tindakan dari LLM; temuan AI juga tampil di panel kecamatan.
 - [x] **TV.7 [K]** Menu utama berisi halaman insight; `/kamera` dan `/mosaik` masuk kelompok "Sumber data".
 - [x] **TV.4 [K]** Panel wilayah. Selesai 12 Okt: kondisi air per lokasi dengan keterangan perubahan status 24 jam terakhir, kepadatan dengan grafik irama lalu lintas 24 jam (jam tanpa data digambar terputus), hujan dengan prakiraan per jam 12 jam ke depan, temuan AI, dan tautan ke kamera. Riwayat status air sebagai grafik menunggu pencatatan kejadian (T4.5).
+- [x] **TV.8 [K]** Perkembangan lokasi air terlihat di layar (12 Okt, dari masukan pemilik proyek atas simulasi): linimasa "Perkembangan 2 jam terakhir" (titik = penilaian AI, pita = status resmi), penanda peta untuk lokasi yang menunggu penilaian kedua dan yang statusnya naik, dan keterangan di panel kecamatan. Berlaku di beranda (data langsung) dan simulasi. *Bukti:* dipotret di simulasi langkah 3, 6, dan 7; di beranda panel tidak tampil karena tidak ada yang bergerak. **Belum teruji dengan data langsung yang naik**, karena belum ada kejadian nyata.
 - [ ] **TV.6 [K]** Matriks jam × hari di `/lalu-lintas` (bagian dari T5.1). Butuh beberapa hari data.
 
 ## Fitur tambahan terpilih
@@ -290,4 +291,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai) |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai) |

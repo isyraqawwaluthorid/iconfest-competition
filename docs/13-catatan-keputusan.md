@@ -79,6 +79,12 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 - **Tidak ada yang ditulis ke database.** Skenario disimpan sebagai berkas di repo (`web/lib/demo/scenario.json`) dan ditimpakan di browser ke data langsung; tabel `camera_status`, `alerts`, dan `insights` tidak tersentuh, jadi beranda tidak mungkin ikut menampilkan data simulasi.
 - **Label selalu terlihat:** pita "SIMULASI · Bukan data langsung" dengan jam simulasi dan penjelasan langkah. Snapshot, lalu lintas, dan halaman kamera tetap data langsung, dan itu ditulis di pita yang sama.
 
+### Perubahan harus terlihat di visual, bukan hanya di teks (12 Okt)
+- Masukan pemilik proyek atas simulasi: perubahan tiap langkah harus terbukti dari visualisasinya, dan yang tampil di simulasi harus sama dengan yang tampil saat kejadian nyata. Karena itu linimasa perkembangan dan penanda peta dibuat di layar bersama (`InsightScreen`), bukan khusus simulasi: **saat kejadian nyata, semuanya muncul di Beranda dengan cara yang sama.**
+- Yang sebelumnya tidak terlihat sama sekali: lokasi yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi. Sekarang tampak di peta (lingkaran putus-putus), di linimasa (titik di atas pita yang belum berubah), dan di panel kecamatan.
+- Linimasa tidak tampil pada hari yang tenang, supaya layar tetap renggang.
+- Satu penilaian AI yang kurang yakin tidak lagi menaikkan tingkat kota menjadi "perlu perhatian"; lokasinya tetap disebut dalam fakta insight.
+
 ### Keandalan
 - Worker menulis log ke berkas bergulir (`FRAMES_DIR/_state/worker.log`), meminta Windows tidak menidurkan mesin, dan menjalankan satu siklus segera setelah mesin terbangun.
 - Hanya **satu worker** yang boleh berjalan. Dua worker membuat data ganda dan biaya AI dobel.
