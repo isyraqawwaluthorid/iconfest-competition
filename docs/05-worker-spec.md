@@ -229,6 +229,10 @@ Setiap 30 menit: untuk tiap titik di `weather_grid`, ambil data Open-Meteo (liha
 
 ## Insight (`insights.py`)
 - **Situasi (15 menit):** kumpulkan fakta ringkas (kamera dengan status ≥ waspada, tren naik, peringatan aktif, anomali lalu lintas, hujan per grid, kamera mati). Jika tidak ada perubahan berarti dari insight terakhir, jangan panggil LLM (hemat).
+  - **Sudah berjalan (12 Okt).** `InsightWriter.update` dipanggil di akhir tiap siklus, setelah detak dikirim. Fakta disusun tiap siklus (dua pembacaan database, tanpa LLM); LLM baru dipanggil bila "sidik" faktanya berubah (status, tren naik, genangan, sampah banyak, kelas hujan per wilayah, peringatan, kamera unggulan mati) dan panggilan terakhir sudah lewat `INSIGHT_INTERVAL_MINUTES`. Kenaikan tingkat keseluruhan tidak menunggu jeda itu. Tanpa perubahan, insight disegarkan tiap 60 menit.
+  - **Tingkat keseluruhan dari aturan**, bukan dari LLM: awas/siaga/waspada mengikuti status air terkonfirmasi terburuk (waspada juga bila prakiraan hujan 3 jam ≥ 20 mm); `perlu_perhatian` bila ada tren naik, hujan ≥ 10 mm, peringatan aktif, atau lokasi yang perlu diperiksa; selain itu `aman`.
+  - Jawaban LLM diperiksa sebelum disimpan (angka harus ada di fakta, tanpa satuan yang tidak diukur, tingkat tidak melampaui aturan); rinciannya di `07-ai-prompts.md`. Satu panggilan ±2.500 token masuk dan ±600–1.000 token keluar, sekitar $0,001.
+  - Saat `--dry-run`, insight tidak dibuat.
 - **Harian (06.00 WIB):** kejadian 24 jam, durasi surut, titik paling rawan, anomali, ketersediaan kamera.
 - **Lintas modul:** dipanggil saat kejadian selesai dan `traffic_impact` tersedia.
 - Prompt dan schema: `07-ai-prompts.md`. Simpan `facts` yang dikirim bersama output.

@@ -4,7 +4,7 @@ Platform web yang mengubah CCTV publik Kota Semarang menjadi "sensor kota": AI m
 
 Proyek lomba **ICONFEST 2026 – Software Development**, tema Smart City.
 
-> Status (12 Okt 2026): worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI; peringatan, tren, dan skor risiko berjalan; beranda berupa peta tematik per kecamatan. Insight dari LLM, hubungan hulu–hilir, dan grafik riwayat masih dikerjakan.
+> Status (12 Okt 2026): worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI; peringatan, tren, dan skor risiko berjalan; beranda berupa peta tematik per kecamatan dengan kartu insight (Kondisi → Penyebab → Dampak → Tindakan) yang ditulis LLM dari angka sistem dan diperiksa terhadap data sebelum tampil. Hubungan hulu–hilir dan grafik riwayat masih dikerjakan.
 
 ## Struktur repo
 

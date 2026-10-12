@@ -78,7 +78,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan.
 - [ ] **T4.5 [K]** `fusion/events.py`: buka, perbarui puncak, tutup kejadian.
 - [ ] **T4.6 [K]** `fusion/cross_module.py`: genangan → lalu lintas (kamera ganda + radius 1 km), simpan `events.traffic_impact`.
-- [ ] **T4.7 [K]** `insights.py`: insight situasi 15 menit (lewati LLM jika tidak ada perubahan), validasi `insight.schema.json`.
+- [x] **T4.7 [K]** `insights.py`: insight situasi 15 menit (lewati LLM jika tidak ada perubahan), validasi `insight.schema.json`. Selesai 12 Okt: fakta dari `camera_status`, cuaca, dan peringatan; tingkat keseluruhan dari aturan; jawaban LLM diperiksa (angka harus ada di fakta) sebelum disimpan; 22 unit test; diuji dengan keadaan nyata dan keadaan buatan (`scripts/probe_insight.py`). Insight harian dan lintas modul belum.
 - [ ] **T4.8 [K]** `/air`: daftar kamera urut risiko, diagram hulu → hilir, hujan per grid, kejadian aktif.
 - [ ] **T4.9 [K]** `/` "Denyut Kota": kartu angka, insight terbaru, peringatan aktif, peta mini.
 
@@ -117,7 +117,7 @@ Lihat `06-web-spec.md`. Kamera menjadi lapisan bukti; Beranda dan Peta dibangun 
 - [x] **TV.2 [K]** Pemetaan kamera → kecamatan dan agregat per kecamatan (risiko air, indeks kepadatan, jumlah titik pantau). Selesai 11 Okt, dihitung di web (`lib/insight.ts`).
 - [x] **TV.3 [K]** Peta tematik: choropleth risiko air, kepadatan lalu lintas, dan hujan per wilayah; sumber data sebagai titik kecil. Selesai 11 Okt. Kepadatan memakai choropleth median per kecamatan, bukan heatmap, agar tidak mengesankan ada data di antara titik ukur.
 - [ ] **TV.4 [K]** Panel wilayah: tren 24 jam, temuan, jumlah titik pantau, tautan "lihat buktinya". Sebagian 11 Okt: kondisi air per lokasi, kepadatan, hujan, dan tautan ke kamera sudah ada; **tren 24 jam belum**.
-- [ ] **TV.5 [K]** Beranda insight: kalimat kondisi kota, peta kecamatan, kartu insight Kondisi → Penyebab → Dampak → Tindakan (menggantikan cakupan T4.9). Sebagian 11 Okt: kalimat kondisi kota (dari aturan), peringatan aktif, peta, dan peringkat sudah ada; **kartu insight dari LLM belum** (menunggu T4.7).
+- [x] **TV.5 [K]** Beranda insight: kalimat kondisi kota, peta kecamatan, kartu insight Kondisi → Penyebab → Dampak → Tindakan (menggantikan cakupan T4.9). Selesai 12 Okt: tab "Insight" di panel kanan dan temuan AI di panel kecamatan; kalimat kondisi kota tetap dari aturan.
 - [ ] **TV.6 [K]** Heatmap jam × hari di `/lalu-lintas` (bagian dari T5.1).
 - [x] **TV.7 [K]** Menu utama berisi halaman insight; `/kamera` dan `/mosaik` pindah ke kelompok "Sumber data". Selesai 11 Okt.
 

@@ -54,6 +54,15 @@ Terakhir diperbarui: 12 Oktober 2026.
 - **Peringatan dari aturan dan template**, bukan dari LLM: air naik, jalan tergenang, hujan lebat, sampah sebelum hujan, kamera unggulan tidak terbaca. Diselaraskan tiap siklus; yang syaratnya hilang ditutup otomatis.
 - **Gambar yang dinilai AI disimpan 3 hari** di Storage sebagai bukti; angkanya disimpan tanpa batas.
 
+### Insight dari LLM (12 Okt)
+- **LLM menjelaskan, aturan memutuskan.** Tingkat keseluruhan dihitung aturan dari status air terkonfirmasi dan prakiraan hujan, lalu menimpa apa pun yang ditulis LLM. Kalimat "Kondisi kota" di panel kiri juga tetap dari aturan, sehingga selalu tersedia walau LLM gagal.
+- **Setiap angka di teks LLM diperiksa terhadap fakta** sebelum disimpan. Angka yang tidak ada di fakta (atau satuan yang tidak diukur: cm, km/jam, liter) membuat item itu dibuang; bila ada di ringkasan, seluruh jawaban dibuang. Ini penerapan langsung dari aturan "jangan menampilkan angka yang tidak dikumpulkan sistem".
+- **Schema insight ditambah `cause` dan `impact`**, supaya pola Kondisi → Penyebab → Dampak → Tindakan benar-benar terpisah di data, bukan hanya di tampilan. LLM diminta menulis "belum dapat dipastikan dari data" bila penyebab tidak terlihat, dan "bersamaan dengan" bila hanya korelasi.
+- **Tingkat kepadatan lalu lintas tidak dikirim ke LLM selama pembanding masih sementara.** Pada siang hari 40 dari 54 titik terbaca "padat" (indeks sampai 15×) karena median 24 jam ikut memuat jam-jam malam yang sepi. Kalau angka itu dikirim, LLM akan menulis kota macet. **Catatan:** angka yang sama masih tampil di beranda ("Titik lebih padat dari biasanya 49 / 55") dan di tema peta kepadatan; itu perlu pembanding per jam (T5.8) atau keterangan yang lebih jelas.
+- **Hemat:** fakta disusun tiap siklus tanpa LLM; LLM dipanggil hanya saat keadaan berubah (paling sering tiap 15 menit, segera bila tingkat naik) atau tiap 60 menit sebagai penyegaran. Satu panggilan ±$0,001.
+- **Saat tenang paling banyak dua kartu**, dan hujan ringan bukan temuan. Uji pertama menghasilkan empat kartu untuk keadaan normal, termasuk saran "perbaiki baseline" untuk perencana kota; keterbatasan sistem sekarang hanya boleh disebut, tidak dijadikan temuan.
+- Label tingkat `aman` di web adalah "Tidak ada temuan penting", karena lokasi air hanya terpantau di 9 dari 16 kecamatan.
+
 ### Keandalan
 - Worker menulis log ke berkas bergulir (`FRAMES_DIR/_state/worker.log`), meminta Windows tidak menidurkan mesin, dan menjalankan satu siklus segera setelah mesin terbangun.
 - Hanya **satu worker** yang boleh berjalan. Dua worker membuat data ganda dan biaya AI dobel.
@@ -92,7 +101,8 @@ EcoTraffic (karya rekan) dipakai sebagai referensi untuk modul emisi.
 
 - Grafik: tren 24 jam per kecamatan, kurva hari ini vs kebiasaan, matriks jam × hari.
 - Hubungan hulu–hilir antar lokasi (`river_links`) dan skema alirannya.
-- Insight dari LLM (kartu Kondisi → Penyebab → Dampak → Tindakan), kejadian, dan insight lintas modul (genangan → lalu lintas).
+- Kejadian, insight harian, dan insight lintas modul (genangan → lalu lintas). Insight situasi sudah berjalan sejak 12 Okt.
+- Pembanding lalu lintas per jam, agar tingkat kepadatan di beranda dan peta tidak menyesatkan pada siang hari.
 - Evaluasi akurasi formal (siang dan malam) dengan label manusia.
 - Halaman Air, Lalu Lintas, Riwayat, Tentang, dan mode replay.
 - Deploy ke Vercel, video demo, laporan.

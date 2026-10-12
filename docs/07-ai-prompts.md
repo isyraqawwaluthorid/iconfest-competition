@@ -71,50 +71,64 @@ Kualitas gambar menurut sistem: {quality}
 
 Schema: `ai/schemas/insight.schema.json`
 
-**System prompt**
-```
-Kamu adalah analis kota untuk platform pemantauan Kota Semarang berbasis CCTV publik.
-Kamu menerima objek JSON "facts" yang dihitung oleh sistem (status air terkonfirmasi,
-tren, skor risiko dan komponennya, hubungan hulu-hilir, kepadatan lalu lintas relatif
-terhadap kondisi normal, keramaian, hujan, kejadian, kamera mati).
+Tiap item berpola **Kondisi → Penyebab → Dampak → Tindakan**: `body` (kondisi), `cause`, `impact`, dan `recommendations` per audiens, ditambah `evidence` dan `camera_ids` sebagai dasar data.
 
-Tugas: tulis insight yang membantu orang bertindak.
+**System prompt:** `worker/semarsight_worker/prompts/insight.md` (satu-satunya sumber; tidak disalin di sini agar tidak berbeda). Isi pokoknya:
+- Hanya memakai angka, nama lokasi, dan waktu yang ada di `facts`; angka disalin apa adanya, tanpa menjumlah atau menghitung sendiri.
+- `overall_level` disalin dari `facts.overall_level` (ditetapkan aturan); tingkat item tidak boleh melampaui yang didukung fakta.
+- Penyebab yang tidak terlihat di fakta ditulis "belum dapat dipastikan dari data"; hubungan yang hanya bersamaan memakai "bersamaan dengan", bukan "karena".
+- Status air adalah penilaian visual, bukan tinggi air; kepadatan adalah indeks relatif, bukan jumlah atau kecepatan; hujan adalah prakiraan model.
+- Wilayah tanpa lokasi pantau bukan berarti aman. Keterbatasan sistem (`facts.limits`) disebut, tetapi tidak dijadikan temuan atau rekomendasi.
+- Saat `overall_level = aman` paling banyak 2 item; hujan ringan bukan temuan tersendiri.
+- Untuk kualitas udara dan emisi (jika kelak ada di `facts`): sebut sumbernya, model atau terukur, dan bahwa emisi adalah estimasi.
 
-Aturan WAJIB:
-- Gunakan HANYA angka, nama lokasi, dan waktu yang ada di facts. Jangan mengarang.
-- Setiap item mencantumkan evidence (fakta dari facts) dan camera_ids terkait.
-- Rekomendasi konkret per audiens: bpbd, pu, dishub, perencana, warga.
-- Kepadatan dan keramaian adalah indeks relatif terhadap kondisi normal kamera
-  (mis. "2,1× dari biasanya"), BUKAN jumlah kendaraan absolut.
-- Status air adalah penilaian visual, bukan pengukuran tinggi air; jangan menyebut cm.
-- Jika data terbatas atau baseline masih sementara, katakan dengan jelas.
-- Untuk kualitas udara (jika ada di facts), sebut sumbernya dan apakah model atau terukur,
-  serta kategori ISPU.
-- Emisi (jika ada di facts) adalah ESTIMASI Tier 2 (faktor emisi Permen LH 12/2010 + asumsi
-  konsumsi BBM), bukan pengukuran. Jangan menyimpulkan emisi satu lokasi menyebabkan
-  perubahan PM2.5 kota.
-- Jika tidak ada yang penting, overall_level="aman" dan items berisi ringkasan singkat.
-- Bahasa Indonesia yang mudah dipahami orang awam. Waktu dalam WIB.
-```
+**Pemeriksaan setelah LLM menjawab** (`insights.enforce`), sebelum apa pun disimpan:
 
-**Contoh `facts` (situasi)**
+| Pemeriksaan | Jika gagal |
+|---|---|
+| Bentuk sesuai schema (Pydantic) | Jawaban dibuang, dicoba sekali lagi |
+| Setiap angka di teks adalah angka (atau pembulatan angka) yang ada di `facts` | Di ringkasan: seluruh jawaban dibuang. Di item: item itu dibuang |
+| Tidak ada satuan yang tidak diukur sistem (cm, meter, km/jam, liter) | Sama seperti di atas |
+| `overall_level` | Selalu ditimpa dengan tingkat dari aturan |
+| Tingkat item | Diturunkan ke batas yang diizinkan tingkat keseluruhan |
+| `camera_ids` | Yang tidak ada di `facts` dihapus |
+
+Jika tidak ada jawaban yang lolos, insight lama tetap tampil dan web menandainya bila sudah lebih dari 2 jam.
+
+**Isi `facts` (situasi)**, disusun `insights.build_facts` dari `camera_status`, cuaca terakhir, dan peringatan aktif:
 ```json
 {
-  "generated_at_wib": "2026-10-14 17:45",
+  "generated_at_wib": "12 Okt 2026 17.45",
   "scope": "situasi",
-  "rain": [{"grid": "G2", "name": "Semarang Utara / Tengah", "now_mm": 6.2, "next_3h_mm": 18.5, "prob_max_3h": 90}],
-  "water": [
-    {"camera_id": "…", "name": "Banger-IN", "status": "siaga", "since_wib": "17:20", "trend": "naik_cepat",
-     "risk": {"score": 0.71, "level": "tinggi", "components": {"status": 0.7, "trend": 1.0, "upstream": 0.4, "rain": 0.92}},
-     "downstream": [{"name": "Banger-Out", "eta_minutes": 45, "lag_source": "dipelajari dari 2 kejadian"}]}
-  ],
-  "road_flood": [{"camera_id": "…", "name": "JRAKAH", "road_flood": "genangan_sedang", "density_ratio_now": 2.3}],
-  "traffic_anomalies": [{"camera_id": "…", "name": "KALIBANTENG", "density_index": 2.1, "baseline_provisional": false}],
-  "crowd": [],
-  "cameras_offline": {"count": 9, "of": 146},
-  "active_alerts": 4
+  "overall_level": "siaga",
+  "water": {
+    "sites_monitored": 20,
+    "by_status": {"normal": 18, "waspada": 1, "siaga": 1},
+    "rising": 2,
+    "attention": [
+      {"camera_id": "…", "name": "KS-OUT-2", "kind": "pompa_out", "area": "Semarang Utara / Tengah",
+       "status": "siaga", "since_wib": "12 Okt 2026 17.20", "trend": "naik_cepat", "road_flood": "tidak_relevan",
+       "trash": "banyak", "ai_confidence": 0.82, "needs_verification": false, "risk_score": 0.665, "risk_level": "tinggi",
+       "risk_components": {"status": 0.7, "trend": 1.0, "upstream": 0.0, "rain": 0.925},
+       "rain_next_3h_mm": 18.5, "camera_live": true}
+    ],
+    "highest_risk": [{"camera_id": "…", "name": "KS-OUT-2", "area": "…", "status": "siaga", "trend": "naik_cepat", "risk_score": 0.665, "risk_level": "tinggi"}],
+    "trash_heavy": [{"camera_id": "…", "name": "KS-OUT-2", "area": "Semarang Utara / Tengah"}]
+  },
+  "rain": {
+    "peak_next_3h_mm": 18.5, "peak_category": "lebat", "peak_area": "Semarang Utara / Tengah",
+    "areas": [{"area": "Semarang Utara / Tengah", "now_mm": 6.2, "next_1h_mm": 9.4, "next_3h_mm": 18.5, "next_6h_mm": 18.5, "probability_max_3h_pct": 90}]
+  },
+  "traffic": {"sites_with_index": 54, "baseline": "sementara"},
+  "cameras": {"active": 146, "live": 131, "offline": 15, "featured_offline": []},
+  "alerts": [{"type": "water_rising", "level": "siaga", "title": "Air siaga di KS-OUT-2", "message": "…", "camera_id": "…", "since_wib": "12 Okt 2026 17.20"}],
+  "limits": ["Status air adalah penilaian visual AI atas gambar CCTV, bukan pengukuran tinggi air.", "…"]
 }
 ```
+
+Selama pembanding lalu lintas masih sementara (median 24 jam yang mencampur siang dan malam), tingkat kepadatan **tidak dikirim** ke LLM: yang tidak layak disimpulkan tidak perlu sampai ke sana. Setelah pembanding per jam tersedia, `traffic` memuat `by_level`, `anomalies`, dan `busiest`.
+
+Uji tanpa menulis: `python scripts/probe_insight.py` (keadaan nyata) atau `python scripts/probe_insight.py naik` (keadaan buatan di memori: satu pompa siaga, satu jalan tergenang, hujan lebat).
 
 **Laporan harian**: `facts` berisi kejadian 24 jam (lokasi, mulai, puncak, durasi), lima titik paling rawan 7 hari, anomali lalu lintas terbesar, perbandingan hujan, ketersediaan kamera. Gunakan schema yang sama.
 
