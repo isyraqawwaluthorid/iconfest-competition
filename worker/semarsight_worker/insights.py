@@ -161,7 +161,8 @@ def build_facts(
     return {
         "generated_at_wib": _wib(now),
         "scope": SCOPE,
-        "overall_level": _overall_level(by_status, rising, peak_rain, bool(attention or active_alerts or featured_offline)),
+        # Lokasi yang penilaiannya kurang yakin tetap masuk `attention` untuk disebut, tetapi tidak menaikkan tingkat kota.
+        "overall_level": _overall_level(by_status, rising, peak_rain, bool(active_alerts or featured_offline)),
         "water": {
             "sites_monitored": len(sites),
             "by_status": dict(by_status),

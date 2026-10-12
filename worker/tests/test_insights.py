@@ -273,3 +273,9 @@ def test_facts_name_the_upstream_and_downstream_sites_of_a_site_needing_attentio
     assert site["upstream"] == []
     assert any("1 pasangan lokasi" in note for note in facts["limits"])
     assert any("belum diisi" in note for note in _facts()["limits"])
+
+
+def test_an_unsure_reading_is_mentioned_but_does_not_raise_the_city_level():
+    facts = _facts({"a": _status(needs_verification=True), "b": _status()})
+    assert facts["overall_level"] == "aman"
+    assert [site["name"] for site in facts["water"]["attention"]] == ["Pompa A"]

@@ -7,6 +7,7 @@ peringatan, dan insight dari LLM teks. Hasil tiap langkah disimpan ke `web/lib/d
 
     python scripts/build_demo_scenario.py            # susun ulang (±6 panggilan LLM teks, sekitar $0,01)
     python scripts/build_demo_scenario.py --no-llm   # periksa jalannya aturan saja, tanpa menulis berkas
+    python scripts/build_demo_scenario.py --keep-insights   # hitung ulang aturannya, pakai lagi insight yang sudah ada
 
 Jalankan ulang setelah mengubah aturan, prompt insight, atau hubungan hulu-hilir, supaya simulasi tetap
 mencerminkan sistem yang sebenarnya. Dijalankan dari folder `worker/` dengan virtualenv aktif.
@@ -97,6 +98,8 @@ def main() -> None:
         levels[cam.id] = [(start - timedelta(minutes=minutes), 0) for minutes in (30, 60, 90)]
     wet_grids = {by_name[name].weather_grid_id for name in (UPSTREAM_SITE, DOWNSTREAM_SITE, ROAD_SITE)}
 
+    history: list[dict] = []  # semua penilaian AI buatan sejauh ini, urut waktu
+    kept = json.loads(OUTPUT.read_text(encoding="utf-8"))["steps"] if "--keep-insights" in sys.argv else None
     active: dict[tuple, dict] = {}  # peringatan aktif: kunci (jenis, kamera) → baris
     alert_seq = 0
     weather: dict[str, GridWeather] = {}
@@ -118,6 +121,13 @@ def main() -> None:
                 levels[cam.id].insert(0, (at, level))
             before = statuses[cam.id]["water_status"]
             confirmed, needs_verification = smoothing.confirm_water_status(before, readings[cam.id], cam.water_kind)
+            # Catatan yang sama dengan yang disimpan worker di tiap pembacaan; web menggambar linimasa darinya.
+            history.append(
+                {
+                    "camera_id": cam.id, "captured_at": at.isoformat(), "status": status, "road_flood": road_flood, "confidence": confidence,
+                    "level": smoothing.LEVELS[level] if level is not None else None, "previous": before, "confirmed": confirmed,
+                }
+            )  # fmt: skip
             statuses[cam.id] |= {"water_status": confirmed, "road_flood": road_flood, "water_confidence": confidence, "needs_verification": needs_verification}
             if confirmed != before:
                 statuses[cam.id]["water_status_since"] = at.isoformat()
@@ -160,7 +170,11 @@ def main() -> None:
 
         facts = insights.build_facts(cameras, statuses, weather, list(active.values()), at, links)
         current_signature = insights.signature(facts)
-        if current_signature != last_signature and use_llm:
+        if kept is not None:
+            # Insight yang sudah diperiksa dipakai lagi; hanya sah bila susunan langkahnya tidak berubah.
+            assert kept[len(steps)]["minute"] == minute and kept[len(steps)]["overall_level"] == facts["overall_level"], f"menit {minute}: langkah berubah, susun ulang tanpa --keep-insights"
+            last_insight = kept[len(steps)]["insight"]
+        elif current_signature != last_signature and use_llm:
             result, info = insights.generate(facts, api_key=settings.openai_api_key, model=settings.openai_text_model)
             if result is None:
                 raise SystemExit(f"menit {minute}: insight gagal disusun ({info['error']}); jalankan ulang")
@@ -175,6 +189,7 @@ def main() -> None:
                 "note": note,
                 "overall_level": facts["overall_level"],
                 "cameras": {cam.id: {key: statuses[cam.id][key] for key in CAMERA_FIELDS} for cam in sites},
+                "readings": list(history),
                 "alerts": sorted(active.values(), key=lambda row: (rank[row["level"]], row["created_at"])),
                 "weather": [_web_weather(grid[grid_id], w, at) for grid_id, w in weather.items()],
                 "insight": last_insight,

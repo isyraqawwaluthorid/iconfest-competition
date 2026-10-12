@@ -132,6 +132,22 @@ class WaterPipeline:
             if observation is None:
                 continue
             cam, vision = result.camera, observation.result
+            # Penghalusan dihitung sebelum pembacaan disimpan, supaya hasilnya ikut tercatat di baris itu:
+            # level yang dihitung dari pembacaan ini (None jika diabaikan) dan status resmi sebelum dan sesudahnya.
+            # Web menggambar linimasa dari catatan ini, tanpa mengulang aturannya.
+            image_quality = result.quality.quality if result.quality else None
+            latest = smoothing.Reading(vision.status, vision.road_flood, vision.confidence, image_quality, vision.change_vs_reference)
+            readings = [latest, *self._load_readings(cam)]
+            level = smoothing.level_of(latest, cam.water_kind)
+            if level is not None:
+                self._levels[cam.id].insert(0, (result.checked_at, level))
+            before = previous_status.get(cam.id, {})
+            confirmed, needs_verification = smoothing.confirm_water_status(before.get("water_status"), readings, cam.water_kind)
+            outcome = {
+                "level": smoothing.LEVELS[level] if level is not None else None,
+                "previous": before.get("water_status"),
+                "confirmed": confirmed,
+            }
             self._database.insert_water_reading(
                 {
                     "camera_id": cam.id,
@@ -144,16 +160,13 @@ class WaterPipeline:
                     "reason": vision.reason[:200],
                     "trigger": observation.trigger,
                     "change_score": observation.change,
-                    "quality": result.quality.quality if result.quality else None,
+                    "quality": image_quality,
                     "is_night": result.quality.is_night if result.quality else None,
                     "snapshot_path": result.evidence_path,
                     "model": self._settings.openai_vision_model,
-                    "raw": observation.raw,
+                    "raw": observation.raw | {"smoothing": outcome},
                 }
             )
-            readings = self._load_readings(cam)
-            before = previous_status.get(cam.id, {})
-            confirmed, needs_verification = smoothing.confirm_water_status(before.get("water_status"), readings, cam.water_kind)
 
             update: dict[str, Any] = {
                 "water_status": confirmed,

@@ -142,6 +142,30 @@ def test_an_ai_reading_updates_status_trend_and_risk_together():
     assert update["risk_score"] == pytest.approx(0.68)
     assert update["risk_level"] == "tinggi"
     assert len(database.inserted) == 1
+    assert database.inserted[0]["raw"]["smoothing"] == {"level": "siaga", "previous": "normal", "confirmed": "siaga"}
+
+
+def test_a_first_raised_reading_is_recorded_as_counted_but_not_yet_confirmed():
+    database = FakeDatabase(["normal", "normal", "normal"])
+    pipeline = WaterPipeline(SETTINGS, database, _weather(0.0))
+
+    def observe(confidence: float) -> dict:
+        vision = VisionResult(
+            image_usable=True, status="waspada", road_flood="tidak_relevan", trash="tidak_terlihat", water_position="di atas N",
+            change_vs_reference="sedikit_lebih_tinggi", confidence=confidence, reason="air sedikit di atas garis normal",
+        )  # fmt: skip
+        observed = CameraResult(camera=_camera(), checked_at=NOW, health="live")
+        observed.water = WaterObservation(trigger="heartbeat", change=0.1, result=vision, raw={"usage": {}})
+        update = pipeline.commit([observed], {"cam-1": {"water_status": "normal"}})["cam-1"]
+        return update | {"smoothing": database.inserted[-1]["raw"]["smoothing"]}
+
+    sure = observe(0.8)
+    assert (sure["water_status"], sure["needs_verification"]) == ("normal", False)
+    assert sure["smoothing"] == {"level": "waspada", "previous": "normal", "confirmed": "normal"}
+    unsure = observe(0.55)  # busa pompa: dinilai naik dengan keyakinan rendah, jadi tidak dihitung
+    assert (unsure["water_status"], unsure["needs_verification"]) == ("normal", True)
+    assert unsure["smoothing"] == {"level": None, "previous": "normal", "confirmed": "normal"}
+    assert database.inserted[-1]["raw"]["usage"] == {}  # isi raw yang lain tetap ada
 
 
 def test_upstream_status_raises_the_risk_of_the_downstream_site():
