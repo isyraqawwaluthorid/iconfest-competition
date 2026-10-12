@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Senin, 12 Oktober 2026, 19.45 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Senin, 12 Oktober 2026, 20.05 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -296,4 +296,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
 | 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser; README lengkap (T6.5 selesai) |
-| 12 Okt malam | Halaman Lalu Lintas dari video referensi pemilik proyek (T5.1 selesai): ruas jalan berwarna kepadatan, heksagon aktivitas per jam (TX.7), beban emisi relatif (TX.8); aturan "sedikit kendaraan tidak disebut padat"; referensi malam DPU-Mberok2-OUT dan Semarang Indah_IN (T3.11 tinggal Banger-IN) |
+| 12 Okt malam | Halaman Lalu Lintas dari video referensi pemilik proyek (T5.1 selesai): ruas jalan berwarna kepadatan, heksagon aktivitas per jam (TX.7), beban emisi relatif (TX.8); aturan "sedikit kendaraan tidak disebut padat"; referensi malam DPU-Mberok2-OUT dan Semarang Indah_IN (T3.11 tinggal Banger-IN); atas masukan pemilik proyek: semua jalan berwarna (tanpa abu-abu), peta dasar berwarna di semua halaman, dan tombol "Peta gelap" |

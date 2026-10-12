@@ -43,6 +43,9 @@
   --density-ramai: var(--status-waspada);
   --density-padat: var(--status-awas);
 
+  /* Latar peta pada mode gelap, terlihat sebelum ubin peta termuat. */
+  --map-dark-bg: #15171c;
+
   /* Jalan utama yang tidak punya kamera: tergambar jelas, tetapi netral. */
   --road-untracked: #8a93a6;
 
@@ -387,6 +390,32 @@ h1, h2, h3 {
 .emission-card.level-2 { border-left-color: var(--emission-2); }
 .emission-card.level-4 { border-left-color: var(--emission-4); }
 .emission-card.level-5 { border-left-color: var(--emission-5); }
+
+/*
+ * Mode peta gelap (tombol "Peta gelap", lib/map-theme.ts). Peta dasarnya tetap ubin OpenStreetMap yang sama,
+ * digelapkan dengan membalik warnanya; yang digambar di atasnya (ruas, wilayah, heksagon) tidak ikut dibalik,
+ * jadi warnanya justru lebih menonjol. Tidak butuh penyedia peta atau kunci API tambahan.
+ */
+.map-dark .leaflet-container { background: var(--map-dark-bg); }
+.map-dark .leaflet-container .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) grayscale(0.8) brightness(0.95) contrast(0.9);
+}
+.map-dark .district { stroke: var(--surface); stroke-opacity: 0.9; fill-opacity: 0.5; }
+.map-dark .district:hover { fill-opacity: 0.65; }
+.map-dark .district.is-selected { stroke: var(--primary-soft); fill-opacity: 0.7; }
+.map-dark .district-label span {
+  color: var(--surface);
+  text-shadow: 0 0 3px var(--text), 0 0 3px var(--text), 0 0 3px var(--text);
+}
+.map-dark .road-segment.is-network { stroke-opacity: 0.9; }
+.map-dark .road-segment.is-network.is-far { stroke-opacity: 0.55; }
+.map-dark .road-casing.is-selected { stroke: var(--surface); }
+.map-dark .camera-halo { fill-opacity: 0.4; }
+.map-dark .camera-marker.is-selected,
+.map-dark .camera-marker.is-raised,
+.map-dark .camera-marker.is-pending { stroke: var(--surface); }
+.map-dark .activity-hex { stroke: var(--map-dark-bg); fill-opacity: 0.82; }
+.map-dark .activity-hex.is-selected { stroke: var(--surface); }
 
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {

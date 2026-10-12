@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useLiveCameras } from "@/lib/hooks";
+import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { isOnline, MAP_LAYERS, type MapLayer } from "@/lib/status";
 import type { CameraOverview } from "@/lib/types";
 import { Legend } from "./Legend";
+import { MapThemeToggle } from "./MapThemeToggle";
 
 // Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
 const CityMap = dynamic(() => import("./CityMap"), {
@@ -21,6 +23,7 @@ export function MapView({ initialCameras }: { initialCameras: CameraOverview[] }
   const cameras = useLiveCameras(initialCameras);
   const [layer, setLayer] = useState<MapLayer>("health");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const mapTheme = useMapTheme();
 
   const requiredModule = MAP_LAYERS.find((l) => l.id === layer)?.module ?? null;
   const visible = requiredModule ? cameras.filter((c) => c.modules.includes(requiredModule)) : cameras;
@@ -44,11 +47,14 @@ export function MapView({ initialCameras }: { initialCameras: CameraOverview[] }
         <p className="text-sm text-muted">
           {visible.length} kamera, {online} aktif
         </p>
+        <span className="ml-auto rounded-control border border-border bg-surface p-0.5">
+          <MapThemeToggle />
+        </span>
       </div>
       <Legend layer={layer} />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="h-[60vh] min-h-80 lg:h-[72vh]">
+        <div className={`h-[60vh] min-h-80 lg:h-[72vh] ${mapThemeClass(mapTheme)}`}>
           <CityMap cameras={visible} layer={layer} selectedId={selectedId} onSelect={setSelectedId} />
         </div>
         <aside className="rounded-token border border-border bg-surface p-4">

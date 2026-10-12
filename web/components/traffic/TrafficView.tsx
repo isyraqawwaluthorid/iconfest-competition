@@ -2,10 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
+import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { activityBreaks, buildHexes, hourWib, type ActivityMetric, type ActivityProfile } from "@/lib/activity";
 import { emissionRows, EMISSION_LEVELS, type Pollutant } from "@/lib/emission";
 import { useClassCounts, useLiveCameras, useNow } from "@/lib/hooks";
+import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { roadRows, trafficSituation } from "@/lib/traffic";
 import type { CameraOverview } from "@/lib/types";
 import { ActivityPanels } from "./ActivityPanels";
@@ -78,6 +80,7 @@ export function TrafficView({ initialCameras, profile }: Props) {
     [emission],
   );
 
+  const mapTheme = useMapTheme();
   const group = "flex gap-1";
   const button = (active: boolean) =>
     `rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
@@ -86,7 +89,7 @@ export function TrafficView({ initialCameras, profile }: Props) {
 
   return (
     <div className="relative flex flex-1 flex-col lg:min-h-[40rem]">
-      <section aria-label="Peta lalu lintas" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
+      <section aria-label="Peta lalu lintas" className={`relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto ${mapThemeClass(mapTheme)}`}>
         <TrafficMap
           layer={layer}
           rows={rows}
@@ -122,6 +125,8 @@ export function TrafficView({ initialCameras, profile }: Props) {
               </button>
             ))}
           </div>
+          <span aria-hidden className="h-5 w-px bg-border" />
+          <MapThemeToggle />
         </div>
       </section>
 

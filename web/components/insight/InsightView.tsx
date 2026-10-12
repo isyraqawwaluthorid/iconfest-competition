@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/insight";
 import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib, minutesSince } from "@/lib/time";
+import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { siteProgress } from "@/lib/progress";
 import type { Alert, CameraOverview, GridWeather, SiteReading } from "@/lib/types";
 import { AiInsightPanel } from "./AiInsight";
@@ -88,6 +90,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("insight");
   const [summaryOpen, setSummaryOpen] = useState(true);
+  const mapTheme = useMapTheme();
 
   const summaries = useMemo(() => summarizeDistricts(cameras, weather), [cameras, weather]);
   const situation = useMemo(() => citySituation(cameras, weather), [cameras, weather]);
@@ -137,13 +140,16 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
         </defs>
       </svg>
 
-      <section aria-label="Peta kondisi per kecamatan" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
+      <section
+        aria-label="Peta kondisi per kecamatan"
+        className={`relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto ${mapThemeClass(mapTheme)}`}
+      >
         <ThematicMap summaries={summaries} theme={theme} sources={sources} pending={pendingLevels} selected={selected} onSelect={setSelected} />
 
         <div
           role="group"
           aria-label="Tema peta"
-          className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 gap-1 overflow-x-auto p-1"
+          className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1 overflow-x-auto p-1"
         >
           {THEMES.map((item) => (
             <button
@@ -158,6 +164,8 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
               {item.label}
             </button>
           ))}
+          <span aria-hidden className="mx-1 h-5 w-px bg-border" />
+          <MapThemeToggle />
         </div>
       </section>
 

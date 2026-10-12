@@ -168,6 +168,8 @@ Dibuat dari video referensi pemilik proyek (dasbor lalu lintas dengan ruas berwa
 | Aktivitas per jam | Kawasan mana yang biasanya ramai pada jam tertentu? | Heksagon 400 m berisi rata-rata kendaraan (atau orang) terlihat per gambar pada jam yang dipilih, dari profil yang ditulis worker ke `system_status` (`activity_profile`). Penggeser jam, tombol putar, grafik 24 batang, rincian per heksagon | Heksagon hanya ada di tempat yang punya kamera. Jam yang datanya belum cukup digambar kosong, bukan sepi. Hitungan orang ikut memuat pengendara motor |
 | Beban emisi | Ruas mana yang estimasi beban emisinya paling berat? | Kendaraan terlihat 30 menit terakhir ditimbang faktor emisi Permen LH 12/2010 (CO₂, NOx, CO); ruas diperingkat terhadap ruas lain, dalam "setara sepeda motor", dengan porsi tiap jenis kendaraan | Estimasi relatif. Bukan pengukuran udara dan bukan kg per jam, karena sistem tahu kendaraan yang terlihat, bukan yang lewat. Porsi per jenis belum diuji dengan hitungan manual |
 
+Semua peta (Beranda, Simulasi, Lalu Lintas, Kamera) memakai peta dasar yang sama (`lib/map-tiles.ts`) dan punya tombol **Peta gelap** (`components/map/MapThemeToggle.tsx`, `lib/map-theme.ts`): peta dasar digelapkan lewat CSS supaya warna ruas dan batas wilayah lebih menonjol; pilihannya diingat di browser.
+
 Komponen: `components/traffic/TrafficView.tsx` (lapisan dan keadaan), `TrafficMap.tsx` (peta), `RoadPanels.tsx`, `ActivityPanels.tsx`, `EmissionPanels.tsx`, `SegmentPanel.tsx`. Logika murni: `lib/traffic.ts`, `lib/activity.ts`, `lib/emission.ts`, `lib/geo/roads.ts`.
 - Status kamera berubah di browser tanpa refresh saat worker memperbarui `camera_status`.
 - Mematikan worker → banner muncul dalam 15 menit; halaman tetap menampilkan data terakhir.
