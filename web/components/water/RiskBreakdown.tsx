@@ -1,14 +1,22 @@
 import { Badge } from "@/components/ui/Badge";
 import { formatNumber } from "@/lib/insight";
 import { RISK } from "@/lib/status";
-import type { CameraOverview } from "@/lib/types";
+import type { CameraOverview, RiskComponents } from "@/lib/types";
 
 const PARTS = [
   { key: "status", label: "Status air", explain: "normal 0 · waspada 0,4 · siaga 0,7 · awas 1" },
   { key: "trend", label: "Tren", explain: "naik 0,5 · naik cepat 1" },
-  { key: "upstream", label: "Kondisi hulu", explain: "status lokasi di hulu; belum terhubung" },
+  { key: "upstream", label: "Kondisi hulu", explain: "" },
   { key: "rain", label: "Prakiraan hujan 3 jam", explain: "0 mm → 0 · 20 mm atau lebih → 1" },
 ] as const;
+
+/** Lokasi hulu disebut namanya; lokasi tanpa hulu yang terhubung dikatakan terus terang. */
+function upstreamExplain(components: RiskComponents): string {
+  const name = components.inputs?.upstream_name;
+  if (!name) return "lokasi ini belum punya lokasi hulu yang terhubung, jadi komponen ini 0";
+  const status = components.inputs?.upstream_status;
+  return `mengikuti status ${name}${status ? ` (sekarang ${status})` : ""}: normal 0 · waspada 0,4 · siaga 0,7 · awas 1`;
+}
 
 /** Skor risiko dibuka per komponen: nilai tiap komponen, bobotnya, dan sumbangannya ke skor akhir. */
 export function RiskBreakdown({ camera }: { camera: CameraOverview }) {
@@ -44,7 +52,7 @@ export function RiskBreakdown({ camera }: { camera: CameraOverview }) {
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface-muted" aria-hidden>
                 <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, Math.max(0, value * 100))}%` }} />
               </div>
-              <p className="mt-0.5 text-xs text-muted">{part.explain}</p>
+              <p className="mt-0.5 text-xs text-muted">{part.key === "upstream" ? upstreamExplain(components) : part.explain}</p>
             </li>
           );
         })}

@@ -79,7 +79,7 @@ export type RiskComponents = {
   upstream: number;
   rain: number;
   weights: Record<"status" | "trend" | "upstream" | "rain", number>;
-  inputs?: { rain_next_3h_mm?: number | null };
+  inputs?: { rain_next_3h_mm?: number | null; upstream_status?: string | null; upstream_name?: string | null };
 };
 
 /** Peringatan aktif dari tabel `alerts`; teksnya dibuat worker dari template. */
