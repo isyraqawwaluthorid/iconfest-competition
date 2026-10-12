@@ -162,13 +162,43 @@ class Database:
     def active_alerts(self, types: tuple[str, ...]) -> list[dict[str, Any]]:
         response = (
             self._client.table("alerts")
-            .select("id, type, camera_id, level, title, message")
+            .select("id, type, camera_id, level, title, message, created_at")
             .eq("is_active", True)
             .eq("source", "live")
             .in_("type", list(types))
             .execute()
         )
         return response.data
+
+    def insight_inputs(self) -> dict[str, dict[str, Any]]:
+        """Keadaan `camera_status` terbaru, sebatas kolom yang dirangkum menjadi fakta insight."""
+        response = (
+            self._client.table("camera_status")
+            .select(
+                "camera_id, health, consecutive_failures, water_status, water_status_since, water_trend, road_flood, "
+                "trash, water_confidence, needs_verification, risk_score, risk_level, risk_components, "
+                "density_index, density_level, is_anomaly, baseline_is_provisional"
+            )
+            .execute()
+        )
+        return {row["camera_id"]: row for row in response.data}
+
+    def latest_insight(self, scope: str) -> dict[str, Any] | None:
+        response = (
+            self._client.table("insights")
+            .select("created_at, facts")
+            .eq("scope", scope)
+            .eq("source", "live")
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        return response.data[0] if response.data else None
+
+    def insert_insight(self, row: dict[str, Any]) -> None:
+        if self.dry_run:
+            return
+        self._client.table("insights").insert(row).execute()
 
     def insert_alerts(self, rows: list[dict[str, Any]]) -> None:
         if not rows or self.dry_run:

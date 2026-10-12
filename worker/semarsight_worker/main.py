@@ -24,6 +24,7 @@ from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
 from .fusion import baseline
+from .insights import InsightWriter
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
 from .sources import openmeteo
 from .water_pipeline import WaterPipeline
@@ -107,6 +108,7 @@ def run_cycle(
     water_pipeline: WaterPipeline,
     weather: dict[str, openmeteo.GridWeather],
     *,
+    insight_writer: InsightWriter | None = None,
     only: list[str] | None = None,
     limit: int | None = None,
 ) -> CycleStats:
@@ -173,6 +175,12 @@ def run_cycle(
         sum(r.traffic is not None for r in recordable), sum(r.water is not None for r in recordable),
         stats.duration_ms / 1000, " [dry-run]" if database.dry_run else "",
     )  # fmt: skip
+    if insight_writer is not None:
+        # Setelah detak dan log siklus, supaya panggilan LLM tidak membuat siklus tampak lambat.
+        try:
+            insight_writer.update(all_cameras, weather, datetime.now(timezone.utc))
+        except Exception:  # noqa: BLE001 - insight lama tetap tampil; dicoba lagi pada siklus berikutnya
+            log.exception("pembaruan insight gagal")
     return stats
 
 
@@ -392,12 +400,14 @@ def main(argv: list[str] | None = None) -> int:
     refresh_weather(database, weather)
     water_pipeline = WaterPipeline(settings, database, weather)
     log.info("modul air: penilaian AI %s", f"aktif ({settings.openai_vision_model})" if water_pipeline.enabled else "nonaktif")
+    insight_writer = InsightWriter(settings, database)
+    log.info("insight: ringkasan AI %s", f"aktif ({settings.openai_text_model})" if insight_writer.enabled else "nonaktif")
 
     def cycle() -> None:
         try:
             run_cycle(
                 settings, database, frame_states, history, water_pipeline, weather,
-                only=args.only_camera, limit=args.limit,
+                insight_writer=insight_writer, only=args.only_camera, limit=args.limit,
             )  # fmt: skip
         except Exception:  # noqa: BLE001 - siklus berikutnya harus tetap berjalan
             log.exception("siklus gagal")

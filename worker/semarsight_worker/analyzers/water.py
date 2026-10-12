@@ -22,10 +22,10 @@ from pydantic import ValidationError
 
 from ..config import REPO_ROOT
 from ..models import CameraRow, QualityResult, VisionResult
+from ..openai_api import RESPONSES_URL, json_schema_format, output_text
 
 log = logging.getLogger(__name__)
 
-RESPONSES_URL = "https://api.openai.com/v1/responses"
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts" / "water_vision.md"
 SCHEMA_PATH = REPO_ROOT / "ai" / "schemas" / "water_vision.schema.json"
 WIB = ZoneInfo("Asia/Jakarta")
@@ -204,13 +204,12 @@ def classify_with_ai(
     content.append({"type": "input_image", "image_url": _data_url(annotated_crop(frame, cam))})
     if reference is not None:
         content.append({"type": "input_image", "image_url": _data_url(annotated_crop(reference, cam))})
-    schema = _schema()
     payload = {
         "model": model,
         "instructions": _system_prompt(),
         "reasoning": {"effort": "low"},
         "input": [{"role": "user", "content": content}],
-        "text": {"format": {"type": "json_schema", "name": schema["name"], "strict": True, "schema": schema["schema"]}},
+        "text": {"format": json_schema_format(_schema())},
         "max_output_tokens": 700,
     }
 
@@ -222,7 +221,7 @@ def classify_with_ai(
             )
             response.raise_for_status()
             body = response.json()
-            result = VisionResult.model_validate_json(_output_text(body))
+            result = VisionResult.model_validate_json(output_text(body))
             if not result.image_usable:
                 result = result.model_copy(update={"status": "tidak_dapat_dinilai"})
             return result, {"output": result.model_dump(), "usage": body.get("usage"), "model": body.get("model")}
@@ -262,19 +261,6 @@ def _data_url(image: np.ndarray) -> str:
     if not ok:
         raise ValueError("gagal meng-encode gambar untuk AI")
     return "data:image/jpeg;base64," + base64.b64encode(buffer.tobytes()).decode()
-
-
-def _output_text(body: dict) -> str:
-    parts = [
-        part.get("text", "")
-        for item in body.get("output", [])
-        if item.get("type") == "message"
-        for part in item.get("content") or []
-        if part.get("type") == "output_text"
-    ]
-    if not parts:
-        raise ValueError("respons AI tidak berisi teks")
-    return "".join(parts)
 
 
 @lru_cache(maxsize=1)

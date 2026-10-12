@@ -81,6 +81,40 @@ class VisionResult(BaseModel):
         )
 
 
+class InsightRecommendation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    audience: Literal["bpbd", "pu", "dishub", "perencana", "warga"]
+    action: str
+
+
+class InsightItem(BaseModel):
+    """Satu kartu insight: Kondisi (`body`) → Penyebab → Dampak → Tindakan."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    body: str
+    cause: str
+    impact: str
+    module: Literal["air", "lalu_lintas", "ruang_publik", "lintas_modul", "sistem"]
+    level: Literal["info", "waspada", "siaga", "awas"]
+    camera_ids: list[str]
+    evidence: list[str]
+    recommendations: list[InsightRecommendation]
+
+
+class InsightResult(BaseModel):
+    """Jawaban LLM teks; bentuknya sama dengan `ai/schemas/insight.schema.json`."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    headline: str
+    summary: str
+    overall_level: Literal["aman", "perlu_perhatian", "waspada", "siaga", "awas"]
+    items: list[InsightItem]
+
+
 @dataclass(frozen=True)
 class QualityResult:
     quality: Quality
