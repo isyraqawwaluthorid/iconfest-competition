@@ -19,11 +19,11 @@ Cara membaca:
 | Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
 | Fase 3 — Modul air | 11 dari 14 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 6 dari 9 | 1 | 2 | Sel 13 Okt |
-| Fase 5 — Kelengkapan dan keandalan | 2 dari 8 | 1 | 5 | Rab 14 Okt |
+| Fase 5 — Kelengkapan dan keandalan | 3 dari 8 | 1 | 4 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **58 dari 88 (66%)** | **5** | **25** | |
+| **Jumlah inti** | **59 dari 88 (67%)** | **5** | **24** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -66,7 +66,7 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 |---|---|---|
 | Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~, ~~T4.4 dan inti T4.3 hulu–hilir~~, ~~TV.4 tren 24 jam~~ (selesai); referensi malam (T3.11) setelah gelap, dikerjakan asisten | – |
 | Sel 13 Okt | T2.10 deploy; ~~T5.4 cara mendemokan kejadian~~, ~~T4.5 kejadian~~, ~~T5.2 riwayat~~ (selesai 12 Okt) | Akun Vercel |
-| Rab 14 Okt | T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; T5.3 halaman Tentang; T6.5 README | Template laporan dari panitia (T0.7) |
+| Rab 14 Okt | T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; ~~T5.3 halaman Tentang~~ (selesai 12 Okt); T6.5 README | Template laporan dari panitia (T0.7) |
 | Kam 15 Okt | Perbaikan bug saja (T6.4); T6.6 laporan; T6.7 video; T7.3 repo publik; T7.4 ganti kunci | Laporan, video, surat bermaterai (T6.8), pengumpulan |
 | Jum 16 Okt | Cadangan; T7.1 cek tautan dari perangkat lain; T7.2 pengumpulan bila belum | Pengumpulan |
 
@@ -217,7 +217,7 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 
 - [ ] **T5.1 [K]** `/lalu-lintas`: peta kepadatan, daftar anomali, grafik hari ini vs baseline. Kandidat digeser.
 - [x] **T5.2 [K]** `/riwayat` + `/api/export/events` (CSV). Selesai 12 Okt: tabel kejadian (mulai, lokasi, jenis, puncak, lama, selesai), unduhan CSV, dan keadaan kosong yang menjelaskan bahwa belum ada kejadian dan menautkan ke simulasi. *Bukti:* halaman dan CSV diuji dengan tabel kosong; **tampilan tabel berisi baris belum pernah terlihat**, karena belum ada kejadian nyata. Statistik titik rawan belum.
-- [ ] **T5.3 [K]** `/tentang`: cara kerja, atribusi PANTAUSEMAR, batasan, privasi.
+- [x] **T5.3 [K]** `/tentang`: cara kerja, atribusi PANTAUSEMAR, batasan, privasi. Selesai 12 Okt: cakupan dari data langsung (146 kamera, 20 lokasi air, 9 dari 16 kecamatan), empat langkah cara kerja, bobot skor risiko, tujuh batasan yang ditulis terus terang, privasi dan retensi, serta sumber data dan lisensinya.
 - [x] **T5.4 [K]** Cara mendemokan kejadian. Selesai 12 Okt sebagai halaman `/simulasi`: skenario 8 langkah (115 menit) dengan masukan buatan (penilaian AI tiga lokasi dan prakiraan hujan) yang dijalankan melalui aturan dan LLM asli, lalu diputar di layar yang sama dengan beranda dengan label "SIMULASI · Bukan data langsung" dan penjelasan tiap langkah. Tidak menulis apa pun ke database; data langsung tidak tersentuh. Disusun ulang dengan `worker/scripts/build_demo_scenario.py` bila aturan atau prompt berubah. `/replay` dari kejadian nyata menunggu ada kejadian yang terekam.
 - [ ] **T5.5 [M+K]** Pindahkan worker ke VPS (systemd, `Restart=always`). *Bukti:* berjalan stabil semalaman. **Sebagian** 12 Okt: worker dipindah dari laptop ke PC yang menetap (mulai 12.51 WIB, mesin diatur tidak tidur); VPS belum, dan bukti semalaman menyusul 13 Okt pagi. Worker belum menyala sendiri setelah PC restart.
 - [ ] **T5.6 [K]** Audit empat keadaan (memuat, kosong, error, usang) di semua komponen data; uji mematikan worker.
@@ -291,4 +291,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai) |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai) |

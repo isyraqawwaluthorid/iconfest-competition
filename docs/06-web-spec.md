@@ -51,6 +51,7 @@ Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan
   - **Ringkasan AI ikut tahu:** fakta insight memuat `pending_confirmation`, sehingga kartu insight menyebut penilaian yang menunggu konfirmasi dan tidak lagi menulis "semua normal" di sebelah penilaian waspada (temuan pemilik proyek pada langkah 3 simulasi).
   - Web tidak mengulang aturannya: worker menyimpan hasil aturan di tiap penilaian (`water_readings.raw.smoothing`: level yang dihitung, status resmi sebelum dan sesudahnya). Penilaian dimuat ulang tiap menit (tabelnya tidak ikut Realtime).
 - **`/riwayat` (12 Okt):** tabel kejadian (mulai, lokasi, jenis, puncak, lama, selesai atau "masih berlangsung") dari tabel `events`, dengan tombol "Unduh CSV" (`/api/export/events`). Selama belum ada kejadian, halaman menjelaskannya dan menautkan ke simulasi. Menu utama kini: Beranda, Riwayat, Simulasi.
+- **`/tentang` (12 Okt):** cakupan saat ini (dihitung dari data langsung), cara kerja dalam empat langkah, bobot skor risiko, daftar "yang tidak dilakukan sistem ini", privasi dan retensi, serta sumber data dan lisensinya. Isinya harus ikut diperbarui bila batasan berubah (misalnya setelah evaluasi malam atau kejadian nyata pertama).
 - **Halaman kamera** menyebut nama lokasi hulu yang ikut menentukan skor risiko, atau mengatakan bahwa lokasi itu belum punya hulu yang terhubung.
 - Belum dibangun: garis alir hulu–hilir, heatmap jam × hari, riwayat status air sebagai grafik (menunggu pencatatan kejadian).
 
