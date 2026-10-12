@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { districtOf, type LatLng } from "./geo/districts";
+import { CITY_BOUNDS, districtOf, type LatLng } from "./geo/districts";
 import type { CameraOverview } from "./types";
 
 /**
  * Lapisan "Aktivitas per jam": seberapa ramai tiap kawasan biasanya pada jam tertentu.
  * Sumbernya profil yang dihitung worker (fusion/activity.py): rata-rata kendaraan dan orang yang terlihat
- * per gambar, per kamera, per jam (WIB). Kawasan digambar sebagai heksagon; heksagon hanya ada di tempat
- * yang punya kamera. Kawasan tanpa kamera dibiarkan kosong, tidak diisi perkiraan.
+ * per gambar, per kamera, per jam (WIB). Kawasan digambar sebagai heksagon yang memenuhi kota; hanya heksagon
+ * yang punya kamera yang berwarna. Kawasan tanpa kamera digambar abu-abu, tidak diisi perkiraan.
  */
 
 const hourly = z.array(z.number().nullable()).length(24);
@@ -68,6 +68,34 @@ function toLatLng(x: number, y: number): LatLng {
   return [ORIGIN[0] + y / M_PER_DEG_LAT, ORIGIN[1] + x / M_PER_DEG_LNG];
 }
 
+function hexRing(q: number, r: number): LatLng[] {
+  const [x, y] = hexCenter(q, r);
+  return Array.from({ length: 6 }, (_, corner) => {
+    const angle = (Math.PI / 180) * (60 * corner - 30);
+    return toLatLng(x + HEX_RADIUS_M * Math.cos(angle), y + HEX_RADIUS_M * Math.sin(angle));
+  });
+}
+
+/**
+ * Heksagon di dalam batas kota yang tidak punya kamera, supaya kisi heksagon memenuhi kota dan kawasan
+ * tanpa data terlihat sebagai abu-abu. `occupied` berisi id heksagon yang sudah punya kamera.
+ */
+export function emptyHexRings(occupied: ReadonlySet<string>): LatLng[][] {
+  const [[south, west], [north, east]] = CITY_BOUNDS;
+  const rows = [south, north].map((lat) => ((lat - ORIGIN[0]) * M_PER_DEG_LAT) / (1.5 * HEX_RADIUS_M));
+  const columns = [west, east].map((lng) => ((lng - ORIGIN[1]) * M_PER_DEG_LNG) / (Math.sqrt(3) * HEX_RADIUS_M));
+  const rings: LatLng[][] = [];
+  for (let r = Math.floor(rows[0]) - 1; r <= Math.ceil(rows[1]) + 1; r++) {
+    for (let q = Math.floor(columns[0] - r / 2) - 1; q <= Math.ceil(columns[1] - r / 2) + 1; q++) {
+      if (occupied.has(`${q},${r}`)) continue;
+      const [x, y] = hexCenter(q, r);
+      const [lat, lng] = toLatLng(x, y);
+      if (districtOf(lat, lng) !== null) rings.push(hexRing(q, r));
+    }
+  }
+  return rings;
+}
+
 function mean(values: number[]): number | null {
   return values.length === 0 ? null : values.reduce((sum, value) => sum + value, 0) / values.length;
 }
@@ -89,10 +117,7 @@ export function buildHexes(cameras: CameraOverview[], profile: ActivityProfile, 
     return {
       id,
       center,
-      ring: Array.from({ length: 6 }, (_, corner) => {
-        const angle = (Math.PI / 180) * (60 * corner - 30);
-        return toLatLng(x + HEX_RADIUS_M * Math.cos(angle), y + HEX_RADIUS_M * Math.sin(angle));
-      }),
+      ring: hexRing(q, r),
       district: districtOf(center[0], center[1]),
       cameras: inside,
       hourly: HOURS.map((hour) =>

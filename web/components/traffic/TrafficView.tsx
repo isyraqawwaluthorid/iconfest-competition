@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { activityBreaks, buildHexes, hourWib, type ActivityMetric, type ActivityProfile } from "@/lib/activity";
+import { activityBreaks, buildHexes, emptyHexRings, hourWib, type ActivityMetric, type ActivityProfile } from "@/lib/activity";
 import { emissionRows, EMISSION_LEVELS, type Pollutant } from "@/lib/emission";
 import { useClassCounts, useLiveCameras, useNow } from "@/lib/hooks";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
@@ -66,9 +66,12 @@ export function TrafficView({ initialCameras, profile }: Props) {
   const breaks = useMemo(() => activityBreaks(hexes), [hexes]);
   // Dipakai tombol Putar: maju satu jam dari jam yang sedang tampil, kembali ke 00 setelah 23.
   const advanceHour = useCallback(() => setPickedHour((picked) => ((picked ?? currentHour ?? DEFAULT_HOUR) + 1) % 24), [currentHour]);
+  // Heksagon kosong hanya bergantung pada heksagon mana yang punya kamera, bukan pada nilainya.
+  const occupied = hexes.map((hex) => hex.id).join("|");
+  const empty = useMemo(() => (occupied ? emptyHexRings(new Set(occupied.split("|"))) : []), [occupied]);
   const activity = useMemo(
-    () => ({ hexes, breaks, hour, selected: selectedHex, onSelect: setSelectedHex }),
-    [hexes, breaks, hour, selectedHex],
+    () => ({ hexes, empty, breaks, hour, selected: selectedHex, onSelect: setSelectedHex }),
+    [hexes, empty, breaks, hour, selectedHex],
   );
 
   const [pollutant, setPollutant] = useState<Pollutant>("co2");

@@ -353,6 +353,20 @@ h1, h2, h3 {
 .activity-hex.level-4 { fill: var(--activity-4); }
 .activity-hex.level-5 { fill: var(--activity-5); }
 .activity-hex.is-selected { stroke: var(--text); stroke-width: 3; fill-opacity: 0.9; }
+/* Kawasan tanpa kamera: abu-abu rata, supaya kisi heksagon memenuhi kota tanpa mengarang nilai. */
+.activity-hex.level-none { fill: var(--status-unknown); fill-opacity: 0.3; stroke: var(--surface); stroke-width: 1; cursor: default; }
+.activity-swatch.level-none { background: color-mix(in srgb, var(--status-unknown) 45%, var(--surface)); }
+/* Angka pada pin gabungan (beberapa kamera di satu tempat); tidak menangkap klik agar pinnya tetap bisa dipilih. */
+.pin-count { background: none; border: none; pointer-events: none; }
+.pin-count span {
+  display: block;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--surface);
+}
 .activity-source { fill: var(--surface); fill-opacity: 1; stroke: var(--text); stroke-width: 1; pointer-events: none; }
 .activity-swatch.level-0 { border: 1px dashed var(--status-unknown); background: var(--neutral-bg); }
 .activity-swatch.level-1 { background: var(--activity-1); }
@@ -416,6 +430,7 @@ h1, h2, h3 {
 .map-dark .camera-marker.is-pending { stroke: var(--surface); }
 .map-dark .activity-hex { stroke: var(--map-dark-bg); fill-opacity: 0.82; }
 .map-dark .activity-hex.is-selected { stroke: var(--surface); }
+.map-dark .activity-hex.level-none { fill-opacity: 0.22; stroke: var(--map-dark-bg); }
 
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {

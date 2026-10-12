@@ -133,6 +133,10 @@ export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metr
               <span aria-hidden className="activity-swatch level-0 h-3 w-5 rounded-[3px]" />
               Belum ada data pada jam ini
             </span>
+            <span className="flex items-center gap-1.5">
+              <span aria-hidden className="activity-swatch level-none h-3 w-5 rounded-[3px]" />
+              Tanpa kamera
+            </span>
           </div>
         </div>
       </div>
@@ -173,7 +177,7 @@ export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metr
               Dari {profile.days} hari data{profile.since ? ` (sejak ${formatDateTimeWib(profile.since)})` : ""}. Makin banyak hari
               terkumpul, makin mewakili pola ini.
             </p>
-            <p>Kawasan tanpa kamera dibiarkan kosong, tidak diisi perkiraan. Ini bukan jumlah kendaraan yang lewat.</p>
+            <p>Heksagon abu-abu adalah kawasan tanpa kamera; tidak diisi perkiraan. Ini bukan jumlah kendaraan yang lewat.</p>
           </div>
         </section>
       </div>

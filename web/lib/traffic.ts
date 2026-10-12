@@ -45,6 +45,27 @@ export function roadRows(cameras: CameraOverview[]): RoadRow[] {
   );
 }
 
+const SAME_SPOT_M = 30; // kamera sedekat ini berdiri di tiang atau simpang yang sama
+const M_PER_DEG = 111_320;
+
+/** Satu pin di peta: satu kamera, atau beberapa kamera yang berdiri di tempat yang sama (digambar berangka). */
+export type Pin = { center: [number, number]; members: RoadRow[] };
+
+/** Gabungkan kamera yang setempat. Urutan `rows` dipertahankan, jadi anggota pertama tiap pin adalah yang terdepan di `rows`. */
+export function groupPins(rows: RoadRow[]): Pin[] {
+  const pins: Pin[] = [];
+  for (const row of rows) {
+    const { lat, lng } = row.camera;
+    const near = pins.find(
+      (pin) =>
+        Math.hypot((pin.center[0] - lat) * M_PER_DEG, (pin.center[1] - lng) * M_PER_DEG * Math.cos((lat * Math.PI) / 180)) <= SAME_SPOT_M,
+    );
+    if (near) near.members.push(row);
+    else pins.push({ center: [lat, lng], members: [row] });
+  }
+  return pins;
+}
+
 /** Indeks di atas batas "ramai" tetapi tingkatnya tidak naik: kendaraannya lebih banyak dari biasanya, namun masih sedikit. */
 export function isFewButAboveUsual(camera: CameraOverview): boolean {
   return (camera.density_index ?? 0) >= BUSY_INDEX && (camera.density_level === "normal" || camera.density_level === "lancar");

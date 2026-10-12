@@ -1,14 +1,28 @@
 "use client";
 
 import L from "leaflet";
-import { Fragment, useEffect, useMemo, useRef } from "react";
-import { AttributionControl, CircleMarker, MapContainer, Pane, Polygon, Polyline, TileLayer, Tooltip, useMap, ZoomControl } from "react-leaflet";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import {
+  AttributionControl,
+  CircleMarker,
+  MapContainer,
+  Marker,
+  Pane,
+  Polygon,
+  Polyline,
+  TileLayer,
+  Tooltip,
+  useMap,
+  useMapEvents,
+  ZoomControl,
+} from "react-leaflet";
 import { activityLevel, hexTitle, type Hex } from "@/lib/activity";
+import type { LatLng } from "@/lib/geo/districts";
 import { paintNetwork } from "@/lib/geo/road-network";
 import { CENTER_BOUNDS, ROADS_BOUNDS, segmentBounds } from "@/lib/geo/roads";
 import { formatNumber } from "@/lib/insight";
 import { BASEMAP } from "@/lib/map-tiles";
-import type { RoadRow } from "@/lib/traffic";
+import { groupPins, type RoadRow } from "@/lib/traffic";
 
 /** Yang digambar di peta: ruas berwarna kepadatan, heksagon aktivitas pada jam yang dipilih, atau ruas berwarna beban emisi. */
 export type Layer = "roads" | "activity" | "emission";
@@ -20,7 +34,15 @@ export type RoadPaint = Map<string, { level: number; label: string }>;
 export type Scope = "center" | "city";
 
 /** Heksagon aktivitas beserta jam dan batas warna yang sedang dipakai. */
-export type ActivityView = { hexes: Hex[]; breaks: number[]; hour: number; selected: string | null; onSelect: (hexId: string) => void };
+export type ActivityView = {
+  hexes: Hex[];
+  /** Heksagon di dalam kota yang tidak punya kamera; digambar abu-abu supaya kisinya memenuhi kota. */
+  empty: LatLng[][];
+  breaks: number[];
+  hour: number;
+  selected: string | null;
+  onSelect: (hexId: string) => void;
+};
 
 type Props = {
   layer: Layer;
@@ -107,6 +129,25 @@ export default function TrafficMap({ layer, rows, selected, scope, onSelect, act
 
 type RoadsProps = Pick<Props, "rows" | "selected" | "onSelect"> & { paint: RoadPaint | null };
 
+const BASE_ZOOM = 13; // di bawah ini pin dan garis memakai ukuran terkecilnya
+
+/** Zoom peta saat ini; berubah setelah peta selesai didekatkan atau dijauhkan. */
+function useZoom(): number {
+  const map = useMap();
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  return zoom;
+}
+
+const countIcons = new Map<number, L.DivIcon>();
+
+/** Angka di tengah pin gabungan: jumlah kamera yang berdiri di tempat itu. */
+function countIcon(count: number): L.DivIcon {
+  const icon = countIcons.get(count) ?? L.divIcon({ className: "pin-count", html: `<span>${count}</span>`, iconSize: [0, 0] });
+  countIcons.set(count, icon);
+  return icon;
+}
+
 function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
   // Tanpa `paint` ruas berwarna tingkat kepadatan; dengan `paint` berwarna tingkat beban emisi (abu-abu bila tidak ada).
   const look = ({ camera, status }: RoadRow) => {
@@ -116,6 +157,12 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
       ? { line: `emission-${painted.level}`, dot: "tone-unknown", label: `beban ${painted.label.toLowerCase()}` }
       : { line: "tone-unknown", dot: "tone-unknown", label: "tidak ada gambar" };
   };
+  // Makin dekat, pin dan garis makin besar, supaya pada skala jalan keduanya tetap menonjol di atas peta.
+  const zoom = useZoom();
+  const pinRadius = Math.min(18, Math.max(6, 6 + (zoom - 12) * 2.5));
+  const thickness = Math.min(1.4, Math.max(1, 1 + (zoom - BASE_ZOOM) * 0.15));
+  // Kamera yang berdiri di tempat yang sama menjadi satu pin berangka; yang paling padat (digambar terakhir) di depan.
+  const pins = useMemo(() => groupPins([...ordered].reverse()).reverse(), [ordered]);
   // Jalan tanpa kamera mewarisi warna kamera terdekat yang sedang punya nilai, sebagai perkiraan.
   const network = useMemo(() => {
     const donors = ordered.filter((row) => (paint ? paint.has(row.camera.id) : row.measured));
@@ -130,7 +177,7 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
           <Polyline
             key={`${group.tone}-${group.far}`}
             positions={group.lines}
-            pathOptions={{ weight: 3 }}
+            pathOptions={{ weight: 3 * thickness }}
             className={`road-segment is-network ${group.tone}${group.far ? " is-far" : ""}`}
           >
             <Tooltip sticky>
@@ -149,7 +196,7 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
               // Leaflet hanya membaca className saat garis dibuat, jadi garis dibuat ulang saat warnanya berubah.
               key={`${camera.id}-${index}-${tone}`}
               positions={line}
-              pathOptions={{ weight: 4 }}
+              pathOptions={{ weight: 4 * thickness }}
               className={`road-segment is-extended ${tone}`}
               eventHandlers={{ click: () => onSelect(camera.id) }}
             >
@@ -167,7 +214,7 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
             <Polyline
               key={`${camera.id}-${index}-${camera.id === selected}`}
               positions={line}
-              pathOptions={{ weight: camera.id === selected ? 15 : 10 }}
+              pathOptions={{ weight: (camera.id === selected ? 15 : 10) * thickness }}
               className={`road-casing${camera.id === selected ? " is-selected" : ""}`}
               eventHandlers={{ click: () => onSelect(camera.id) }}
             />
@@ -182,7 +229,7 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
             <Polyline
               key={`${camera.id}-${index}-${tone}-${camera.id === selected}`}
               positions={line}
-              pathOptions={{ weight: camera.id === selected ? 9 : 6 }}
+              pathOptions={{ weight: (camera.id === selected ? 9 : 6) * thickness }}
               className={`road-segment ${tone}`}
               eventHandlers={{ click: () => onSelect(camera.id) }}
             >
@@ -195,26 +242,29 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
       </Pane>
       {/* Titik kamera di atas garis: menunjukkan dari mana ruas itu dilihat. */}
       <Pane name="road-cameras" style={{ zIndex: 450 }}>
-        {ordered.map((row) => {
-          const { camera } = row;
-          const { dot } = look(row);
+        {pins.map(({ center, members }) => {
+          const active = members.find((row) => row.camera.id === selected);
+          const shown = active ?? members[0];
+          const { dot } = look(shown);
+          // Pin gabungan: klik pertama memilih kamera terdepan, klik berikutnya berpindah ke kamera lain di tempat itu.
+          const next = members[active ? (members.indexOf(active) + 1) % members.length : 0];
           return (
-            // Lingkaran luar tembus pandang membuat titik kamera terlihat dari jauh; yang bisa diklik adalah titik dalamnya.
-            <Fragment key={`${camera.id}-${dot}-${camera.id === selected}`}>
+            // Lingkaran luar tembus pandang membuat pin terlihat dari jauh; yang bisa diklik adalah lingkaran dalamnya.
+            <Fragment key={`${shown.camera.id}-${dot}-${Boolean(active)}-${members.length}`}>
+              <CircleMarker center={center} radius={pinRadius + (active ? 9 : 6)} className={`camera-halo ${dot}`} interactive={false} />
               <CircleMarker
-                center={[camera.lat, camera.lng]}
-                radius={camera.id === selected ? 15 : 11}
-                className={`camera-halo ${dot}`}
-                interactive={false}
-              />
-              <CircleMarker
-                center={[camera.lat, camera.lng]}
-                radius={camera.id === selected ? 8 : 6}
-                className={`camera-marker ${dot}${camera.id === selected ? " is-selected" : ""}`}
-                eventHandlers={{ click: () => onSelect(camera.id) }}
+                center={center}
+                radius={active ? pinRadius + 2 : pinRadius}
+                className={`camera-marker ${dot}${active ? " is-selected" : ""}`}
+                eventHandlers={{ click: () => onSelect(next.camera.id) }}
               >
-                <Tooltip>Kamera {camera.name}</Tooltip>
+                <Tooltip>
+                  {members.length === 1
+                    ? `Kamera ${shown.camera.name}`
+                    : `${members.length} kamera di sini: ${members.map((row) => row.camera.name).join(", ")}. Klik lagi untuk berpindah kamera.`}
+                </Tooltip>
               </CircleMarker>
+              {members.length > 1 ? <Marker position={center} icon={countIcon(members.length)} interactive={false} keyboard={false} /> : null}
             </Fragment>
           );
         })}
@@ -224,9 +274,14 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
 }
 
 /** Heksagon aktivitas: makin gelap makin ramai pada jam yang dipilih. Titik kecil menandai kamera sumbernya. */
-function ActivityHexes({ hexes, breaks, hour, selected, onSelect }: ActivityView) {
+function ActivityHexes({ hexes, empty, breaks, hour, selected, onSelect }: ActivityView) {
+  // Satu bentuk gabungan untuk semua heksagon kosong, supaya ratusan heksagon tetap ringan digambar.
+  const emptyShape = useMemo(() => empty.map((ring) => [ring]), [empty]);
   return (
     <>
+      <Pane name="activity-empty" style={{ zIndex: 405 }}>
+        {emptyShape.length > 0 ? <Polygon positions={emptyShape} className="activity-hex level-none" interactive={false} /> : null}
+      </Pane>
       <Pane name="activity-hexes" style={{ zIndex: 410 }}>
         {hexes.map((hex) => {
           const value = hex.hourly[hour];
