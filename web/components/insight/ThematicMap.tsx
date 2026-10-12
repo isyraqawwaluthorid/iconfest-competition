@@ -16,6 +16,7 @@ import {
 } from "react-leaflet";
 import { CITY_BOUNDS, districtOf, DISTRICTS, shortName } from "@/lib/geo/districts";
 import { themeDisplay, type DistrictSummary, type Theme } from "@/lib/insight";
+import { BASEMAP } from "@/lib/map-tiles";
 import { DENSITY, isElevated, NOT_ASSESSED, WATER } from "@/lib/status";
 import type { CameraOverview, WaterStatus } from "@/lib/types";
 
@@ -88,10 +89,7 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
       scrollWheelZoom
       className="thematic-map h-full w-full"
     >
-      <TileLayer
-        attribution='&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <TileLayer {...BASEMAP} />
       {/* Pojok kiri bawah adalah satu-satunya pojok yang tidak tertutup panel. */}
       <AttributionControl position="bottomleft" />
       <ZoomControl position="bottomleft" />

@@ -45,14 +45,10 @@ export function RoadPanels({ rows, situation, latest, selected, onSelect }: Prop
                 {item.label}
               </li>
             ))}
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden className="h-1 w-5 rounded-full bg-road-untracked" />
-              Tanpa kamera
-            </li>
           </ul>
           <p className="mt-1 text-center text-[11px] text-muted">
             Dibanding kebiasaan pada jam yang sama, bukan kecepatan. Garis tebal: terlihat kamera. Garis tipis: perkiraan
-            untuk jalan yang sama.
+            dari kamera terdekat, makin pudar makin jauh.
           </p>
         </div>
       </div>

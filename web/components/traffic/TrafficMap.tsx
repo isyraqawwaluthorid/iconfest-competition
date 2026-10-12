@@ -4,9 +4,10 @@ import L from "leaflet";
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { AttributionControl, CircleMarker, MapContainer, Pane, Polygon, Polyline, TileLayer, Tooltip, useMap, ZoomControl } from "react-leaflet";
 import { activityLevel, hexTitle, type Hex } from "@/lib/activity";
-import { ROAD_NETWORK } from "@/lib/geo/road-network";
+import { paintNetwork } from "@/lib/geo/road-network";
 import { CENTER_BOUNDS, ROADS_BOUNDS, segmentBounds } from "@/lib/geo/roads";
 import { formatNumber } from "@/lib/insight";
+import { BASEMAP } from "@/lib/map-tiles";
 import type { RoadRow } from "@/lib/traffic";
 
 /** Yang digambar di peta: ruas berwarna kepadatan, heksagon aktivitas pada jam yang dipilih, atau ruas berwarna beban emisi. */
@@ -91,11 +92,7 @@ export default function TrafficMap({ layer, rows, selected, scope, onSelect, act
       scrollWheelZoom
       className="road-map h-full w-full"
     >
-      <TileLayer
-        attribution='&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
-      />
+      <TileLayer {...BASEMAP} />
       <AttributionControl position="bottomleft" />
       <ZoomControl position="bottomleft" />
       <Focus rows={rows} selected={selected} scope={scope} activity={activity} />
@@ -119,11 +116,28 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
       ? { line: `emission-${painted.level}`, dot: "tone-unknown", label: `beban ${painted.label.toLowerCase()}` }
       : { line: "tone-unknown", dot: "tone-unknown", label: "tidak ada gambar" };
   };
+  // Jalan tanpa kamera mewarisi warna kamera terdekat yang sedang punya nilai, sebagai perkiraan.
+  const network = useMemo(() => {
+    const donors = ordered.filter((row) => (paint ? paint.has(row.camera.id) : row.measured));
+    const lineOf = (row: RoadRow) => (paint ? `emission-${paint.get(row.camera.id)?.level}` : `tone-${row.status.tone}`);
+    return paintNetwork(new Map(donors.map((row) => [row.camera.id, lineOf(row)])), "tone-unknown");
+  }, [ordered, paint]);
   return (
     <>
-      {/* Semua jalan utama sebagai satu garis tanpa warna: jalan tanpa kamera terlihat sebagai tidak terpantau. */}
+      {/* Seluruh jaringan jalan utama. Satu garis gabungan per warna, supaya ribuan garis tetap ringan digambar. */}
       <Pane name="road-network" style={{ zIndex: 402 }}>
-        <Polyline positions={ROAD_NETWORK} pathOptions={{ weight: 3 }} className="road-network" interactive={false} />
+        {network.map((group) => (
+          <Polyline
+            key={`${group.tone}-${group.far}`}
+            positions={group.lines}
+            pathOptions={{ weight: 3 }}
+            className={`road-segment is-network ${group.tone}${group.far ? " is-far" : ""}`}
+          >
+            <Tooltip sticky>
+              {group.tone === "tone-unknown" ? "Tidak ada kamera berdata di dekat jalan ini" : "Perkiraan dari kamera terdekat, bukan pengamatan jalan ini"}
+            </Tooltip>
+          </Polyline>
+        ))}
       </Pane>
       {/* Jalan yang sama lebih jauh dari kamera: warna kamera itu sebagai perkiraan, lebih tipis daripada ruas yang terlihat. */}
       <Pane name="road-extended" style={{ zIndex: 406 }}>

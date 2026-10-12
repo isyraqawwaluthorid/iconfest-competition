@@ -290,7 +290,7 @@ Implementasinya berupa penyelarasan sekali per siklus (`alerts.sync`): aturan me
 
 ### Ruas jalan (`roads.py`, `scripts/build_road_segments.py`, sejak 12 Okt)
 - Bukan bagian siklus. Skrip mengambil jalan dari OpenStreetMap (Overpass, satu kotak yang memuat semua kamera), memilih jalan utama terdekat tiap kamera lalu lintas (di simpang, jalan yang namanya disebut pada nama kamera didahulukan), lalu memotong dua potongan dengan menyambung garis-garis jalan yang sama: ruas dekat ±200 m ke tiap arah (yang terlihat) dan perpanjangannya sampai ±1 km (perkiraan). Jalan dua jalur mendapat dua garis. Keduanya berhenti di tengah jarak ke kamera lain di jalan yang sama.
-- Hasilnya `web/lib/geo/road-segments.json` (66 ruas) dan `web/lib/geo/road-network.json` (2.278 garis jalan utama, ±460 KB, digambar tanpa warna sebagai latar). **Jalankan ulang bila daftar kamera lalu lintas berubah.** Kunci tiap ruas adalah `id` kamera di database.
+- Hasilnya `web/lib/geo/road-segments.json` (66 ruas) dan `web/lib/geo/road-network.json` (2.278 garis jalan utama beserta empat kamera terdekat tiap garis, ±530 KB; web mewarnainya sebagai perkiraan dari kamera terdekat). **Jalankan ulang bila daftar kamera lalu lintas berubah.** Kunci tiap ruas adalah `id` kamera di database.
 
 ## Skrip
 - `scripts/build_road_segments.py [--cache berkas]`: bangun ulang ruas jalan untuk halaman Lalu Lintas (hanya membaca database).

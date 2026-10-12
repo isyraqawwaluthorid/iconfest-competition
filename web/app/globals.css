@@ -235,8 +235,8 @@ h1, h2, h3 {
 
 /* Peta tematik: satu poligon per kecamatan, diwarnai menurut tema yang dipilih. */
 .thematic-map .leaflet-tile-pane {
-  /* Peta dasar diredam agar warna wilayah yang menjadi pusat perhatian. */
-  filter: grayscale(1) opacity(0.45);
+  /* Peta dasar tetap berwarna supaya kota terlihat hidup; warna wilayah di atasnya dibuat tembus pandang. */
+  filter: saturate(1.15);
 }
 .thematic-map.leaflet-container {
   background: var(--surface-muted);
@@ -244,12 +244,12 @@ h1, h2, h3 {
 }
 .district {
   stroke: var(--surface);
-  stroke-width: 1.5;
-  fill-opacity: 0.55;
+  stroke-width: 2;
+  fill-opacity: 0.38;
   cursor: pointer;
   transition: fill-opacity 120ms;
 }
-.district:hover { fill-opacity: 0.75; }
+.district:hover { fill-opacity: 0.55; }
 .district.tone-normal { fill: var(--status-normal); }
 .district.tone-waspada { fill: var(--status-waspada); }
 .district.tone-siaga { fill: var(--status-siaga); }
@@ -266,13 +266,13 @@ h1, h2, h3 {
 .district.tone-rain-4 { fill: var(--rain-4); fill-opacity: 0.8; }
 .district.tone-untracked {
   fill: url(#untracked-stripes);
-  fill-opacity: 0.9;
+  fill-opacity: 0.55;
   stroke: var(--untracked);
 }
 .district.is-selected {
   stroke: var(--primary-strong);
   stroke-width: 3.5;
-  fill-opacity: 0.8;
+  fill-opacity: 0.6;
 }
 /* Nama kecamatan di atas poligon; tidak menangkap klik agar poligon di bawahnya tetap bisa dipilih. */
 .district-label {
@@ -294,9 +294,8 @@ h1, h2, h3 {
 
 /* Halaman Lalu Lintas: ruas jalan di sekitar tiap kamera, diwarnai menurut tingkat kepadatannya. */
 .road-map .leaflet-tile-pane {
-  /* Peta dasar diredam secukupnya: warna asli jalannya tidak boleh menyaingi warna ruas, tetapi nama jalan dan
-     bangunan tetap terbaca saat didekati. */
-  filter: grayscale(0.8) opacity(0.75);
+  /* Peta dasar tetap berwarna; jalannya sendiri pucat, jadi warna ruas di atasnya tetap menonjol. */
+  filter: saturate(1.15);
 }
 .road-map.leaflet-container {
   background: var(--surface-muted);
@@ -323,13 +322,10 @@ h1, h2, h3 {
 .road-segment.tone-offline { stroke: var(--status-offline); stroke-dasharray: 2 9; }
 /* Jalan yang sama lebih jauh dari kamera: warna yang sama, lebih tipis dan sedikit tembus, karena itu perkiraan. */
 .road-segment.is-extended { stroke-opacity: 0.8; }
-/* Jalan utama tanpa kamera: tergambar, tanpa warna status. */
-.road-network {
-  stroke: var(--road-untracked);
-  stroke-opacity: 0.9;
-  fill: none;
-  pointer-events: none;
-}
+/* Jalan tanpa kamera: warna kamera terdekat sebagai perkiraan; makin jauh kameranya makin pudar. */
+.road-segment.is-network { stroke-opacity: 0.72; }
+.road-segment.is-network.is-far { stroke-opacity: 0.4; }
+.road-segment.is-network.tone-unknown { stroke: var(--road-untracked); }
 .camera-halo { stroke: none; fill-opacity: 0.28; pointer-events: none; }
 .camera-halo.tone-density-lancar { fill: var(--density-lancar); }
 .camera-halo.tone-density-normal { fill: var(--density-normal); }

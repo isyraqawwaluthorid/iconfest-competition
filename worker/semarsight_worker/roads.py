@@ -82,9 +82,22 @@ def ways_from_overpass(elements: list[dict]) -> list[Way]:
     return ways
 
 
+NEAREST_COUNT = 4  # kamera terdekat yang dicatat per garis; web memakai yang pertama yang sedang punya nilai
+
+
 def network_lines(ways: list[Way]) -> list[tuple[Point, ...]]:
-    """Garis semua jalan utama, untuk digambar sebagai latar jaringan jalan (termasuk yang tidak punya kamera)."""
+    """Garis semua jalan utama, untuk digambar sebagai jaringan jalan (termasuk yang tidak punya kamera)."""
     return [way.points for way in ways if way.is_major]
+
+
+def nearest_cameras(line: tuple[Point, ...], cameras: list[Point], count: int = NEAREST_COUNT) -> list[tuple[int, int]]:
+    """Kamera terdekat dari titik tengah garis: (indeks kamera, jarak meter), yang terdekat lebih dulu.
+
+    Jalan tanpa kamera diwarnai web sebagai perkiraan dari kamera terdekat, dan jaraknya menentukan seberapa pudar.
+    """
+    middle = line[len(line) // 2]
+    ranked = sorted((distance_m(middle, camera), index) for index, camera in enumerate(cameras))
+    return [(index, round(distance)) for distance, index in ranked[:count]]
 
 
 def _xy(point: Point, origin: Point) -> tuple[float, float]:

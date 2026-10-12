@@ -82,6 +82,14 @@ def test_network_keeps_major_roads_only():
     assert roads.network_lines([main, link, alley]) == [main.points, link.points]
 
 
+def test_nearest_cameras_are_ranked_from_the_middle_of_the_line():
+    line = east_west(1, "Jalan Pemuda", 0, 11).points  # titik tengah di 110.405
+    cameras = [(LAT, 110.415), (LAT, 110.406), (LAT, 110.40)]
+    ranked = roads.nearest_cameras(line, cameras, count=2)
+    assert [index for index, _ in ranked] == [1, 2]
+    assert abs(ranked[0][1] - 110) <= 2
+
+
 def test_far_road_is_flagged_and_no_road_gives_none():
     road = east_west(1, "Jalan Pemuda", 0, 11)
     far = roads.segment_for((LAT + 0.0008, 110.405), [road])  # ±89 m dari jalan

@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleMarker, MapContainer, TileLayer, Tooltip } from "react-leaflet";
+import { BASEMAP } from "@/lib/map-tiles";
 import { displayFor, type MapLayer } from "@/lib/status";
 import type { CameraOverview } from "@/lib/types";
 
@@ -13,14 +14,11 @@ type Props = {
   onSelect: (id: string) => void;
 };
 
-/** Peta Leaflet + OpenStreetMap. Hanya dirender di browser (lihat MapView). */
+/** Peta Leaflet di atas peta dasar bersama (`lib/map-tiles.ts`). Hanya dirender di browser (lihat MapView). */
 export default function CityMap({ cameras, layer, selectedId, onSelect }: Props) {
   return (
     <MapContainer center={SEMARANG_CENTER} zoom={12} scrollWheelZoom className="h-full w-full rounded-token">
-      <TileLayer
-        attribution='&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <TileLayer {...BASEMAP} />
       {cameras.map((camera) => {
         const status = displayFor(camera, layer);
         const selected = camera.id === selectedId;

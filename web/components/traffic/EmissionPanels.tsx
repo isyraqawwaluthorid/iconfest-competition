@@ -49,7 +49,7 @@ export function EmissionPanels({ rows, error, pollutant, selected, onPollutant, 
             </span>
           </div>
           <p className="mt-1 text-center text-[11px] text-muted">
-            Estimasi relatif untuk membandingkan ruas. Bukan pengukuran udara dan bukan kg per jam.
+            Estimasi relatif, bukan pengukuran udara dan bukan kg per jam. Garis tipis: perkiraan dari kamera terdekat.
           </p>
         </div>
       </div>

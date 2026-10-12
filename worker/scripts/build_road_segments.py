@@ -2,7 +2,8 @@
 
 Hasilnya dua berkas di `web/lib/geo/`: `road-segments.json` (per kamera: ruas dekat yang kira-kira
 terlihat, dan perpanjangannya di jalan yang sama) yang diwarnai web menurut tingkat kepadatan kamera itu,
-dan `road-network.json` (semua jalan utama, digambar tanpa warna sebagai latar). Dijalankan sekali, dan
+dan `road-network.json` (semua jalan utama beserta kamera terdekatnya; jalan tanpa kamera diwarnai web
+sebagai perkiraan dari kamera terdekat). Dijalankan sekali, dan
 diulang bila daftar kamera lalu lintas berubah. Hanya membaca database; yang ditulis hanya dua berkas itu.
 
     python scripts/build_road_segments.py                 # ambil dari Overpass, tulis JSON
@@ -129,8 +130,22 @@ def main() -> None:
     )
     print(f"{len(segments)} ruas ditulis ke {OUTPUT}")
 
-    network = _rounded(roads.network_lines(ways), 5)
-    NETWORK_OUTPUT.write_text(json.dumps({"source": SOURCE, "lines": network}, separators=(",", ":")), encoding="utf-8")
+    lines = roads.network_lines(ways)
+    camera_points = [points[camera["id"]] for camera in cameras]
+    NETWORK_OUTPUT.write_text(
+        json.dumps(
+            {
+                "source": SOURCE,
+                "cameras": [camera["id"] for camera in cameras],
+                "lines": _rounded(lines, 5),
+                # Per garis: [indeks kamera, jarak m, ...] untuk beberapa kamera terdekat, yang terdekat lebih dulu.
+                "near": [[value for pair in roads.nearest_cameras(line, camera_points) for value in pair] for line in lines],
+            },
+            separators=(",", ":"),
+        ),
+        encoding="utf-8",
+    )
+    network = lines
     print(f"{len(network)} garis jalan utama ditulis ke {NETWORK_OUTPUT} ({NETWORK_OUTPUT.stat().st_size // 1024} KB)")
 
 

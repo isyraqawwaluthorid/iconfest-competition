@@ -30,7 +30,7 @@ export function SegmentPanel({ row, onClose }: { row: RoadRow; onClose: () => vo
           <h2 className="mt-1 text-xl leading-tight font-extrabold">{title}</h2>
           <p className="mt-1 text-xs text-muted">
             Dilihat dari kamera {camera.name}. Garis tebal (±{ROAD_REACH_M} m dari kamera) adalah yang terlihat; garis tipis
-            sampai ±{ROAD_EXTENDED_M / 1000} km di jalan yang sama adalah perkiraan dari kamera ini.
+            sampai ±{ROAD_EXTENDED_M / 1000} km di jalan yang sama, dan jalan lain di sekitarnya, adalah perkiraan dari kamera ini.
           </p>
         </div>
         <button
