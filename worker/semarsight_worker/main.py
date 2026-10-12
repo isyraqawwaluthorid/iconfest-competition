@@ -23,7 +23,7 @@ from . import acquisition, alerts, housekeeping, quality, storage
 from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
-from .fusion import baseline, events, upstream
+from .fusion import activity, baseline, events, upstream
 from .insights import InsightWriter
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
 from .sources import openmeteo
@@ -33,6 +33,8 @@ log = logging.getLogger("semarsight_worker")
 
 FRAME_STATE_FILE = "_state/frame_states.json"
 COUNTING_MODULES = {"traffic", "crowd"}
+ACTIVITY_PROFILE_KEY = "activity_profile"  # baris `system_status` yang dibaca lapisan "Aktivitas per jam" di web
+POOR_QUALITY = "poor"  # hitungan dari gambar buruk tidak ikut profil aktivitas
 OUTAGE_MIN_CAMERAS = 10
 OUTAGE_SHARE = 0.4  # porsi kamera tanpa jawaban server yang menandakan gangguan jaringan worker
 
@@ -109,6 +111,7 @@ def run_cycle(
     weather: dict[str, openmeteo.GridWeather],
     *,
     insight_writer: InsightWriter | None = None,
+    profile: activity.Profile | None = None,
     only: list[str] | None = None,
     limit: int | None = None,
 ) -> CycleStats:
@@ -132,6 +135,8 @@ def run_cycle(
             frame_states[result.camera.id] = result.frame_state
         if result.counts is not None:
             result.traffic = _evaluate_traffic(result, history)
+            if profile is not None and (result.quality is None or result.quality.quality != POOR_QUALITY):
+                profile.add(result.camera.id, result.checked_at, result.counts.vehicle_total, result.counts.persons)
         log.debug("%-32s %-6s %5s ms %s", result.camera.name[:32], result.health, result.latency_ms, _detail(result))
 
     recordable, unreachable = split_unreachable(results)
@@ -179,6 +184,13 @@ def run_cycle(
         sum(r.traffic is not None for r in recordable), sum(r.water is not None for r in recordable),
         stats.duration_ms / 1000, " [dry-run]" if database.dry_run else "",
     )  # fmt: skip
+    if profile is not None and profile.due(started_at):
+        try:
+            snapshot = profile.snapshot(started_at)
+            database.set_system_status(ACTIVITY_PROFILE_KEY, snapshot, updated_at=snapshot["generated_at"])
+            profile.mark_written(started_at)
+        except Exception:  # noqa: BLE001 - profil lama tetap tampil; ditulis lagi pada siklus berikutnya
+            log.exception("penyimpanan profil aktivitas gagal")
     if insight_writer is not None:
         # Setelah detak dan log siklus, supaya panggilan LLM tidak membuat siklus tampak lambat.
         try:
@@ -273,11 +285,13 @@ def refresh_weather(database: Database, weather: dict[str, openmeteo.GridWeather
         log.exception("pembaruan cuaca gagal")
 
 
-def seed_history(history: baseline.History, database: Database) -> None:
-    """Isi riwayat pembanding dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart."""
+def seed_history(history: baseline.History, profile: activity.Profile, database: Database) -> None:
+    """Isi riwayat pembanding dan profil aktivitas dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart."""
     metric_by_camera = {cam.id: _density_metric(cam) for cam in database.active_cameras()}
     rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.HISTORY)
     for row in rows:
+        if row["camera_id"] in metric_by_camera and row["quality"] != POOR_QUALITY:
+            profile.add(row["camera_id"], datetime.fromisoformat(row["captured_at"]), row["vehicle_total"], row["persons"])
         metric = metric_by_camera.get(row["camera_id"])
         if metric is None or not _usable_for_baseline(row["quality"], row["is_night"]):
             continue
@@ -441,7 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     state_path = settings.frames_dir / FRAME_STATE_FILE
     frame_states = acquisition.load_frame_states(state_path)
     history = baseline.History()
-    seed_history(history, database)
+    profile = activity.Profile()
+    seed_history(history, profile, database)
     weather: dict[str, openmeteo.GridWeather] = {}
     refresh_weather(database, weather)
     water_pipeline = WaterPipeline(settings, database, weather)
@@ -453,7 +468,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             run_cycle(
                 settings, database, frame_states, history, water_pipeline, weather,
-                insight_writer=insight_writer, only=args.only_camera, limit=args.limit,
+                insight_writer=insight_writer, profile=profile, only=args.only_camera, limit=args.limit,
             )  # fmt: skip
         except Exception:  # noqa: BLE001 - siklus berikutnya harus tetap berjalan
             log.exception("siklus gagal")

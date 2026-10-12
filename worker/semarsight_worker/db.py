@@ -307,9 +307,9 @@ class Database:
             return
         self._client.storage.from_(self._bucket).remove(paths)
 
-    def set_system_status(self, key: str, value: dict[str, Any]) -> None:
+    def set_system_status(self, key: str, value: dict[str, Any], updated_at: str | None = None) -> None:
         if self.dry_run:
             return
         self._client.table("system_status").upsert(
-            {"key": key, "value": value, "updated_at": value["last_seen"]}
+            {"key": key, "value": value, "updated_at": updated_at or value["last_seen"]}
         ).execute()

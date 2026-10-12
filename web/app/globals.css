@@ -43,6 +43,13 @@
   --density-ramai: var(--status-waspada);
   --density-padat: var(--status-awas);
 
+  /* Lapisan aktivitas: makin gelap makin ramai. Ungu, supaya tidak terbaca sebagai status bahaya. */
+  --activity-1: #ede9fe;
+  --activity-2: #c4b5fd;
+  --activity-3: #8b5cf6;
+  --activity-4: #6d28d9;
+  --activity-5: #3b0764;
+
   /* Peta tematik: wilayah tanpa data dan skala hujan (makin gelap makin lebat). */
   --untracked: #a1a1aa;
   --rain-0: #e0f2fe;
@@ -302,6 +309,43 @@ h1, h2, h3 {
 .road-segment.tone-density-ramai { stroke: var(--density-ramai); }
 .road-segment.tone-density-padat { stroke: var(--density-padat); }
 .road-segment.tone-offline { stroke: var(--status-offline); stroke-dasharray: 2 9; }
+
+/* Lapisan "Aktivitas per jam": satu heksagon per kawasan yang punya kamera; tingkat 0 berarti belum ada data. */
+.activity-hex {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+  fill-opacity: 0.72;
+  cursor: pointer;
+  transition: fill-opacity 120ms;
+}
+.activity-hex:hover { fill-opacity: 0.9; }
+.activity-hex.level-0 { fill: var(--status-unknown); fill-opacity: 0.18; stroke: var(--status-unknown); stroke-dasharray: 4 4; }
+.activity-hex.level-1 { fill: var(--activity-1); }
+.activity-hex.level-2 { fill: var(--activity-2); }
+.activity-hex.level-3 { fill: var(--activity-3); }
+.activity-hex.level-4 { fill: var(--activity-4); }
+.activity-hex.level-5 { fill: var(--activity-5); }
+.activity-hex.is-selected { stroke: var(--text); stroke-width: 3; fill-opacity: 0.9; }
+.activity-source { fill: var(--surface); fill-opacity: 1; stroke: var(--text); stroke-width: 1; pointer-events: none; }
+.activity-swatch.level-0 { border: 1px dashed var(--status-unknown); background: var(--neutral-bg); }
+.activity-swatch.level-1 { background: var(--activity-1); }
+.activity-swatch.level-2 { background: var(--activity-2); }
+.activity-swatch.level-3 { background: var(--activity-3); }
+.activity-swatch.level-4 { background: var(--activity-4); }
+.activity-swatch.level-5 { background: var(--activity-5); }
+/* Kartu nilai heksagon terpilih: garis kiri berwarna tingkatnya. */
+.activity-card { border-left: 4px solid var(--status-unknown); background: var(--surface-muted); }
+.activity-card.level-1 { border-left-color: var(--activity-1); }
+.activity-card.level-2 { border-left-color: var(--activity-2); }
+.activity-card.level-3 { border-left-color: var(--activity-3); }
+.activity-card.level-4 { border-left-color: var(--activity-4); }
+.activity-card.level-5 { border-left-color: var(--activity-5); }
+/* Grafik 24 batang: jam terpilih gelap, jam tanpa data berupa arsiran tipis. */
+.hour-bar { background: var(--activity-2); transition: background 120ms; }
+.group:hover .hour-bar { background: var(--activity-3); }
+.hour-bar.is-current { background: var(--activity-4); }
+.hour-bar.is-empty { background: repeating-linear-gradient(45deg, var(--border) 0 2px, transparent 2px 5px); }
+.hour-bar.is-empty.is-current { outline: 2px solid var(--activity-4); outline-offset: -2px; }
 
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {

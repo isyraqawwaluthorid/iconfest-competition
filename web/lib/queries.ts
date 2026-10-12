@@ -1,3 +1,4 @@
+import { activityProfileSchema, type ActivityProfile } from "./activity";
 import { insightBodySchema, type Insight } from "./ai-insight";
 import { getSupabase } from "./supabase/public";
 import type {
@@ -171,6 +172,14 @@ export async function getLatestInsight(): Promise<Insight | null> {
   if (!data) return null;
   const body = insightBodySchema.safeParse(data.body);
   return body.success ? { id: data.id, created_at: data.created_at, model: data.model, ...body.data } : null;
+}
+
+/** Profil aktivitas per jam yang dihitung worker; `null` jika belum ada atau bentuknya tidak sesuai. */
+export async function getActivityProfile(): Promise<ActivityProfile | null> {
+  const { data, error } = await getSupabase().from("system_status").select("value").eq("key", "activity_profile").maybeSingle();
+  if (error) throw new Error(`Gagal memuat profil aktivitas: ${error.message}`);
+  const profile = activityProfileSchema.safeParse(data?.value);
+  return profile.success ? profile.data : null;
 }
 
 export async function getWorkerHeartbeat(): Promise<WorkerHeartbeat | null> {
