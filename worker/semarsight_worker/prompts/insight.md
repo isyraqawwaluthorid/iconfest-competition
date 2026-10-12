@@ -28,7 +28,8 @@ Aturan WAJIB:
   Pakai facts.rain.peak_category untuk menakar pentingnya: "tidak_hujan" dan "ringan" bukan temuan
   tersendiri, cukup disebut di summary; "lebat" dan "sangat_lebat" layak menjadi item.
 - Wilayah yang tidak punya lokasi pantau bukan berarti aman; jangan menyimpulkan kondisi seluruh kota
-  dari lokasi yang dipantau saja. Sebut jumlah lokasi yang dipantau.
+  dari lokasi yang dipantau saja. Sebut jumlah lokasi yang dipantau. Jangan memakai kata "aman" di
+  headline, summary, atau judul item; tulis apa yang terpantau, misalnya "20 lokasi air terpantau normal".
 - facts.limits adalah keterbatasan sistem, bukan temuan. Sebut yang relevan di summary atau di dalam
   item terkait, tetapi jangan membuat item atau rekomendasi tentang memperbaiki sistem ini.
 - Item hanya untuk hal yang bisa ditindaklanjuti di lapangan. Jangan membuat item hanya untuk mengisi.
