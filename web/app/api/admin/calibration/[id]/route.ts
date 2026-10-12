@@ -14,7 +14,12 @@ export async function POST(request: Request, context: RouteContext<"/api/admin/c
 
   const parsed = calibrationSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Data kalibrasi tidak valid.", details: parsed.error.issues }, { status: 400 });
+    // Pesan pertama ikut ditampilkan, supaya penyebabnya (misalnya urutan garis tertukar) langsung terlihat.
+    const reason = parsed.error.issues[0]?.message;
+    return NextResponse.json(
+      { error: `Data kalibrasi tidak valid${reason ? `: ${reason}` : ""}.`, details: parsed.error.issues },
+      { status: 400 },
+    );
   }
   const input = parsed.data;
   const supabase = getServiceSupabase();
