@@ -189,6 +189,7 @@ Alat untuk memeriksa hal ini: `scripts/replay_readings.py` menilai ulang gambar 
 - Gambar 2: foto referensi kondisi normal dengan garis yang sama.
 - Teks: kartu kamera (`water_kind`, `calibration_notes`, nama sungai) dan kualitas gambar.
 - Panggil OpenAI dengan **structured outputs (JSON schema)** sesuai `07-ai-prompts.md`. Validasi dengan Pydantic. Gagal/timeout → simpan `status = tidak_dapat_dinilai`, jangan ulangi lebih dari 1 kali.
+- **Penilaian naik diulang sekali** (`classify_twice_if_raised`, 12 Okt): jika jawaban pertama di atas normal (atau jalan tergenang), gambar yang sama dinilai sekali lagi. Keduanya naik → dipakai level yang lebih rendah dengan keyakinan terkecil. Tidak sepakat → dipakai jawaban kedua dengan keyakinan dibatasi 0,45, sehingga tidak dihitung penghalusan dan lokasi ditandai perlu diperiksa. Jawaban kedua ikut disimpan di `raw.recheck`. Penilaian normal tidak diulang.
 - Simpan `raw` JSON (jawaban dan pemakaian token) serta nama model.
 - Foto referensi dipilih sesuai waktu (siang atau malam) dan jatuh ke yang satunya bila belum ada.
 - Alur per siklus ada di `water_pipeline.py`: `observe` di thread tiap kamera, `commit` sekali per siklus.

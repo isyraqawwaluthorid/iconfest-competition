@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Senin, 12 Oktober 2026, 16.50 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Senin, 12 Oktober 2026, 17.30 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -17,13 +17,13 @@ Cara membaca:
 | Fase 0 — Prasyarat | 5 dari 7 | – | 2 (manual) | sebelum 10 Okt |
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
 | Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
-| Fase 3 — Modul air | 11 dari 14 | 2 | 1 (manual) | Sen 12 Okt |
+| Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 6 dari 9 | 1 | 2 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 3 dari 8 | 1 | 4 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **59 dari 88 (67%)** | **5** | **24** | |
+| **Jumlah inti** | **60 dari 89 (67%)** | **5** | **24** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -156,6 +156,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T3.11 [M]** Simpan foto referensi untuk kamera terkalibrasi. **Sebagian:** referensi siang kini lengkap, 22 dari 22 (empat kamera jalan disimpan 12 Okt pukul 14.18–14.19, jalan kering, lalu 16 gambar bukti dinilai ulang dan tetap normal). Referensi malam 19 dari 22; kurang: **DPU-Mberok2-OUT** (unggulan, paling mendesak), Banger-IN, Semarang Indah_IN.
 - [x] **T3.12 [K]** Pemeriksaan salah baca 12 Okt. Ke-22 penilaian bukan normal sejak 11 Okt ditinjau (yang terjadi 12 Okt dari gambar buktinya, sisanya lewat nilai ulang); tidak ada yang menunjukkan kejadian nyata. Hasil: pembacaan naik butuh keyakinan ≥ 0,65 agar dihitung; referensi siang Kartini-OUT dan KP.Kali-OUT diganti dengan keadaan normal yang paling tinggi (foto lama dicadangkan); garis W/S KP.Kali-OUT yang tertukar dibetulkan; `scripts/replay_readings.py` untuk menilai ulang gambar bukti. *Bukti:* nilai ulang 130 gambar dari 20 lokasi tidak lagi menghasilkan pembacaan naik (sebelumnya 8).
 - [x] **T3.14 [K]** Halaman kalibrasi menolak garis acuan yang urutannya tertukar, dan menampilkan sebabnya.
+- [x] **T3.15 [K]** Penilaian ganda (12 Okt sore): penilaian yang hasilnya naik diulang sekali atas gambar yang sama dan baru dihitung bila sepakat. Pemicunya indikasi "awas" palsu di Banger-SD-IN pukul 17.00 (cahaya sore). *Bukti:* tiga putaran nilai ulang atas enam gambar sore kamera itu tidak lagi menghasilkan penilaian naik yang dihitung; dari 76 gambar semua lokasi tersisa satu (Kartini-OUT), yang hilang setelah garis N-nya digeser. Indikasi di Banger-SD-IN itu juga menjadi uji pertama linimasa dan penanda peta dengan **data langsung** di beranda.
 - [ ] **T3.13 [M]** Lihat sekilas kalibrasi yang diubah asisten 12 Okt (tabel di bawah): referensi siang baru KP.Kali-OUT dan Kartini-OUT, dan garis N IPdome-Polder Tawang yang digeser. Tidak mendesak: semuanya sudah diuji dengan nilai ulang dan cadangannya ada di `FRAMES_DIR\_state\referensi-lama`. Yang hanya pemilik proyek bisa nilai: apakah posisi garis S dan A tiap lokasi sesuai keadaan di lapangan.
 
 ### Kalibrasi dan referensi per kamera (keadaan 12 Okt, 14.30 WIB)
@@ -164,7 +165,7 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 
 | Kamera | Jenis | Garis | Ref. siang | Ref. malam | Keyakinan | Catatan dan tindak lanjut |
 |---|---|---|---|---|---|---|
-| Banger-SD-IN | pompa masuk | N S A | ada | ada | 0,77 / 0,75 | Dikalibrasi ulang 11 Okt; stabil sejak itu |
+| Banger-SD-IN | pompa masuk | N S A | ada | ada | 0,77 / 0,75 | Dikalibrasi ulang 11 Okt. **Sore hari (sekitar 15.30–17.30) kamera melawan cahaya** dan penilaiannya tidak stabil: 12 Okt 17.00 sempat dinilai "awas" padahal airnya setinggi referensi. Ditahan oleh penilaian ganda; pantau tiap sore |
 | Bulu Drain-IN | pompa masuk | N W S A | ada | ada | 0,81 / 0,75 | Baik |
 | Kartini-IN | pompa masuk | N W S A | ada | ada | 0,78 / 0,73 | Satu "waspada" lemah 12 Okt; garis N berimpit dengan muka air. Pantau |
 | Manggis-IN | pompa masuk | N W S A | ada | ada | 0,84 / 0,79 | Baik. Sampah terbaca banyak 12 Okt |
@@ -176,7 +177,7 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 | DPU-Mberok2-OUT | pompa keluar | N W S A | ada | **belum** | 0,74 / **0,51** | Keyakinan malam terendah; 18 penilaian rendah. **Butuh referensi malam** |
 | KP.Kali-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,72 / 0,71 | Garis W/S tertukar, dibetulkan. Referensi siang kini kanal penuh pukul 08.09. Sampah terbaca banyak. **Perlu disetujui (T3.13)** |
 | KS-OUT-2 | pompa keluar | N W S A | ada | ada | 0,73 / 0,65 | Busa saat pompa menyala sempat terbaca "awas"; kini tertahan aturan keyakinan. Pantau |
-| Kartini-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,78 / 0,76 | Referensi siang lama kolam kosong; kini kolam terisi pukul 13.13. **Perlu disetujui (T3.13)** |
+| Kartini-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,78 / 0,76 | Referensi siang lama kolam kosong; kini kolam terisi pukul 13.13. Garis N digeser ke dasar dinding beton 12 Okt sore, setelah dua "waspada" lagi (15.20, 15.55); delapan gambar yang sama kini normal. **Perlu disetujui (T3.13)** |
 | Progo-OUT | pompa keluar | N W S A | ada | ada | 0,81 / 0,75 | Baik |
 | Semarang Indah_OUT | pompa keluar | N W S A | ada | ada | 0,71 / 0,66 | Busa pompa; 9 penilaian berkeyakinan rendah. Gambar pukul 13.13 kadang terbaca "waspada" saat dinilai ulang padahal muka airnya sama dengan referensi (derau). Pantau |
 | Trimulyo_OUT | pompa keluar | N W S A | ada | ada | 0,75 / 0,75 | Baik |
@@ -291,4 +292,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai) |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser |
