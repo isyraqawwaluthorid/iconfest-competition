@@ -49,6 +49,15 @@ Terakhir diperbarui: 12 Oktober 2026.
 4. **Aspal basah yang mengilap bukan genangan** (JRAKAH malam hari). Definisi genangan ringan diperjelas; kamera jalan tidak butuh garis acuan.
 5. **Referensi siang dan malam** dipilih otomatis sesuai waktu. Tanpa referensi malam, keyakinan AI malam hari turun ke 0,48–0,76.
 
+### Pelajaran kalibrasi (12 Okt)
+Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-OUT, KP.Kali-OUT, KS-OUT-2, IPdome-Polder Tawang, dan Kartini-IN dilihat langsung gambar buktinya; sisanya dinilai ulang dengan alat. Tidak ada yang menunjukkan kejadian nyata.
+
+6. **Foto referensi harus menunjukkan keadaan normal yang paling tinggi** (kolam terisi, kanal saat penuh), karena prompt menjadikan referensi patokan utama. Referensi siang Kartini-OUT (kolam hampir kosong) dan KP.Kali-OUT (kanal surut) diganti; foto lama dicadangkan di `FRAMES_DIR\_state\referensi-lama`.
+7. **Garis N digambar sedikit di atas muka air normal, bukan tepat di atasnya.** Di IPdome-Polder Tawang dan Kartini-IN, garis N yang berimpit dengan muka air membuat riak kecil terbaca "melewati N".
+8. **Garis W dan S di KP.Kali-OUT tertukar** dan sudah dibetulkan; halaman kalibrasi kini menolak urutan yang tertukar.
+9. **Penilaian AI atas gambar yang sama bisa berbeda saat diulang**, terutama pada pemandangan di batas dan saat busa pompa menutupi permukaan. Karena itu pembacaan naik kini butuh keyakinan ≥ 0,65 agar dihitung; di bawah itu hanya menandai "perlu diperiksa".
+10. **Setiap perubahan kalibrasi atau prompt diuji dengan `scripts/replay_readings.py`**, yang menilai ulang gambar bukti tersimpan. Setelah perbaikan di atas, 130 gambar dari 20 lokasi tidak lagi menghasilkan satu pun pembacaan naik (sebelumnya 8).
+
 ### Risiko dan peringatan
 - **Skor risiko 0–1, terbuka:** status air 40%, tren 20%, kondisi hulu 20%, prakiraan hujan 3 jam 20%. Dihitung ulang tiap siklus tanpa menambah panggilan AI. Komponen hulu masih 0 sampai hubungan hulu–hilir diisi.
 - **Peringatan dari aturan dan template**, bukan dari LLM: air naik, jalan tergenang, hujan lebat, sampah sebelum hujan, kamera unggulan tidak terbaca. Diselaraskan tiap siklus; yang syaratnya hilang ditutup otomatis.
@@ -125,4 +134,5 @@ Daftar lengkap dan statusnya ada di `10-tasklist.md`.
 | 11 Okt sore | Dua salah baca AI (Banger-SD-IN, Semarang Indah_OUT) | Kalibrasi dan prompt diperbaiki; lihat pelajaran kalibrasi |
 | 11 Okt 18.10 WIB | Satu siklus terlewat tanpa jejak | Log worker kini ditulis ke berkas |
 | 12 Okt pagi | Empat jeda (total ±4 jam) saat laptop dibawa bepergian | Worker dipindah ke PC yang menetap (lihat `14-operasional.md`) |
+| 12 Okt 12.08–13.35 WIB | Tiga penilaian "awas" dalam sehari (Kartini-OUT keyakinan 0,99, KP.Kali-OUT 0,87, KS-OUT-2 0,55 saat pompa berbusa); status resmi tetap normal karena butuh dua penilaian sepakat | Referensi dua kamera diganti, garis KP.Kali-OUT dibetulkan, pembacaan naik butuh keyakinan ≥ 0,65; lihat pelajaran kalibrasi 12 Okt |
 | 12 Okt 12.51 WIB | Worker mulai berjalan di PC (siklus terakhir laptop 12.44); dua siklus pertama gagal mengunggah 23 dan 14 snapshot | Klien Supabase dipindah ke HTTP/1.1; pembacaan kamera dan angka tidak terpengaruh, hanya gambar terbaru kamera itu yang tertinggal satu-dua siklus |

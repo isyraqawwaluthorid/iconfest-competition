@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Senin, 12 Oktober 2026, 14.00 WIB.** Diperbarui di akhir setiap sesi kerja.
+**Terakhir diperbarui: Senin, 12 Oktober 2026, 14.30 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -17,13 +17,13 @@ Cara membaca:
 | Fase 0 — Prasyarat | 5 dari 7 | – | 2 (manual) | sebelum 10 Okt |
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
 | Fase 2 — Lalu lintas, web dasar, deploy | 11 dari 14 | – | 3 | Min 11 Okt |
-| Fase 3 — Modul air | 9 dari 11 | 2 | – | Sen 12 Okt |
+| Fase 3 — Modul air | 11 dari 14 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 4 dari 9 | – | 5 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 0 dari 8 | 1 | 7 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 5 dari 7 | 1 | 1 | – |
-| **Jumlah inti** | **49 dari 84 (58%)** | **5** | **30** | |
+| **Jumlah inti** | **51 dari 87 (59%)** | **5** | **31** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -61,7 +61,9 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 
 Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pengumpulan: **Kamis malam**, supaya Jumat menjadi cadangan.
 
-| Hari | Dikerjakan | Butuh pemilik proyek |
+**Tabel ini urutan kerja, bukan kalender.** Keputusan pemilik proyek 12 Okt: apa pun yang sudah bisa dikerjakan langsung dikerjakan tanpa menunggu harinya, supaya sisa waktu sebelum pengumpulan bisa dipakai untuk evaluasi. Kolom hari adalah batas paling lambat.
+
+| Paling lambat | Dikerjakan | Butuh pemilik proyek |
 |---|---|---|
 | Sen 12 Okt (sisa hari) | T2.14 pembanding lalu lintas per jam; usulan pasangan hulu–hilir untuk T4.4 | Simpan referensi malam yang kurang (T3.11) setelah gelap |
 | Sel 13 Okt | T2.10 deploy; T4.3 hulu–hilir; T5.4 cara mendemokan kejadian; TV.4 tren 24 jam | Akun Vercel; persetujuan pasangan hulu–hilir (T4.4); referensi siang 4 kamera jalan (T3.11) |
@@ -77,6 +79,7 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 |---|---|---|
 | **T3.11** Referensi malam: Banger-IN, Semarang Indah_IN, DPU-Mberok2-OUT | Sen 12 Okt malam | Satu klik per kamera di halaman kalibrasi, setelah gelap |
 | **T3.11** Referensi siang: JRAKAH, SP. AKPOL, Jembatan Mberok, DPU_Pahlawan | Sel 13 Okt siang | Sama, pada siang hari |
+| **T3.13** Memeriksa tiga kalibrasi yang diubah atau diragukan 12 Okt | Sel 13 Okt | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; rinciannya di tabel kalibrasi per kamera |
 | **T2.10** Akun Vercel dan langkah deploy | Sel 13 Okt | Dipandu langkah demi langkah |
 | **T4.4** Menyetujui usulan pasangan hulu–hilir | Sel 13 Okt | Usulan disusun dari nama dan lokasi kamera |
 | **T0.7** Jam tenggat dan template laporan dari panitia | Sel 13 Okt | CP Software Development ada di `MULAI-DI-SINI.md` |
@@ -152,6 +155,38 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T3.9 [K]** `sources/openmeteo.py`: ingest per `weather_grid` tiap 30 menit; 9 titik dalam satu permintaan; pemicu hujan modul air aktif.
 - [ ] **T3.10 [K]** Uji klasifikasi siang dan malam; sesuaikan prompt dan ambang. **Sebagian.** Siang selesai 11 Okt (prompt dan gambar anotasi disesuaikan; dua salah baca diperbaiki lewat kalibrasi). Malam: worker sudah membuat 453 penilaian malam (448 normal, 4 waspada, 1 tidak dapat dinilai; keyakinan rata-rata 0,74 dibanding 0,80 pada siang hari), tetapi **belum pernah diperiksa terhadap penilaian manusia**.
 - [ ] **T3.11 [M]** Simpan foto referensi untuk kamera terkalibrasi. **Sebagian:** 19 dari 22 punya referensi malam dan 18 dari 22 punya referensi siang. Kurang referensi malam: Banger-IN, Semarang Indah_IN, DPU-Mberok2-OUT. Kurang referensi siang: JRAKAH, SP. AKPOL, Jembatan Mberok, DPU_Pahlawan.
+- [x] **T3.12 [K]** Pemeriksaan salah baca 12 Okt. Ke-22 penilaian bukan normal sejak 11 Okt ditinjau (yang terjadi 12 Okt dari gambar buktinya, sisanya lewat nilai ulang); tidak ada yang menunjukkan kejadian nyata. Hasil: pembacaan naik butuh keyakinan ≥ 0,65 agar dihitung; referensi siang Kartini-OUT dan KP.Kali-OUT diganti dengan keadaan normal yang paling tinggi (foto lama dicadangkan); garis W/S KP.Kali-OUT yang tertukar dibetulkan; `scripts/replay_readings.py` untuk menilai ulang gambar bukti. *Bukti:* nilai ulang 130 gambar dari 20 lokasi tidak lagi menghasilkan pembacaan naik (sebelumnya 8).
+- [x] **T3.14 [K]** Halaman kalibrasi menolak garis acuan yang urutannya tertukar, dan menampilkan sebabnya.
+- [ ] **T3.13 [M]** Periksa kalibrasi yang diubah atau diragukan 12 Okt (lihat tabel di bawah): setujui atau ganti referensi baru KP.Kali-OUT dan Kartini-OUT; naikkan sedikit garis N di IPdome-Polder Tawang.
+
+### Kalibrasi dan referensi per kamera (keadaan 12 Okt, 14.30 WIB)
+
+Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak memakai garis. "Keyakinan" adalah rata-rata keyakinan AI siang / malam sejak 11 Okt.
+
+| Kamera | Jenis | Garis | Ref. siang | Ref. malam | Keyakinan | Catatan dan tindak lanjut |
+|---|---|---|---|---|---|---|
+| Banger-SD-IN | pompa masuk | N S A | ada | ada | 0,77 / 0,75 | Dikalibrasi ulang 11 Okt; stabil sejak itu |
+| Bulu Drain-IN | pompa masuk | N W S A | ada | ada | 0,81 / 0,75 | Baik |
+| Kartini-IN | pompa masuk | N W S A | ada | ada | 0,78 / 0,73 | Satu "waspada" lemah 12 Okt; garis N berimpit dengan muka air. Pantau |
+| Manggis-IN | pompa masuk | N W S A | ada | ada | 0,84 / 0,79 | Baik. Sampah terbaca banyak 12 Okt |
+| Progo-IN | pompa masuk | N W S A | ada | ada | 0,84 / 0,80 | Baik |
+| Trimulyo_Depan | pompa masuk | N W S A | ada | ada | 0,83 / 0,81 | Baik |
+| Banger-IN | pompa masuk | N W S A | ada | **belum** | – | Bukan unggulan, jadi belum dinilai AI. Garis sangat rapat; perlu digambar ulang bila ingin dipakai |
+| Semarang Indah_IN | pompa masuk | N W S A | ada | **belum** | – | Bukan unggulan, jadi belum dinilai AI |
+| Bulu Drain-OUT | pompa keluar | N W S A | ada | ada | 0,74 / 0,71 | Baik; 5 penilaian berkeyakinan rendah |
+| DPU-Mberok2-OUT | pompa keluar | N W S A | ada | **belum** | 0,74 / **0,51** | Keyakinan malam terendah; 18 penilaian rendah. **Butuh referensi malam** |
+| KP.Kali-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,72 / 0,71 | Garis W/S tertukar, dibetulkan. Referensi siang kini kanal penuh pukul 08.09. Sampah terbaca banyak. **Perlu disetujui (T3.13)** |
+| KS-OUT-2 | pompa keluar | N W S A | ada | ada | 0,73 / 0,65 | Busa saat pompa menyala sempat terbaca "awas"; kini tertahan aturan keyakinan. Pantau |
+| Kartini-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,78 / 0,76 | Referensi siang lama kolam kosong; kini kolam terisi pukul 13.13. **Perlu disetujui (T3.13)** |
+| Progo-OUT | pompa keluar | N W S A | ada | ada | 0,81 / 0,75 | Baik |
+| Semarang Indah_OUT | pompa keluar | N W S A | ada | ada | 0,71 / 0,66 | Busa pompa; 9 penilaian berkeyakinan rendah. Pantau |
+| Trimulyo_OUT | pompa keluar | N W S A | ada | ada | 0,75 / 0,75 | Baik |
+| IPdome-Polder Tawang | kolam | N W S A | ada | ada | 0,81 / 0,77 | Dua "waspada" 12 Okt karena garis N berimpit dengan muka air. **Naikkan garis N sedikit (T3.13)** |
+| Jinunjung_Halaman | kolam | N W S A | ada | ada | 0,81 / 0,75 | Baik |
+| DPU_Pahlawan | jalan | – | **belum** | ada | 0,95 / 0,90 | Butuh referensi siang |
+| JRAKAH | jalan | – | **belum** | ada | 0,88 / 0,82 | Butuh referensi siang |
+| Jembatan Mberok | jalan | – | **belum** | ada | 0,87 / 0,79 | Butuh referensi siang |
+| SP. AKPOL | jalan | – | **belum** | ada | 0,91 / 0,63 | Butuh referensi siang. Malam hari gelap: 9 penilaian rendah, satu "waspada" lemah dari aspal mengilap |
 
 ## Fase 4 — Fusi dan insight (Selasa 13 Okt)
 
@@ -242,3 +277,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender |

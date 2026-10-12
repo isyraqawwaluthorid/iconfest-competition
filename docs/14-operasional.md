@@ -96,7 +96,12 @@ cd worker
 .\.venv\Scripts\python.exe scripts\status.py            # detak worker, 20 lokasi air, peringatan, jeda 24 jam
 .\.venv\Scripts\python.exe scripts\status.py --hours 48
 .\.venv\Scripts\python.exe scripts\probe_camera.py "JRAKAH"   # uji penilaian AI satu kamera, tanpa menulis
+.\.venv\Scripts\python.exe scripts\replay_readings.py "Kartini-OUT" --odd   # nilai ulang gambar bukti yang dulu bukan normal
+.\.venv\Scripts\python.exe scripts\replay_readings.py --all 3               # semua lokasi, setelah mengubah kalibrasi atau prompt
+.\.venv\Scripts\python.exe scripts\probe_insight.py           # uji ringkasan AI atas keadaan sekarang, tanpa menulis
 ```
+
+Setelah mengganti foto referensi, muat ulang worker (`muat-ulang-worker.ps1`): foto referensi disimpan sementara di memori worker.
 
 - **Log worker:** `FRAMES_DIR\_state\worker.log` (bergulir, 4 berkas × 2 MB). Baris "siklus selesai" muncul tiap 5 menit.
 - **"jaringan worker bermasalah"** berarti internet mesin ini putus; kamera tidak dicatat mati.

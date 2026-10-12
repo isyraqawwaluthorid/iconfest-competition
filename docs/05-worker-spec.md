@@ -164,6 +164,13 @@ Tiga pelajaran dari salah baca sore 11 Okt (keduanya dikonfirmasi normal dari ga
 - **Garis Waspada boleh dihilangkan** bila ruangnya sempit: air yang melewati Normal tetapi belum mencapai Siaga sudah dinilai waspada.
 - **Busa pompa bukan kenaikan air.** Di Semarang Indah_OUT busa saat pompa menyala menutupi tepi dan terbaca awas lalu waspada. Prompt kini menyebut busa secara khusus; pada enam frame yang sama hasilnya normal, lima di antaranya dengan keyakinan di bawah 0,5 sehingga tidak mengubah status dan ditandai perlu verifikasi.
 
+Tiga pelajaran lagi dari 12 Okt, setelah gambar bukti penilaian yang bukan normal hari itu diperiksa (semuanya salah baca):
+- **Foto referensi harus menunjukkan keadaan normal yang paling tinggi.** Prompt menjadikan referensi patokan utama, jadi referensi kolam kosong (Kartini-OUT) atau kanal saat surut (KP.Kali-OUT) membuat setiap keadaan terisi dinilai "jauh lebih tinggi", dan hasilnya berayun antara normal, waspada, dan awas untuk pemandangan yang sama. Setelah referensi diganti dengan keadaan terisi, delapan gambar Kartini-OUT yang sama dinilai normal semua dengan keyakinan 0,88–0,91 (sebelumnya 0,73–0,79).
+- **Urutan garis bisa tertukar tanpa terlihat.** Di KP.Kali-OUT garis W berada di atas garis S. Halaman kalibrasi kini menolak susunan seperti itu saat disimpan.
+- **Penilaian AI tidak persis sama bila diulang.** Gambar berbusa KS-OUT-2 yang dinilai "awas" (keyakinan 0,55) dinilai "normal" saat diulang. Karena itu satu penilaian tidak pernah menjadi status, dan pembacaan naik berkeyakinan rendah tidak dihitung (lihat Penghalusan).
+
+Alat untuk memeriksa hal ini: `scripts/replay_readings.py` menilai ulang gambar bukti yang tersimpan dengan kalibrasi dan prompt saat ini, tanpa menulis apa pun. Hasil 12 Okt atas 130 gambar dari 20 lokasi: pembacaan naik yang dipakai penghalusan turun dari 8 menjadi 0.
+
 ### Deteksi perubahan
 - **Area pengamatan** = selubung cembung dari titik area air dan titik semua garis acuan. Garis acuan sering digambar di dinding tepat di luar area air, dan dinding itulah tempat air naik.
 - Potong ke kotak pembatas area pengamatan (bagian di luar poligon tidak ikut dihitung), resize ke 256 px lebar, grayscale.
@@ -188,6 +195,7 @@ Tiga pelajaran dari salah baca sore 11 Okt (keduanya dikonfirmasi normal dari ga
 ### Penghalusan (`fusion/smoothing.py`)
 Urutan level: normal(0) < waspada(1) < siaga(2) < awas(3).
 - Abaikan pembacaan dengan `confidence < 0.5` atau kualitas `poor` → set `needs_verification = true`, status terkonfirmasi tidak berubah.
+- **Pembacaan di atas normal butuh `confidence ≥ 0.65`** (12 Okt). Busa pompa dan pantulan malam berulang kali dinilai naik dengan keyakinan 0,48–0,62; pembacaan seperti itu menandai `needs_verification`, tidak ikut dihitung untuk naik, dan tidak membelokkan tren.
 - Abaikan juga pembacaan yang bertentangan dengan dirinya sendiri: status di atas normal tetapi air dinilai sama atau lebih rendah dari foto referensi. Pada uji pertama, dua kamera dengan garis acuan yang sangat rapat sempat dinilai waspada dan siaga padahal kondisinya sama dengan referensi.
 - Status pertama: satu pembacaan `normal` cukup; status di atas normal tetap butuh dua pembacaan.
 - **Naik:** jika 2 pembacaan valid terakhir ≥ level baru → konfirmasi level terendah dari keduanya.
