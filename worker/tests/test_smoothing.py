@@ -36,6 +36,15 @@ def test_low_confidence_reading_is_ignored_and_flags_verification():
     assert confirm_water_status("normal", readings, "sungai") == ("normal", True)
 
 
+def test_raised_readings_need_more_confidence_than_normal_ones():
+    # Busa pompa: "awas" dengan keyakinan 0,55 dua kali berturut-turut tidak boleh menjadi peringatan.
+    foam = [_r("awas", confidence=0.55), _r("awas", confidence=0.62), _r("normal"), _r("normal")]
+    assert confirm_water_status("normal", foam, "pompa_out") == ("normal", True)
+    assert confirm_water_status("normal", [_r("normal", confidence=0.55), _r("normal")], "pompa_out") == ("normal", False)
+    sure = [_r("siaga", confidence=0.7), _r("siaga", confidence=0.65), _r("normal")]
+    assert confirm_water_status("normal", sure, "pompa_out") == ("siaga", False)
+
+
 def test_poor_image_and_unassessable_readings_are_ignored():
     readings = [_r("tidak_dapat_dinilai"), _r("awas", quality="poor"), _r("normal"), _r("normal")]
     assert confirm_water_status("normal", readings, "sungai") == ("normal", True)

@@ -12,6 +12,9 @@ LEVELS = ("normal", "waspada", "siaga", "awas")
 ROAD_FLOOD_LEVEL = {"tidak_tergenang": 0, "genangan_ringan": 1, "genangan_sedang": 2, "genangan_tinggi": 3}
 NOT_HIGHER_THAN_REFERENCE = {"sama", "lebih_rendah"}
 MIN_CONFIDENCE = 0.5
+# Pembacaan di atas normal butuh keyakinan lebih tinggi. Busa pompa dan pantulan malam hampir selalu
+# dinilai naik dengan keyakinan 0,48-0,62; pembacaan seperti itu menandai "perlu diperiksa", bukan menaikkan status.
+MIN_CONFIDENCE_ELEVATED = 0.65
 READINGS_TO_RISE = 2
 READINGS_TO_FALL = 3
 
@@ -35,6 +38,8 @@ def level_of(reading: Reading, water_kind: str | None) -> int | None:
         level = ROAD_FLOOD_LEVEL.get(reading.road_flood)
     else:
         level = LEVELS.index(reading.status) if reading.status in LEVELS else None
+    if level and reading.confidence < MIN_CONFIDENCE_ELEVATED:
+        return None
     if level and reading.change_vs_reference in NOT_HIGHER_THAN_REFERENCE:
         # Jawaban yang bertentangan dengan dirinya sendiri: status di atas normal (atau jalan
         # tergenang), tetapi kondisinya dinilai sama dengan foto referensi normal. Tidak dipakai.
