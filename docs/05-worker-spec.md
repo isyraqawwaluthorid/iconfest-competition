@@ -202,7 +202,7 @@ Urutan level: normal(0) < waspada(1) < siaga(2) < awas(3).
 - Status pertama: satu pembacaan `normal` cukup; status di atas normal tetap butuh dua pembacaan.
 - **Naik:** jika 2 pembacaan valid terakhir ≥ level baru → konfirmasi level terendah dari keduanya.
 - **Turun:** jika 3 pembacaan valid terakhir < level sekarang → turunkan ke level tertinggi dari ketiganya.
-- **Hasil aturan disimpan di tiap pembacaan** (12 Okt), di `water_readings.raw.smoothing`: `level` (level yang dihitung dari pembacaan itu, atau `null` jika diabaikan), `previous`, dan `confirmed` (status resmi sebelum dan sesudahnya). Web menggambar linimasa dan penanda "menunggu konfirmasi" dari catatan ini, sehingga aturannya hanya ada di satu tempat.
+- **Hasil aturan disimpan di tiap pembacaan** (12 Okt), di `water_readings.raw.smoothing`: `level` (level yang dihitung dari pembacaan itu, atau `null` jika diabaikan), `previous` dan `confirmed` (status resmi sebelum dan sesudahnya), `needed` (jumlah penilaian sepakat untuk naik), dan `recheck_minutes` (jeda pemeriksaan berkala saat itu: 10 menit bila hujan, selain itu 30). Web menggambar linimasa dan penanda "menunggu konfirmasi" dari catatan ini, sehingga aturannya hanya ada di satu tempat.
 - Kamera `water_kind = jalan` memakai `road_flood` dengan aturan sama (tidak_tergenang < ringan < sedang < tinggi). Pemetaan ke status umum: ringan → waspada, sedang → siaga, tinggi → awas.
 
 ### Tren (`fusion/trend.py`)
