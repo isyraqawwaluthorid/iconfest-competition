@@ -24,7 +24,11 @@ winget install OpenJS.NodeJS.LTS
 winget install Gyan.FFmpeg
 ```
 
-Tutup lalu buka lagi PowerShell, kemudian periksa: `git --version`, `python --version` (3.13), `node --version` (20 ke atas), `ffmpeg -version`.
+Tutup lalu buka lagi PowerShell, kemudian periksa: `git --version`, `py -3.13 --version`, `node --version` (20 ke atas), `ffmpeg -version`.
+
+Pakai `py -3.13`, bukan `python`: di mesin yang sudah punya Python lama, perintah `python` bisa menunjuk ke versi lama itu (di PC tim, `python --version` menjawab 3.5.4). Worker butuh Python 3.11 ke atas. Setelah virtualenv dibuat, semua perintah memakai `.venvScriptspython.exe`, jadi versi bawaan mesin tidak berpengaruh lagi.
+
+Jangan menaruh repo, `.env`, atau arsip gambar di dalam folder OneDrive: isinya akan ikut tersinkron ke awan.
 
 ### 2.2 Kode dan berkas rahasia
 
@@ -46,7 +50,7 @@ Di `.env`, sesuaikan `FRAMES_DIR` dengan drive yang lega di mesin baru (arsip ga
 
 ```powershell
 cd worker
-python -m venv .venv
+py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install --no-deps ultralytics==8.4.175
 .\.venv\Scripts\python.exe -m pytest -q
