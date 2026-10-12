@@ -299,7 +299,7 @@ def _evaluate_traffic(result: CameraResult, history: baseline.History) -> Traffi
     return TrafficReading(
         counts=counts,
         density_index=index,
-        density_level=baseline.density_level(index),
+        density_level=baseline.density_level(index, value),
         baseline_median=base.median if base else None,
         baseline_is_provisional=base.provisional if base else True,
         is_anomaly=is_anomaly,

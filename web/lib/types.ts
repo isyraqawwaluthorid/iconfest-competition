@@ -158,6 +158,10 @@ export type TrafficPoint = {
   captured_at: string;
   vehicle_total: number;
   persons: number;
+  cars: number;
+  motorcycles: number;
+  buses: number;
+  trucks: number;
   density_index: number | null;
   baseline_median: number | null;
 };

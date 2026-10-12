@@ -33,6 +33,20 @@ def test_density_level_boundaries(index, level):
     assert baseline.density_level(index) == level
 
 
+@pytest.mark.parametrize(
+    ("index", "value", "level"),
+    [(4.0, 4, "normal"), (1.5, 7, "normal"), (4.0, 8, "padat"), (1.5, 8, "ramai"), (0.5, 2, "lancar"), (1.0, 3, "normal")],
+)
+def test_few_vehicles_are_never_called_busy_however_many_times_the_usual(index, value, level):
+    assert baseline.density_level(index, value) == level
+
+
+def test_few_vehicles_are_not_an_anomaly():
+    empty_at_night = Baseline(median=1, p90=2, n=40, provisional=False)
+    assert baseline.exceeds_baseline(baseline.MIN_BUSY_COUNT - 1, empty_at_night) is False
+    assert baseline.exceeds_baseline(baseline.MIN_BUSY_COUNT, empty_at_night) is True
+
+
 def test_no_baseline_until_enough_samples_from_earlier_days():
     history = History()
     _day(history, 1, [5] * (baseline.MIN_SAMPLES - 1))

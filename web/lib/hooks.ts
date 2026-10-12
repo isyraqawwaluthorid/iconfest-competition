@@ -2,9 +2,9 @@
 
 import { useEffect, useId, useState } from "react";
 import type { Insight } from "./ai-insight";
-import { getActiveAlerts, getLatestInsight, getSiteReadings } from "./queries";
+import { getActiveAlerts, getLatestInsight, getSiteReadings, getTrafficSeries } from "./queries";
 import { getSupabase } from "./supabase/public";
-import type { Alert, CameraOverview, CameraStatusRow, SiteReading, WorkerHeartbeat } from "./types";
+import type { Alert, CameraOverview, CameraStatusRow, SiteReading, TrafficPoint, WorkerHeartbeat } from "./types";
 
 /**
  * Waktu sekarang yang diperbarui berkala. `null` sampai komponen terpasang di browser,
@@ -105,6 +105,26 @@ export function useLiveReadings(initial: SiteReading[], intervalMs = 60_000): Si
     return () => clearInterval(timer);
   }, [intervalMs]);
   return readings;
+}
+
+/**
+ * Riwayat hitungan satu kamera lalu lintas, dimuat di browser saat ruasnya dipilih.
+ * `points` kosong selama memuat; `error` terisi bila gagal, supaya panel bisa mengatakannya.
+ */
+export function useTrafficSeries(cameraId: string, hours = 24): { points: TrafficPoint[] | null; error: boolean } {
+  const [loaded, setLoaded] = useState<{ id: string; points: TrafficPoint[] | null }>({ id: "", points: null });
+  useEffect(() => {
+    let current = true;
+    getTrafficSeries(cameraId, hours).then(
+      (points) => current && setLoaded({ id: cameraId, points }),
+      () => current && setLoaded({ id: cameraId, points: null }),
+    );
+    return () => {
+      current = false;
+    };
+  }, [cameraId, hours]);
+  const ready = loaded.id === cameraId;
+  return { points: ready ? loaded.points : null, error: ready && loaded.points === null };
 }
 
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */

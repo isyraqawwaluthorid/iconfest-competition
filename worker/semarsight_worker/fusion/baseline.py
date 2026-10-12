@@ -25,6 +25,11 @@ MIN_DAYS = 3  # hari berbeda sebelum pembanding tidak lagi sementara
 LEVEL_UPPER_BOUNDS = ((0.8, "lancar"), (1.3, "normal"), (1.8, "ramai"))
 TOP_LEVEL = "padat"
 UNKNOWN_LEVEL = "tidak_diketahui"
+CALM_LEVEL = "normal"
+BUSY_LEVELS = ("ramai", TOP_LEVEL)
+# Di bawah jumlah ini jalan belum disebut ramai, berapa pun kelipatannya dari kebiasaan: 4 kendaraan pada jam
+# yang biasanya 1 memang empat kali lipat, tetapi jalannya tetap lengang.
+MIN_BUSY_COUNT = 8
 ANOMALY_MIN_INDEX = 1.5
 ANOMALY_CYCLES = 2
 
@@ -42,18 +47,19 @@ def density_index(value: float, median: float) -> float:
     return value / max(median, 1.0)
 
 
-def density_level(index: float | None) -> str:
+def density_level(index: float | None, value: float | None = None) -> str:
+    """Tingkat kepadatan dari indeks; `value` (jumlah terlihat) menahan tingkat di atas normal bila masih sedikit."""
     if index is None:
         return UNKNOWN_LEVEL
-    for upper, level in LEVEL_UPPER_BOUNDS:
-        if index < upper:
-            return level
-    return TOP_LEVEL
+    level = next((name for upper, name in LEVEL_UPPER_BOUNDS if index < upper), TOP_LEVEL)
+    if level in BUSY_LEVELS and value is not None and value < MIN_BUSY_COUNT:
+        return CALM_LEVEL
+    return level
 
 
 def exceeds_baseline(value: float, baseline: Baseline) -> bool:
-    """Satu pembacaan melampaui pola normal: di atas p90 dan indeks >= 1,5."""
-    return value > baseline.p90 and density_index(value, baseline.median) >= ANOMALY_MIN_INDEX
+    """Satu pembacaan melampaui pola normal: di atas p90, indeks >= 1,5, dan jumlahnya tidak sedikit."""
+    return value >= MIN_BUSY_COUNT and value > baseline.p90 and density_index(value, baseline.median) >= ANOMALY_MIN_INDEX
 
 
 class History:

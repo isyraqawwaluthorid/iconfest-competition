@@ -31,7 +31,7 @@ export async function getTrafficSeries(cameraId: string, hours = 24): Promise<Tr
   const since = new Date(Date.now() - hours * 3_600_000).toISOString();
   const { data, error } = await getSupabase()
     .from("traffic_readings")
-    .select("captured_at, vehicle_total, persons, density_index, baseline_median")
+    .select("captured_at, vehicle_total, persons, cars, motorcycles, buses, trucks, density_index, baseline_median")
     .eq("camera_id", cameraId)
     .eq("source", "live")
     .gte("captured_at", since)

@@ -274,6 +274,35 @@ h1, h2, h3 {
   text-shadow: 0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface);
 }
 
+/* Halaman Lalu Lintas: ruas jalan di sekitar tiap kamera, diwarnai menurut tingkat kepadatannya. */
+.road-map .leaflet-tile-pane {
+  /* Peta dasar diredam, tetapi nama dan bentuk jalan tetap terbaca saat didekati. */
+  filter: grayscale(1) opacity(0.6);
+}
+.road-map.leaflet-container {
+  background: var(--surface-muted);
+  font-family: inherit;
+}
+/* Tepi putih di bawah garis berwarna, supaya ruas terbaca di atas peta dasar apa pun. */
+.road-casing {
+  stroke: var(--surface);
+  stroke-opacity: 0.95;
+  fill: none;
+  cursor: pointer;
+}
+.road-casing.is-selected { stroke: var(--text); }
+.road-segment {
+  fill: none;
+  cursor: pointer;
+  stroke: var(--status-unknown);
+  stroke-opacity: 1;
+}
+.road-segment.tone-density-lancar { stroke: var(--density-lancar); }
+.road-segment.tone-density-normal { stroke: var(--density-normal); }
+.road-segment.tone-density-ramai { stroke: var(--density-ramai); }
+.road-segment.tone-density-padat { stroke: var(--density-padat); }
+.road-segment.tone-offline { stroke: var(--status-offline); stroke-dasharray: 2 9; }
+
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {
   fill: color-mix(in srgb, var(--primary) 22%, transparent);
