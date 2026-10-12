@@ -44,6 +44,12 @@ export type SiteReading = {
   level?: WaterStatus | null;
   previous?: WaterStatus | null;
   confirmed?: WaterStatus | null;
+  /** Jumlah penilaian sepakat yang dibutuhkan aturan untuk menaikkan status. */
+  needed?: number;
+  /** Alasan singkat dari AI kamera untuk penilaian ini. */
+  reason?: string | null;
+  /** Gambar yang dinilai, di Storage; kosong untuk penilaian simulasi. */
+  snapshot_path?: string | null;
 };
 export type CameraModule = "traffic" | "crowd" | "water";
 

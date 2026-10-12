@@ -6,16 +6,17 @@ import { useNow } from "@/lib/hooks";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
-import type { WaterStatus } from "@/lib/types";
+import type { SiteReading, WaterStatus } from "@/lib/types";
 import { InsightCard } from "./AiInsight";
 import { RainOutlook, TrafficTrend } from "./DistrictTrend";
+import { PendingReading } from "./PendingReading";
 
 type Props = {
   summary: DistrictSummary;
   insight: Insight | null;
   cameraNames: Map<string, string>;
-  /** Lokasi yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi: id kamera → level yang dinilai. */
-  pending: Map<string, WaterStatus>;
+  /** Lokasi yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi: id kamera → level dan penilaiannya. */
+  pending: Map<string, { level: WaterStatus; reading: SiteReading }>;
   /** Jam yang dipakai panel (ms); diisi halaman simulasi dengan jam skenario. */
   clock?: number;
   onClose: () => void;
@@ -87,23 +88,23 @@ export function DistrictPanel({ summary, insight, cameraNames, pending, clock, o
           <ul className="space-y-2">
             {sites.map((site) => {
               const status = site.water_status ? WATER[site.water_status] : NOT_ASSESSED;
+              const waiting = pending.get(site.id);
               return (
                 <li key={site.id} className={`tint tone-${status.tone} accent-left rounded-control p-3`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Link href={`/kamera/${site.id}`} className="font-semibold underline-offset-2 hover:underline">
                       {site.name}
                     </Link>
-                    <span className="text-xs font-bold uppercase">{status.label}</span>
+                    <span className="text-xs font-bold uppercase">
+                      {waiting ? "Status resmi: " : ""}
+                      {status.label}
+                    </span>
                   </div>
                   <p className="mt-1 text-xs">
                     {site.water_trend ? `Tren ${TREND_LABEL[site.water_trend]}` : "Tren belum diketahui"}
                     {site.risk_score != null ? ` · skor risiko ${formatNumber(site.risk_score, 2)}` : ""}
                   </p>
-                  {pending.has(site.id) ? (
-                    <p className="mt-1 text-xs font-semibold">
-                      AI baru sekali menilai {WATER[pending.get(site.id) as WaterStatus].label.toLowerCase()}; status resmi menunggu penilaian kedua.
-                    </p>
-                  ) : null}
+                  {waiting ? <PendingReading level={waiting.level} reading={waiting.reading} simulated={clock !== undefined} /> : null}
                 </li>
               );
             })}

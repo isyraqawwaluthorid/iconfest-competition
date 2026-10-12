@@ -16,6 +16,8 @@ export type SiteProgress = {
   readings: SiteReading[];
   /** Level yang baru dinilai AI di atas status resmi dan sudah dihitung aturan, tetapi belum dikonfirmasi penilaian berikutnya. */
   pending: WaterStatus | null;
+  /** Penilaian AI paling baru dalam jendela waktu: buktinya (keyakinan, alasan, gambar) ditampilkan apa adanya. */
+  latest: SiteReading | null;
   /** Status resmi sepanjang jendela waktu, untuk digambar sebagai pita. */
   spans: StatusSpan[];
 };
@@ -65,7 +67,7 @@ export function siteProgress(cameras: CameraOverview[], readings: SiteReading[],
       const changed = camera.water_status_since != null && new Date(camera.water_status_since).getTime() >= start;
       const doubtful = Boolean(camera.needs_verification) && own.at(-1)?.status !== "normal" && own.length > 0;
       if (!isElevated(camera.water_status) && !pending && !changed && !doubtful) return [];
-      return [{ camera, readings: own, pending, spans: statusSpans(camera, own, start) }];
+      return [{ camera, readings: own, pending, latest: own.at(-1) ?? null, spans: statusSpans(camera, own, start) }];
     })
     .sort(
       (a, b) =>

@@ -66,6 +66,11 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
     [],
   );
   const initialFraming = useMemo(() => framing(), []);
+  // Yang digambar belakangan berada di atas: lokasi biasa dulu, lalu yang statusnya naik, lalu yang menunggu konfirmasi.
+  const ordered = useMemo(() => {
+    const weight = (camera: CameraOverview) => (theme !== "risk" ? 0 : pending.has(camera.id) ? 2 : isElevated(camera.water_status) ? 1 : 0);
+    return [...sources].sort((a, b) => weight(a) - weight(b));
+  }, [sources, pending, theme]);
 
   return (
     <MapContainer
@@ -106,7 +111,7 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
       {labels.map(({ district, icon }) => (
         <Marker key={district.name} position={district.center} icon={icon} interactive={false} keyboard={false} />
       ))}
-      {sources.map((camera) => {
+      {ordered.map((camera, index) => {
         const status =
           theme === "risk"
             ? camera.water_status
@@ -121,7 +126,7 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
           <CircleMarker
             key={`${camera.id}-${tone}-${waiting ? "pending" : raised ? "raised" : "plain"}`}
             center={[camera.lat, camera.lng]}
-            radius={waiting ? 10 : raised ? 8 : 4}
+            radius={waiting ? 12 : raised ? 9 : 4}
             className={`camera-marker tone-${tone}${waiting ? " is-pending" : raised ? " is-raised" : ""}`}
             eventHandlers={{
               click: () => {
@@ -130,10 +135,18 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
               },
             }}
           >
-            <Tooltip>
-              {camera.name} · {status.label}
-              {waiting ? ` · AI menilai ${WATER[waiting].label.toLowerCase()} sekali, menunggu penilaian kedua` : ""}
-            </Tooltip>
+            {/* Lokasi yang bergerak diberi label tetap, supaya terlihat tanpa harus diarahkan kursor. */}
+            {waiting || raised ? (
+              <Tooltip permanent direction={index % 2 ? "bottom" : "top"} offset={[0, index % 2 ? 12 : -12]} className="site-label">
+                <strong>{camera.name}</strong>
+                <br />
+                {waiting ? `AI menilai ${WATER[waiting].label.toLowerCase()} · 1 dari 2` : status.label}
+              </Tooltip>
+            ) : (
+              <Tooltip>
+                {camera.name} · {status.label}
+              </Tooltip>
+            )}
           </CircleMarker>
         );
       })}

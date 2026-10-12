@@ -79,9 +79,10 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
   const now = clock ?? realNow;
   const progress = useMemo(() => (now === null ? [] : siteProgress(cameras, readings, now)), [cameras, readings, now]);
   const pending = useMemo(
-    () => new Map(progress.flatMap((row) => (row.pending ? [[row.camera.id, row.pending] as const] : []))),
+    () => new Map(progress.flatMap((row) => (row.pending && row.latest ? [[row.camera.id, { level: row.pending, reading: row.latest }] as const] : []))),
     [progress],
   );
+  const pendingLevels = useMemo(() => new Map([...pending].map(([id, item]) => [id, item.level] as const)), [pending]);
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("insight");
@@ -132,7 +133,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
       </svg>
 
       <section aria-label="Peta kondisi per kecamatan" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
-        <ThematicMap summaries={summaries} theme={theme} sources={sources} pending={pending} selected={selected} onSelect={setSelected} />
+        <ThematicMap summaries={summaries} theme={theme} sources={sources} pending={pendingLevels} selected={selected} onSelect={setSelected} />
 
         <div
           role="group"
@@ -217,7 +218,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
             </div>
           ) : null}
         </section>
-        {now !== null ? <ProgressTimeline rows={progress} now={now} /> : null}
+        {now !== null ? <ProgressTimeline rows={progress} now={now} simulated={clock !== undefined} /> : null}
       </div>
 
       <div className="p-3 pt-0 lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[23rem] lg:p-0">

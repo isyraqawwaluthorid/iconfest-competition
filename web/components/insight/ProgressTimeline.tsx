@@ -3,6 +3,7 @@ import { PROGRESS_WINDOW_MINUTES, type SiteProgress } from "@/lib/progress";
 import { isElevated, WATER } from "@/lib/status";
 import { formatTimeWib } from "@/lib/time";
 import type { SiteReading, WaterStatus } from "@/lib/types";
+import { PendingReading } from "./PendingReading";
 
 const MAX_ROWS = 4;
 const NOW_AT = 92; // posisi "sekarang" pada linimasa, dalam persen lebar
@@ -28,7 +29,7 @@ function dotTitle(reading: SiteReading): string {
  * kosong = tidak dihitung); pita di bawahnya adalah status resmi. Dengan begitu terlihat kapan AI mulai
  * menilai naik dan kapan status resmi benar-benar berubah. Tidak tampil saat tidak ada yang bergerak.
  */
-export function ProgressTimeline({ rows, now }: { rows: SiteProgress[]; now: number }) {
+export function ProgressTimeline({ rows, now, simulated }: { rows: SiteProgress[]; now: number; simulated: boolean }) {
   if (rows.length === 0) return null;
   const start = now - PROGRESS_WINDOW_MINUTES * 60_000;
   // "Sekarang" tidak ditaruh di tepi kanan: sisa ruangnya memperlihatkan warna status yang baru saja berubah.
@@ -45,8 +46,12 @@ export function ProgressTimeline({ rows, now }: { rows: SiteProgress[]; now: num
                 {row.camera.name}
               </Link>
             </div>
-            <p className="text-xs text-muted">{stateOf(row)}</p>
-            <div className="relative mt-1.5 h-5" role="img" aria-label={`Linimasa ${row.camera.name}: ${stateOf(row)}`}>
+            {row.pending && row.latest ? (
+              <PendingReading level={row.pending} reading={row.latest} simulated={simulated} />
+            ) : (
+              <p className="text-xs text-muted">{stateOf(row)}</p>
+            )}
+            <div className="relative mt-2 h-5" role="img" aria-label={`Linimasa ${row.camera.name}: ${stateOf(row)}`}>
               {row.spans.map((span) => (
                 <span
                   key={span.from}
