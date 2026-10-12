@@ -59,7 +59,8 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 10. **Setiap perubahan kalibrasi atau prompt diuji dengan `scripts/replay_readings.py`**, yang menilai ulang gambar bukti tersimpan. Setelah perbaikan di atas, 130 gambar dari 20 lokasi tidak lagi menghasilkan satu pun pembacaan naik (sebelumnya 8).
 
 ### Risiko dan peringatan
-- **Skor risiko 0–1, terbuka:** status air 40%, tren 20%, kondisi hulu 20%, prakiraan hujan 3 jam 20%. Dihitung ulang tiap siklus tanpa menambah panggilan AI. Komponen hulu masih 0 sampai hubungan hulu–hilir diisi.
+- **Skor risiko 0–1, terbuka:** status air 40%, tren 20%, kondisi hulu 20%, prakiraan hujan 3 jam 20%. Dihitung ulang tiap siklus tanpa menambah panggilan AI.
+- **Hubungan hulu–hilir diisi untuk empat rumah pompa** (12 Okt): sisi masuk → sisi keluar Bulu Drain, Kartini, Progo, dan Trimulyo, dengan jeda awal 15 menit yang selalu disebut "perkiraan awal". Hanya pasangan yang jelas dari nama dan jarak (0–140 m) yang diisi; tiga pasangan lain yang berdekatan (IPdome → Mberok, Mberok → Jembatan Mberok, Bulu Drain-OUT → KS-OUT-2) ditinggalkan sampai ada yang memastikan alirannya. Lokasi tanpa hulu tetap berkomponen hulu 0, dan halaman kamera mengatakannya terus terang.
 - **Peringatan dari aturan dan template**, bukan dari LLM: air naik, jalan tergenang, hujan lebat, sampah sebelum hujan, kamera unggulan tidak terbaca. Diselaraskan tiap siklus; yang syaratnya hilang ditutup otomatis.
 - **Gambar yang dinilai AI disimpan 3 hari** di Storage sebagai bukti; angkanya disimpan tanpa batas.
 
@@ -109,7 +110,7 @@ EcoTraffic (karya rekan) dipakai sebagai referensi untuk modul emisi.
 ## 7. Yang belum dikerjakan
 
 - Grafik: tren 24 jam per kecamatan, kurva hari ini vs kebiasaan, matriks jam × hari.
-- Hubungan hulu–hilir antar lokasi (`river_links`) dan skema alirannya.
+- Hubungan hulu–hilir antar lokasi yang berbeda, belajar jeda dari kejadian, halaman admin sungai, dan skema alirannya. Empat pasangan rumah pompa sudah berjalan sejak 12 Okt.
 - Kejadian, insight harian, dan insight lintas modul (genangan → lalu lintas). Insight situasi sudah berjalan sejak 12 Okt.
 - Pembanding lalu lintas per jam-dalam-minggu dari 28 hari (rancangan akhir); versi per jam dari 14 hari sudah berjalan sejak 12 Okt.
 - Evaluasi akurasi formal (siang dan malam) dengan label manusia.

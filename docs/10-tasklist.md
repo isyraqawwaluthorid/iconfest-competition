@@ -18,12 +18,12 @@ Cara membaca:
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
 | Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
 | Fase 3 — Modul air | 11 dari 14 | 2 | 1 (manual) | Sen 12 Okt |
-| Fase 4 — Fusi dan insight | 4 dari 9 | – | 5 | Sel 13 Okt |
+| Fase 4 — Fusi dan insight | 5 dari 9 | 1 | 3 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 0 dari 8 | 1 | 7 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 5 dari 7 | 1 | 1 | – |
-| **Jumlah inti** | **52 dari 87 (60%)** | **5** | **30** | |
+| **Jumlah inti** | **53 dari 87 (61%)** | **6** | **28** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -35,7 +35,7 @@ Keadaan sistem saat dokumen ini diperbarui: worker berjalan di PC (13 siklus tan
 | Syarat (dari `CLAUDE.md`) | Posisi | Yang kurang |
 |---|---|---|
 | Worker berjalan terus, merekam semua kamera aktif tiap 5 menit | Sebagian | Berjalan di PC yang menetap, bukan VPS; belum terbukti semalaman di PC |
-| Modul air: kalibrasi 15–20 kamera, klasifikasi AI, status terkonfirmasi, tren, peringatan hulu–hilir | Sebagian | Peringatan hulu–hilir (T4.3, T4.4) |
+| Modul air: kalibrasi 15–20 kamera, klasifikasi AI, status terkonfirmasi, tren, peringatan hulu–hilir | **Selesai** | Peringatan hulu–hilir berjalan untuk empat rumah pompa; belum pernah teruji oleh kejadian nyata |
 | Modul lalu lintas: hitungan YOLO, baseline, indeks kepadatan, anomali | Sebagian | Pembanding per jam sudah berjalan (T2.14), tetapi masih sementara sampai ada tiga hari data sejenis; anomali menyala sendiri setelah itu |
 | Hujan Open-Meteo dan minimal satu insight lintas modul | Sebagian | Hujan sudah; insight lintas modul genangan → lalu lintas belum (T4.6) |
 | Website ter-deploy: beranda, peta, panel kamera, Air, Lalu Lintas, peringatan, riwayat | Sebagian | Deploy (T2.10); halaman Air, Lalu Lintas, Riwayat (T4.8, T5.1, T5.2) |
@@ -64,9 +64,9 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 
 | Paling lambat | Dikerjakan | Butuh pemilik proyek |
 |---|---|---|
-| Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~ (selesai); usulan pasangan hulu–hilir untuk T4.4 | Simpan referensi malam yang kurang (T3.11) setelah gelap |
-| Sel 13 Okt | T2.10 deploy; T4.3 hulu–hilir; T5.4 cara mendemokan kejadian; TV.4 tren 24 jam | Akun Vercel; persetujuan pasangan hulu–hilir (T4.4); memeriksa kalibrasi yang diubah (T3.13) |
-| Rab 14 Okt | T4.5 kejadian; T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; T5.3 halaman Tentang; T6.5 README | Template laporan dari panitia (T0.7) |
+| Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~, ~~T4.4 dan inti T4.3 hulu–hilir~~ (selesai); TV.4 tren 24 jam; referensi malam (T3.11) setelah gelap, dikerjakan asisten | – |
+| Sel 13 Okt | T2.10 deploy; T5.4 cara mendemokan kejadian; T4.5 kejadian | Akun Vercel |
+| Rab 14 Okt | T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; T5.3 halaman Tentang; T6.5 README | Template laporan dari panitia (T0.7) |
 | Kam 15 Okt | Perbaikan bug saja (T6.4); T6.6 laporan; T6.7 video; T7.3 repo publik; T7.4 ganti kunci | Laporan, video, surat bermaterai (T6.8), pengumpulan |
 | Jum 16 Okt | Cadangan; T7.1 cek tautan dari perangkat lain; T7.2 pengumpulan bila belum | Pengumpulan |
 
@@ -76,11 +76,11 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 
 | Tugas | Paling lambat | Keterangan |
 |---|---|---|
-| **T3.11** Referensi malam: DPU-Mberok2-OUT (paling mendesak), Banger-IN, Semarang Indah_IN | Sen 12 Okt malam | Satu klik per kamera di halaman kalibrasi, setelah gelap (sekitar 17.30 WIB) |
+| **T3.11** Referensi malam: DPU-Mberok2-OUT, Banger-IN, Semarang Indah_IN | Sen 12 Okt malam | Dikerjakan asisten pukul 18.12 WIB bila sesi VS Code masih terbuka; kalau tertutup, kirim pesan "referensi malam" setelah gelap |
 | **Rutin** Menilai kalibrasi | tiap sesi | Lihat bagian "Perlu dilihat" dari `calibration_check.py`; asisten mengingatkan di awal tiap sesi |
-| **T3.13** Memeriksa tiga kalibrasi yang diubah atau diragukan 12 Okt | Sel 13 Okt | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; rinciannya di tabel kalibrasi per kamera |
+| **T3.13** Melihat sekilas tiga kalibrasi yang diubah asisten 12 Okt | tidak mendesak | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; sudah diuji, cadangan tersedia |
 | **T2.10** Akun Vercel dan langkah deploy | Sel 13 Okt | Dipandu langkah demi langkah |
-| **T4.4** Menyetujui usulan pasangan hulu–hilir | Sel 13 Okt | Usulan disusun dari nama dan lokasi kamera |
+| **T4.4** (opsional) Memastikan tiga pasangan hulu–hilir yang meragukan | kapan saja | Empat pasangan rumah pompa sudah berjalan; tiga lainnya butuh pengetahuan aliran setempat |
 | **T0.7** Jam tenggat dan template laporan dari panitia | Sel 13 Okt | CP Software Development ada di `MULAI-DI-SINI.md` |
 | **T0.6** Email izin ke Diskominfo | Rab 14 Okt | |
 | **T6.6, T6.7, T6.8** Laporan, video demo, surat bermaterai | Kam 15 Okt | Kerangka di `09-demo-evaluation-report.md`; siapkan materai |
@@ -156,7 +156,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T3.11 [M]** Simpan foto referensi untuk kamera terkalibrasi. **Sebagian:** referensi siang kini lengkap, 22 dari 22 (empat kamera jalan disimpan 12 Okt pukul 14.18–14.19, jalan kering, lalu 16 gambar bukti dinilai ulang dan tetap normal). Referensi malam 19 dari 22; kurang: **DPU-Mberok2-OUT** (unggulan, paling mendesak), Banger-IN, Semarang Indah_IN.
 - [x] **T3.12 [K]** Pemeriksaan salah baca 12 Okt. Ke-22 penilaian bukan normal sejak 11 Okt ditinjau (yang terjadi 12 Okt dari gambar buktinya, sisanya lewat nilai ulang); tidak ada yang menunjukkan kejadian nyata. Hasil: pembacaan naik butuh keyakinan ≥ 0,65 agar dihitung; referensi siang Kartini-OUT dan KP.Kali-OUT diganti dengan keadaan normal yang paling tinggi (foto lama dicadangkan); garis W/S KP.Kali-OUT yang tertukar dibetulkan; `scripts/replay_readings.py` untuk menilai ulang gambar bukti. *Bukti:* nilai ulang 130 gambar dari 20 lokasi tidak lagi menghasilkan pembacaan naik (sebelumnya 8).
 - [x] **T3.14 [K]** Halaman kalibrasi menolak garis acuan yang urutannya tertukar, dan menampilkan sebabnya.
-- [ ] **T3.13 [M]** Periksa kalibrasi yang diubah atau diragukan 12 Okt (lihat tabel di bawah): setujui atau ganti referensi baru KP.Kali-OUT dan Kartini-OUT; naikkan sedikit garis N di IPdome-Polder Tawang.
+- [ ] **T3.13 [M]** Lihat sekilas kalibrasi yang diubah asisten 12 Okt (tabel di bawah): referensi siang baru KP.Kali-OUT dan Kartini-OUT, dan garis N IPdome-Polder Tawang yang digeser. Tidak mendesak: semuanya sudah diuji dengan nilai ulang dan cadangannya ada di `FRAMES_DIR\_state\referensi-lama`. Yang hanya pemilik proyek bisa nilai: apakah posisi garis S dan A tiap lokasi sesuai keadaan di lapangan.
 
 ### Kalibrasi dan referensi per kamera (keadaan 12 Okt, 14.30 WIB)
 
@@ -178,9 +178,9 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 | KS-OUT-2 | pompa keluar | N W S A | ada | ada | 0,73 / 0,65 | Busa saat pompa menyala sempat terbaca "awas"; kini tertahan aturan keyakinan. Pantau |
 | Kartini-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,78 / 0,76 | Referensi siang lama kolam kosong; kini kolam terisi pukul 13.13. **Perlu disetujui (T3.13)** |
 | Progo-OUT | pompa keluar | N W S A | ada | ada | 0,81 / 0,75 | Baik |
-| Semarang Indah_OUT | pompa keluar | N W S A | ada | ada | 0,71 / 0,66 | Busa pompa; 9 penilaian berkeyakinan rendah. Pantau |
+| Semarang Indah_OUT | pompa keluar | N W S A | ada | ada | 0,71 / 0,66 | Busa pompa; 9 penilaian berkeyakinan rendah. Gambar pukul 13.13 kadang terbaca "waspada" saat dinilai ulang padahal muka airnya sama dengan referensi (derau). Pantau |
 | Trimulyo_OUT | pompa keluar | N W S A | ada | ada | 0,75 / 0,75 | Baik |
-| IPdome-Polder Tawang | kolam | N W S A | ada | ada | 0,81 / 0,77 | Dua "waspada" 12 Okt karena garis N berimpit dengan muka air. **Naikkan garis N sedikit (T3.13)** |
+| IPdome-Polder Tawang | kolam | N W S A | ada | ada | 0,81 / 0,77 | Dua "waspada" 12 Okt karena garis N berimpit dengan muka air. Garis N digeser ke anak tangga pertama 12 Okt; delapan gambar yang sama kini normal semua |
 | Jinunjung_Halaman | kolam | N W S A | ada | ada | 0,81 / 0,75 | Baik |
 | DPU_Pahlawan | jalan | – | ada (12 Okt) | ada | 0,95 / 0,90 | Baik |
 | JRAKAH | jalan | – | ada (12 Okt) | ada | 0,88 / 0,82 | Baik |
@@ -195,8 +195,8 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 - [x] **T4.2 [K]** `alerts.py`: satu aktif per (jenis, kamera), teks dari template: `water_rising`, `road_flooded`, `heavy_rain`, `trash_blockage`, `camera_offline`, diselaraskan tiap siklus. Jalur tulis baru teruji dengan hujan buatan; belum pernah ada kejadian air naik yang nyata.
 - [x] **T4.7 [K]** `insights.py`: insight situasi dari LLM teks. Selesai 12 Okt: fakta dari `camera_status`, cuaca, dan peringatan; tingkat keseluruhan dari aturan; setiap angka di jawaban LLM diperiksa terhadap fakta sebelum disimpan; dipanggil hanya saat keadaan berubah atau tiap 60 menit; 22 unit test; `scripts/probe_insight.py` untuk uji tanpa menulis. Insight harian dan lintas modul belum (ikut T4.6).
 - [x] **T4.9 [K]** Beranda "Denyut Kota". Digantikan cakupan TV.5, selesai 12 Okt.
-- [ ] **T4.3 [K]** `/admin/sungai` + `/api/admin/river-links`; `fusion/upstream.py` (peringatan hulu → hilir, belajar jeda). *Bukti:* komponen hulu di skor risiko tidak lagi selalu 0.
-- [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan. Tabel masih kosong. **Usulan 12 Okt, menunggu persetujuan pemilik proyek:**
+- [ ] **T4.3 [K]** `/admin/sungai` + `/api/admin/river-links`; `fusion/upstream.py` (peringatan hulu → hilir, belajar jeda). **Sebagian** 12 Okt: status hulu masuk ke skor risiko lokasi hilir, peringatan dini `upstream_warning` dibuat saat hulu waspada ke atas dan naik, insight menyebut lokasi hulu dan hilir, halaman kamera menyebut nama lokasi hulunya. **Belum:** halaman admin sungai (pasangan masih diisi lewat skrip) dan belajar jeda dari kejadian (menunggu T4.5).
+- [x] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan. Selesai 12 Okt untuk empat pasangan yang jelas (baris berkeyakinan "Tinggi" di bawah), jeda awal 15 menit. Tiga pasangan "perlu dipastikan" tidak diisi; bisa ditambahkan kapan saja bila alirannya diketahui. Usulan lengkapnya:
 
   | Hulu (sisi masuk) | Hilir (sisi keluar) | Jarak | Dasar | Keyakinan |
   |---|---|---|---|---|

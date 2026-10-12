@@ -217,7 +217,10 @@ Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status
 - Komponen hulu bernilai 0 sampai `river_links` diisi.
 
 ### Hulu → hilir (`fusion/upstream.py`)
-- Untuk setiap `river_links`: jika status hulu ≥ waspada dan naik, buat/perbarui peringatan `upstream_warning` pada kamera hilir: "Hulu {nama} {status}; perkiraan dampak di {hilir} dalam {lag} menit". `lag = learned_lag_minutes ?? default_lag_minutes`.
+- **Sudah berjalan (12 Okt):** `river_links` dibaca ulang tiap siklus. Status terkonfirmasi terburuk di antara lokasi hulu sebuah lokasi menjadi komponen hulu skor risikonya (nama lokasi hulu ikut disimpan di `risk_components.inputs.upstream_name`), dan fakta insight menyebut lokasi hulu dan hilir.
+- **Isi tabel saat ini:** empat pasangan sisi masuk → sisi keluar rumah pompa yang sama (Bulu Drain, Kartini, Progo, Trimulyo), jeda awal 15 menit. Pasangan antar lokasi yang berbeda belum diisi karena butuh pengetahuan aliran setempat.
+- Untuk setiap `river_links`: jika status hulu ≥ waspada dan naik, buat/perbarui peringatan `upstream_warning` (tingkat waspada) pada kamera hilir: "Hulu {nama} berstatus {status} dan {tren}; perkiraan dampak di {hilir} dalam sekitar {lag} menit". `lag = learned_lag_minutes ?? default_lag_minutes`; selama belum dipelajari, pesannya menyebut "jeda masih perkiraan awal".
+- **Belum:** belajar jeda (butuh kejadian, T4.5) dan halaman admin `/admin/sungai`; sementara ini pasangan diisi lewat skrip.
 - **Belajar jeda:** setelah kejadian di hilir dimulai, cari waktu kenaikan hulu terakhir sebelumnya (maks. 6 jam). Perbarui `learned_lag_minutes` sebagai median jeda dari semua kejadian; naikkan `learned_from_events`.
 
 ## Lintas modul (`fusion/cross_module.py`)
@@ -264,7 +267,7 @@ Implementasinya berupa penyelarasan sekali per siklus (`alerts.sync`): aturan me
 
 - `heavy_rain` yang sudah aktif baru ditutup setelah prakiraan turun di bawah 7 mm, agar tidak kedap-kedip di sekitar ambang.
 - Kegagalan akibat jaringan worker tidak menaikkan hitungan gagal kamera, jadi tidak memunculkan `camera_offline`.
-- Belum dibuat: `upstream_warning` (menunggu `river_links`), `traffic_anomaly` dan `crowd_anomaly` (menunggu baseline matang), `worker_offline` (dinilai di sisi web dari detak worker).
+- `upstream_warning` dibuat sejak 12 Okt (lihat bagian Hulu → hilir). Belum dibuat: `traffic_anomaly` dan `crowd_anomaly` (menunggu baseline matang), `worker_offline` (dinilai di sisi web dari detak worker).
 
 ## Housekeeping
 - Heartbeat: upsert `system_status` key `worker` dengan `last_seen`, durasi siklus, jumlah kamera live/frozen/dead, panggilan AI hari ini.
