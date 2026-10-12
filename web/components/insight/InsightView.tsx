@@ -9,7 +9,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type { Insight } from "@/lib/ai-insight";
 import { districtOf } from "@/lib/geo/districts";
-import { useLiveAlerts, useLiveCameras, useLiveInsight } from "@/lib/hooks";
+import { useLiveAlerts, useLiveCameras, useLiveInsight, useLiveReadings, useNow } from "@/lib/hooks";
 import {
   citySituation,
   cityStats,
@@ -25,9 +25,11 @@ import {
 } from "@/lib/insight";
 import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
 import { formatTimeWib } from "@/lib/time";
-import type { Alert, CameraOverview, GridWeather } from "@/lib/types";
+import { siteProgress } from "@/lib/progress";
+import type { Alert, CameraOverview, GridWeather, SiteReading } from "@/lib/types";
 import { AiInsightPanel } from "./AiInsight";
 import { DistrictPanel } from "./DistrictPanel";
+import { ProgressTimeline } from "./ProgressTimeline";
 
 // Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
 const ThematicMap = dynamic(() => import("./ThematicMap"), {
@@ -42,21 +44,25 @@ type Props = {
   initialCameras: CameraOverview[];
   initialAlerts: Alert[];
   initialInsight: Insight | null;
+  initialReadings: SiteReading[];
   weather: GridWeather[];
 };
 
 /** Beranda dengan data langsung: kamera, peringatan, dan ringkasan AI ikut berubah lewat Realtime. */
-export function InsightView({ initialCameras, initialAlerts, initialInsight, weather }: Props) {
+export function InsightView({ initialCameras, initialAlerts, initialInsight, initialReadings, weather }: Props) {
   const cameras = useLiveCameras(initialCameras);
   const alerts = useLiveAlerts(initialAlerts);
   const insight = useLiveInsight(initialInsight);
-  return <InsightScreen cameras={cameras} alerts={alerts} insight={insight} weather={weather} />;
+  const readings = useLiveReadings(initialReadings);
+  return <InsightScreen cameras={cameras} alerts={alerts} insight={insight} readings={readings} weather={weather} />;
 }
 
 type ScreenProps = {
   cameras: CameraOverview[];
   alerts: Alert[];
   insight: Insight | null;
+  /** Penilaian AI terbaru per lokasi air, untuk linimasa dan penanda "menunggu konfirmasi". */
+  readings: SiteReading[];
   weather: GridWeather[];
   /** Jam yang dipakai layar (ms). Diisi halaman simulasi dengan jam skenario; kosong berarti jam sebenarnya. */
   clock?: number;
@@ -68,7 +74,14 @@ type ScreenProps = {
  * Di layar sempit, panel turun ke bawah peta. Tidak tahu dari mana datanya berasal:
  * beranda mengisinya dengan data langsung, halaman simulasi dengan langkah skenario.
  */
-export function InsightScreen({ cameras, alerts, insight, weather, clock }: ScreenProps) {
+export function InsightScreen({ cameras, alerts, insight, readings, weather, clock }: ScreenProps) {
+  const realNow = useNow();
+  const now = clock ?? realNow;
+  const progress = useMemo(() => (now === null ? [] : siteProgress(cameras, readings, now)), [cameras, readings, now]);
+  const pending = useMemo(
+    () => new Map(progress.flatMap((row) => (row.pending ? [[row.camera.id, row.pending] as const] : []))),
+    [progress],
+  );
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("insight");
@@ -119,7 +132,7 @@ export function InsightScreen({ cameras, alerts, insight, weather, clock }: Scre
       </svg>
 
       <section aria-label="Peta kondisi per kecamatan" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
-        <ThematicMap summaries={summaries} theme={theme} sources={sources} selected={selected} onSelect={setSelected} />
+        <ThematicMap summaries={summaries} theme={theme} sources={sources} pending={pending} selected={selected} onSelect={setSelected} />
 
         <div
           role="group"
@@ -160,7 +173,8 @@ export function InsightScreen({ cameras, alerts, insight, weather, clock }: Scre
         </div>
       </div>
 
-      <div className="p-3 lg:absolute lg:top-3 lg:left-3 lg:w-[22rem] lg:p-0">
+      {/* Kolom kiri bisa digulir bila isinya melebihi tinggi layar; bagian kosongnya tidak menghalangi klik ke peta. */}
+      <div className="p-3 lg:pointer-events-none lg:absolute lg:top-3 lg:bottom-3 lg:left-3 lg:w-[22rem] lg:overflow-y-auto lg:p-0 lg:[&>*]:pointer-events-auto">
         <section aria-label="Kondisi kota sekarang" className="map-panel relative overflow-hidden">
           <div className={`tint tone-${situation.tone} p-4`}>
             <div className="flex items-center justify-between gap-2">
@@ -203,6 +217,7 @@ export function InsightScreen({ cameras, alerts, insight, weather, clock }: Scre
             </div>
           ) : null}
         </section>
+        {now !== null ? <ProgressTimeline rows={progress} now={now} /> : null}
       </div>
 
       <div className="p-3 pt-0 lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[23rem] lg:p-0">
@@ -213,6 +228,7 @@ export function InsightScreen({ cameras, alerts, insight, weather, clock }: Scre
                 summary={selectedSummary}
                 insight={insight}
                 cameraNames={cameraNames}
+                pending={pending}
                 clock={clock}
                 onClose={() => setSelected(null)}
               />

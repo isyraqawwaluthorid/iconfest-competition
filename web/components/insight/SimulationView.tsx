@@ -69,7 +69,14 @@ export function SimulationView({ cameras }: { cameras: CameraOverview[] }) {
           (disusun {formatDateTimeWib(SCENARIO_GENERATED_AT)}). Snapshot dan halaman kamera tetap menampilkan data langsung.
         </p>
       </section>
-      <InsightScreen cameras={simulated} alerts={step.alerts} insight={step.insight} weather={step.weather} clock={new Date(step.at).getTime()} />
+      <InsightScreen
+        cameras={simulated}
+        alerts={step.alerts}
+        insight={step.insight}
+        readings={step.readings}
+        weather={step.weather}
+        clock={new Date(step.at).getTime()}
+      />
     </div>
   );
 }

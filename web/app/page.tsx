@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { InsightView } from "@/components/insight/InsightView";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { getActiveAlerts, getCameraOverview, getLatestInsight, getWeather } from "@/lib/queries";
+import { getActiveAlerts, getCameraOverview, getLatestInsight, getSiteReadings, getWeather } from "@/lib/queries";
 
 /** Beranda "Denyut Kota": peta memenuhi layar, ringkasan dan rincian tampil sebagai panel di atasnya. */
 export default function HomePage() {
@@ -29,10 +29,13 @@ async function Home() {
     );
   }
   // Peringatan, hujan, dan ringkasan AI adalah pelengkap: jika gagal dimuat, beranda tetap tampil tanpanya.
-  const [alerts, weather, insight] = await Promise.all([
+  const [alerts, weather, insight, readings] = await Promise.all([
     getActiveAlerts().catch(() => []),
     getWeather().catch(() => []),
     getLatestInsight().catch(() => null),
+    getSiteReadings().catch(() => []),
   ]);
-  return <InsightView initialCameras={cameras} initialAlerts={alerts} initialInsight={insight} weather={weather} />;
+  return (
+    <InsightView initialCameras={cameras} initialAlerts={alerts} initialInsight={insight} initialReadings={readings} weather={weather} />
+  );
 }

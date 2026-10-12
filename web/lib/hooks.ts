@@ -2,9 +2,9 @@
 
 import { useEffect, useId, useState } from "react";
 import type { Insight } from "./ai-insight";
-import { getActiveAlerts, getLatestInsight } from "./queries";
+import { getActiveAlerts, getLatestInsight, getSiteReadings } from "./queries";
 import { getSupabase } from "./supabase/public";
-import type { Alert, CameraOverview, CameraStatusRow, WorkerHeartbeat } from "./types";
+import type { Alert, CameraOverview, CameraStatusRow, SiteReading, WorkerHeartbeat } from "./types";
 
 /**
  * Waktu sekarang yang diperbarui berkala. `null` sampai komponen terpasang di browser,
@@ -91,6 +91,20 @@ export function useLiveInsight(initial: Insight | null): Insight | null {
   }, [channelId]);
 
   return insight;
+}
+
+/**
+ * Penilaian AI terbaru per lokasi air, untuk linimasa perkembangan. Tabelnya tidak ikut Realtime,
+ * jadi dimuat ulang tiap menit; penilaian baru paling cepat datang tiap siklus worker (5 menit).
+ */
+export function useLiveReadings(initial: SiteReading[], intervalMs = 60_000): SiteReading[] {
+  const [readings, setReadings] = useState(initial);
+  useEffect(() => {
+    // Jika gagal dimuat ulang, penilaian terakhir tetap ditampilkan.
+    const timer = setInterval(() => getSiteReadings().then(setReadings, () => undefined), intervalMs);
+    return () => clearInterval(timer);
+  }, [intervalMs]);
+  return readings;
 }
 
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */

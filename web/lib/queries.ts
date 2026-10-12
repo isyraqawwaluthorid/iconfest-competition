@@ -6,6 +6,7 @@ import type {
   CameraOverview,
   GridWeather,
   ReferenceLine,
+  SiteReading,
   TrafficPoint,
   WaterReading,
   WorkerHeartbeat,
@@ -52,6 +53,19 @@ export async function getWaterReadings(cameraId: string, limit = 12): Promise<Wa
     ...row,
     snapshot_path: row.snapshot_path?.startsWith("readings/") ? row.snapshot_path : null,
   }));
+}
+
+/** Penilaian AI semua lokasi air dalam `hours` jam terakhir, urut waktu, untuk linimasa perkembangan. */
+export async function getSiteReadings(hours = 2): Promise<SiteReading[]> {
+  const since = new Date(Date.now() - hours * 3_600_000).toISOString();
+  const { data, error } = await getSupabase()
+    .from("water_readings")
+    .select("camera_id, captured_at, status, road_flood, confidence, smoothing:raw->smoothing")
+    .eq("source", "live")
+    .gte("captured_at", since)
+    .order("captured_at");
+  if (error) throw new Error(`Gagal memuat perkembangan penilaian: ${error.message}`);
+  return data.map(({ smoothing, ...row }) => ({ ...row, ...((smoothing as Pick<SiteReading, "level" | "previous" | "confirmed"> | null) ?? {}) })) as SiteReading[];
 }
 
 export type Calibration = { lines: ReferenceLine[]; referenceDay: string | null; referenceNight: string | null };

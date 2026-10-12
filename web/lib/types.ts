@@ -29,6 +29,22 @@ export type WaterReading = {
   trigger: "change" | "heartbeat" | "rain" | "manual" | null;
   is_night: boolean | null;
 };
+/**
+ * Satu penilaian AI untuk linimasa, beserta catatan aturan yang disimpan worker bersamanya.
+ * `level`: level yang dihitung aturan dari penilaian ini; `null` berarti diabaikan (keyakinan rendah,
+ * gambar buruk, atau bertentangan dengan referensi); `undefined` berarti penilaian lama tanpa catatan.
+ * `previous` dan `confirmed`: status resmi sebelum dan sesudah penilaian ini.
+ */
+export type SiteReading = {
+  camera_id: string;
+  captured_at: string;
+  status: WaterStatus;
+  road_flood: RoadFlood | null;
+  confidence: number | null;
+  level?: WaterStatus | null;
+  previous?: WaterStatus | null;
+  confirmed?: WaterStatus | null;
+};
 export type CameraModule = "traffic" | "crowd" | "water";
 
 /** Satu baris view `v_camera_overview`: kamera aktif beserta kondisi terkininya. */

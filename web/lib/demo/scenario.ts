@@ -1,5 +1,5 @@
 import { insightBodySchema, type Insight } from "../ai-insight";
-import type { Alert, CameraOverview, GridWeather } from "../types";
+import type { Alert, CameraOverview, GridWeather, SiteReading } from "../types";
 import raw from "./scenario.json";
 
 /**
@@ -16,6 +16,8 @@ export type ScenarioStep = {
   note: string;
   /** Kolom kondisi air per kamera yang menimpa data langsung selama simulasi. */
   cameras: Record<string, Partial<CameraOverview>>;
+  /** Semua penilaian AI buatan sampai langkah ini, dengan catatan aturan yang sama seperti di worker. */
+  readings: SiteReading[];
   alerts: Alert[];
   weather: GridWeather[];
   insight: Insight | null;

@@ -15,13 +15,15 @@ import {
 } from "react-leaflet";
 import { CITY_BOUNDS, districtOf, DISTRICTS, shortName } from "@/lib/geo/districts";
 import { themeDisplay, type DistrictSummary, type Theme } from "@/lib/insight";
-import { DENSITY, NOT_ASSESSED, WATER } from "@/lib/status";
-import type { CameraOverview } from "@/lib/types";
+import { DENSITY, isElevated, NOT_ASSESSED, WATER } from "@/lib/status";
+import type { CameraOverview, WaterStatus } from "@/lib/types";
 
 type Props = {
   summaries: DistrictSummary[];
   theme: Theme;
   sources: CameraOverview[];
+  /** Lokasi air yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi: id kamera → level yang dinilai. */
+  pending: Map<string, WaterStatus>;
   selected: string | null;
   onSelect: (district: string) => void;
 };
@@ -54,7 +56,7 @@ function Focus({ selected }: { selected: string | null }) {
 }
 
 /** Peta tematik per kecamatan. Hanya dirender di browser (lihat InsightView). */
-export default function ThematicMap({ summaries, theme, sources, selected, onSelect }: Props) {
+export default function ThematicMap({ summaries, theme, sources, pending, selected, onSelect }: Props) {
   const labels = useMemo(
     () =>
       DISTRICTS.map((district) => ({
@@ -111,12 +113,16 @@ export default function ThematicMap({ summaries, theme, sources, selected, onSel
               ? WATER[camera.water_status]
               : NOT_ASSESSED
             : DENSITY[camera.density_level ?? "tidak_diketahui"];
+        // Pada tema risiko air, lokasi yang bergerak dibuat menonjol: menunggu konfirmasi atau sudah naik.
+        const waiting = theme === "risk" ? pending.get(camera.id) : undefined;
+        const raised = theme === "risk" && isElevated(camera.water_status);
+        const tone = waiting ? WATER[waiting].tone : status.tone;
         return (
           <CircleMarker
-            key={`${camera.id}-${status.tone}`}
+            key={`${camera.id}-${tone}-${waiting ? "pending" : raised ? "raised" : "plain"}`}
             center={[camera.lat, camera.lng]}
-            radius={4}
-            className={`camera-marker tone-${status.tone}`}
+            radius={waiting ? 10 : raised ? 8 : 4}
+            className={`camera-marker tone-${tone}${waiting ? " is-pending" : raised ? " is-raised" : ""}`}
             eventHandlers={{
               click: () => {
                 const district = districtOf(camera.lat, camera.lng);
@@ -126,6 +132,7 @@ export default function ThematicMap({ summaries, theme, sources, selected, onSel
           >
             <Tooltip>
               {camera.name} · {status.label}
+              {waiting ? ` · AI menilai ${WATER[waiting].label.toLowerCase()} sekali, menunggu penilaian kedua` : ""}
             </Tooltip>
           </CircleMarker>
         );

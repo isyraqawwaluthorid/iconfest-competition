@@ -6,6 +6,7 @@ import { useNow } from "@/lib/hooks";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
+import type { WaterStatus } from "@/lib/types";
 import { InsightCard } from "./AiInsight";
 import { RainOutlook, TrafficTrend } from "./DistrictTrend";
 
@@ -13,13 +14,15 @@ type Props = {
   summary: DistrictSummary;
   insight: Insight | null;
   cameraNames: Map<string, string>;
+  /** Lokasi yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi: id kamera → level yang dinilai. */
+  pending: Map<string, WaterStatus>;
   /** Jam yang dipakai panel (ms); diisi halaman simulasi dengan jam skenario. */
   clock?: number;
   onClose: () => void;
 };
 
 /** Rincian satu kecamatan: temuan AI, air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
-export function DistrictPanel({ summary, insight, cameraNames, clock, onClose }: Props) {
+export function DistrictPanel({ summary, insight, cameraNames, pending, clock, onClose }: Props) {
   const { district, cameras, online, waterSites, trafficSites, densityIndex, densityLevel, busy, rain } = summary;
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
@@ -96,6 +99,11 @@ export function DistrictPanel({ summary, insight, cameraNames, clock, onClose }:
                     {site.water_trend ? `Tren ${TREND_LABEL[site.water_trend]}` : "Tren belum diketahui"}
                     {site.risk_score != null ? ` · skor risiko ${formatNumber(site.risk_score, 2)}` : ""}
                   </p>
+                  {pending.has(site.id) ? (
+                    <p className="mt-1 text-xs font-semibold">
+                      AI baru sekali menilai {WATER[pending.get(site.id) as WaterStatus].label.toLowerCase()}; status resmi menunggu penilaian kedua.
+                    </p>
+                  ) : null}
                 </li>
               );
             })}
