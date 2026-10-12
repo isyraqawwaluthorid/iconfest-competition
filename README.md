@@ -59,6 +59,7 @@ Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web 
 |---|---|
 | `/` | **Beranda.** Peta penuh per kecamatan dengan tiga tema (risiko air, kepadatan lalu lintas, hujan 3 jam ke depan). Kiri: kondisi kota dari aturan, dan linimasa lokasi yang sedang bergerak. Kanan: ringkasan AI, peringatan, peringkat lokasi, atau rincian kecamatan yang dipilih (termasuk tren 24 jam). |
 | `/simulasi` | **Simulasi kejadian.** Skenario air naik delapan langkah di layar yang sama dengan beranda, berlabel "SIMULASI · Bukan data langsung". Hanya masukannya yang buatan; status, peringatan, dan ringkasan AI dihasilkan aturan dan model yang sama dengan sistem. |
+| `/lalu-lintas` | **Lalu lintas dari dekat**, tiga lapisan di satu peta. *Ruas jalan*: potongan jalan di sekitar tiap kamera, berwarna tingkat kepadatan dibanding kebiasaannya. *Aktivitas per jam*: heksagon dengan penggeser jam, dari rata-rata hitungan yang sudah terkumpul. *Beban emisi*: estimasi relatif per ruas dari kendaraan terlihat dan faktor emisi resmi, bukan kg per jam. |
 | `/riwayat` | Kejadian yang tercatat (mulai, puncak, lama) dengan unduhan CSV. |
 | `/tentang` | Cara kerja, batasan, privasi, dan sumber data. |
 | `/kamera/[id]` | **Bukti visual** satu lokasi: gambar terakhir dengan garis acuan, penilaian AI dan alasannya, pembanding kondisi normal, gambar yang dinilai sebelumnya, rincian skor risiko, dan grafik kepadatan. |
@@ -145,6 +146,7 @@ python scripts/replay_readings.py --all 3          # nilai ulang gambar bukti te
 python scripts/probe_camera.py "JRAKAH"            # uji penilaian AI satu kamera
 python scripts/probe_insight.py naik               # uji ringkasan AI pada keadaan buatan
 python scripts/build_demo_scenario.py --no-llm     # jalankan skenario simulasi melalui aturan asli
+python scripts/build_road_segments.py              # bangun ulang ruas jalan halaman Lalu Lintas dari OpenStreetMap
 ```
 
 Semua skrip di atas tidak menulis ke database. `replay_readings.py` dipakai setiap kali kalibrasi atau prompt diubah, untuk memastikan salah baca yang pernah terjadi tidak terulang dan lokasi lain tidak ikut berubah.

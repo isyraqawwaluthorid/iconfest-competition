@@ -153,7 +153,8 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 - Rancangan akhir tetap median per jam-dalam-minggu dari 28 hari; itu baru mungkin setelah data beberapa minggu.
 - Metrik utama per kamera: `vehicle_total` jika kamera punya modul `traffic`, selain itu `persons` (modul `crowd`).
 - Level: `lancar` < 0,8 ≤ `normal` < 1,3 ≤ `ramai` < 1,8 ≤ `padat`.
-- Anomali: nilai > p90 **dan** index ≥ 1,5 selama 2 siklus berturut-turut.
+- **Sedikit kendaraan tidak disebut ramai** (`MIN_BUSY_COUNT = 8`, sejak 12 Okt): bila yang terlihat kurang dari 8, tingkatnya ditahan di `normal` berapa pun indeksnya. Sebelumnya 4 kendaraan pada jam yang biasanya 1 terbaca "padat" (indeks 4,0); pada pukul 18.20 WIB 12 Okt, 5 dari 12 ruas "lebih padat dari biasanya" adalah kasus seperti itu. Indeksnya tetap disimpan apa adanya.
+- Anomali: nilai ≥ 8, nilai > p90, **dan** index ≥ 1,5 selama 2 siklus berturut-turut.
 - Pembacaan malam hari dengan kualitas `poor` tidak dipakai untuk baseline maupun anomali.
 
 ## Air (`analyzers/water.py`)
@@ -282,7 +283,17 @@ Implementasinya berupa penyelarasan sekali per siklus (`alerts.sync`): aturan me
 - Heartbeat: upsert `system_status` key `worker` dengan `last_seen`, durasi siklus, jumlah kamera live/frozen/dead, panggilan AI hari ini.
 - Retensi frame lokal: hapus folder > `FRAMES_RETENTION_DAYS`, kecuali file yang direferensikan `labels` atau `events`.
 
+### Profil aktivitas (`fusion/activity.py`, sejak 12 Okt)
+- Rata-rata kendaraan dan orang yang terlihat per gambar, per kamera, per jam dalam sehari (WIB). Diisi dari `traffic_readings` 14 hari terakhir saat worker mulai (bersama riwayat pembanding), lalu ditambah tiap siklus; gambar berkualitas `poor` tidak ikut.
+- Ditulis ke `system_status` (key `activity_profile`) saat worker mulai dan tiap jam. Jam dengan kurang dari 6 gambar ditulis `null`, bukan nol. Ukurannya ±26 KB untuk 80 kamera.
+- Dipakai lapisan "Aktivitas per jam" di `/lalu-lintas`. Hitungan orang ikut memuat pengendara sepeda motor.
+
+### Ruas jalan (`roads.py`, `scripts/build_road_segments.py`, sejak 12 Okt)
+- Bukan bagian siklus. Skrip mengambil jalan dari OpenStreetMap (Overpass, satu kotak yang memuat semua kamera), memilih jalan utama terdekat tiap kamera lalu lintas (di simpang, jalan yang namanya disebut pada nama kamera didahulukan), lalu memotong ruas ±200 m ke tiap arah, menyambung garis-garis jalan yang sama. Jalan dua jalur mendapat dua garis. Ruas berhenti di tengah jarak ke kamera lain di jalan yang sama.
+- Hasilnya `web/lib/geo/road-segments.json` (66 ruas). **Jalankan ulang bila daftar kamera lalu lintas berubah.** Kunci tiap ruas adalah `id` kamera di database.
+
 ## Skrip
+- `scripts/build_road_segments.py [--cache berkas]`: bangun ulang ruas jalan untuk halaman Lalu Lintas (hanya membaca database).
 - `scripts/seed_cameras.py <json>`: upsert dari `data/cameras_semarang.json` (alternatif: jalankan `supabase/seed_cameras.sql`).
 - `scripts/sync_cameras.py`: jalankan `pantausemar.sync_cameras()` manual.
 - `scripts/backfill_baselines.py`: hitung baseline dari data yang ada.

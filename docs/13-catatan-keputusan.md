@@ -90,6 +90,15 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 - Linimasa tidak tampil pada hari yang tenang, supaya layar tetap renggang.
 - Satu penilaian AI yang kurang yakin tidak lagi menaikkan tingkat kota menjadi "perlu perhatian"; lokasinya tetap disebut dalam fakta insight.
 
+### Halaman Lalu Lintas dari video referensi (12 Okt malam)
+- Pemilik proyek memberi video referensi (dasbor lalu lintas kota lain: ruas jalan berwarna, heksagon "potensi", angka emisi 8 polutan dalam g/menit) dan meminta tiga hal: jalan dari dekat dengan tingkat kepadatannya, emisi bila memungkinkan, dan heksagon potensi aktivitas. Disepakati: ruas jalan dan heksagon dibangun; emisi sebagai estimasi relatif untuk 16 Okt, kg/jam diusulkan untuk final.
+- **Tata letaknya tidak ditiru.** Referensi itu dasbor padat berangka banyak; halaman kita tetap peta penuh dengan satu lapisan untuk satu pertanyaan. Beranda tidak diubah.
+- **Ruas hanya di sekitar kamera.** Mewarnai seluruh jalan akan mengklaim lebih dari yang terlihat kamera. Bingkai awal peta adalah pusat kota, tempat ruas cukup rapat untuk terbaca.
+- **Heksagon hanya di tempat yang punya kamera**, dan isinya rata-rata dari hari-hari yang sudah terekam ("biasanya"), bukan "potensi" hasil model. Skala warna dihitung dari semua jam sekaligus supaya jam yang berbeda bisa dibandingkan saat penggeser digerakkan. Warnanya ungu, sengaja bukan hijau–merah, supaya tidak terbaca sebagai status bahaya.
+- **Emisi tidak pernah ditulis dalam kg.** Lihat `12-emisi-kualitas-udara.md`. Satuan "setara sepeda motor" dipilih karena jujur sebagai pembanding dan mudah dibayangkan.
+- **Temuan saat membangunnya:** indeks kepadatan dari angka kecil menyesatkan (4 kendaraan vs biasanya 1 = "padat"). Diperbaiki di worker dengan batas jumlah minimum, bukan di tampilan, supaya Beranda, insight, dan peringatan ikut benar.
+- **Yang belum:** pola heksagon baru dari 3 hari data; porsi jenis kendaraan belum diuji dengan hitungan manual; halaman belum dicoba di layar ponsel; `road-segments.json` berkunci `id` kamera sehingga harus dibangun ulang bila database diganti.
+
 ### Keandalan
 - Worker menulis log ke berkas bergulir (`FRAMES_DIR/_state/worker.log`), meminta Windows tidak menidurkan mesin, dan menjalankan satu siklus segera setelah mesin terbangun.
 - Hanya **satu worker** yang boleh berjalan. Dua worker membuat data ganda dan biaya AI dobel.

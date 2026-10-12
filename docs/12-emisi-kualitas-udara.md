@@ -4,7 +4,10 @@ Modul keempat SemarSight, setara dengan modul air, lalu lintas, dan ruang publik
 
 Skema: `supabase/schema_emissions.sql` (diuji bersama `schema.sql`, `seed_cameras.sql`, `schema_features.sql` di PostgreSQL 16, idempoten; contoh perhitungan Tier 2 dijalankan langsung di database dan hasilnya sesuai bagian "Contoh hitung").
 
-## Status keputusan (11 Okt 2026)
+## Status keputusan (11 Okt 2026, diperbarui 12 Okt)
+
+- **12 Okt: emisi ditampilkan sebagai estimasi relatif, bukan kg/jam.** Pemilik proyek meminta tampilan emisi seperti pada video referensinya. Yang dibangun adalah lapisan "Beban emisi" di `/lalu-lintas` (`web/lib/emission.ts`): kendaraan yang terlihat 30 menit terakhir ditimbang faktor emisi pada dokumen ini (CO₂, NOx, CO), lalu ruas diperingkat terhadap ruas lain dalam "setara sepeda motor". Alasannya dua: snapshot memberi kendaraan yang terlihat, bukan yang lewat per jam; dan porsi jenis kendaraan belum bisa dipercaya (sepeda motor 29% dan truk 12% dari deteksi 6 jam terakhir pada 12 Okt). E2–E3 (kg/jam dari klip video) tetap menunggu uji kelayakan dan diusulkan untuk final.
+- Faktor per kendaraan-km yang dipakai lapisan itu: CO₂ 58,8 / 199,2 / 666,1 / 532,9 g (motor / mobil / bus / truk, dari faktor per kg BBM dan asumsi konsumsi di bawah); NOx 0,29 / 2,18 / 11,9 / 17,7; CO 14 / 35,5 / 11 / 8,4. Mobil = 88% bensin + 12% solar.
 
 - **E1 (kartu kualitas udara): dijadwalkan sebelum 16 Okt**, diperluas menjadi kartu "Kondisi luar ruang" (udara, suhu terasa, indeks UV, hujan). Sumber diuji 11 Okt pukul 11.00 WIB: PM2.5 44,2 µg/m³, US AQI 139, UV 10,1, suhu terasa 39,3 °C.
 - **E2–E3 (arus kendaraan dan estimasi emisi): uji kelayakan dulu, baru diputuskan.** Pada hitungan snapshot yang sudah tersimpan, sepeda motor hanya 18% (malam 10 Okt) sampai 24% (siang 11 Okt) dari kendaraan terdeteksi, jauh di bawah porsi motor yang lazim di jalan kota. Karena motor adalah penyumbang utama CO dan HC dalam rumus Tier 2, estimasi emisi dari hitungan saat ini akan terlalu rendah. Langkahnya: rekam 2–3 klip siang dan malam, hitung manual, bandingkan dengan sistem. Jika galat hitungan motor di bawah ±30%, E2–E3 dibangun untuk final; jika tidak, modul ini masuk rencana pengembangan di laporan.

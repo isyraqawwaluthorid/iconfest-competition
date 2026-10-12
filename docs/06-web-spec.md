@@ -65,7 +65,7 @@ Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan
 | `/udara` | Kualitas Udara (direncanakan) | Kartu "Kondisi luar ruang": kualitas udara (model Open-Meteo, terukur BMKG jika ada akses) dengan label sumber dan kategori ISPU, suhu terasa, indeks UV, hujan; grafik 24 jam + prakiraan 48 jam |
 | `/emisi` | Emisi (setelah uji kelayakan) | Peta estimasi emisi per kamera, arus per jenis kendaraan, kotak "Metode & asumsi" (lihat `12-emisi-kualitas-udara.md`) |
 | `/air` | Air & Genangan | Daftar kamera air diurutkan risiko; **diagram hulu → hilir** per sistem sungai; hujan per grid; kejadian aktif |
-| `/lalu-lintas` | Lalu Lintas | Peta kepadatan; daftar anomali; grafik tren per kamera (hari ini vs baseline) |
+| `/lalu-lintas` | Lalu Lintas | **Berjalan sejak 12 Okt.** Peta penuh dengan tiga lapisan (rincian di bawah tabel): Ruas jalan, Aktivitas per jam, Beban emisi |
 | `/ruang-publik` | Ruang Publik | Keramaian kawasan wisata; pola per jam; "waktu terbaik berkunjung" |
 | `/insight` | Insight | Insight lintas modul (genangan → lalu lintas, hujan → keramaian, sampah + hujan); laporan harian |
 | `/riwayat` | Riwayat | Kejadian (tanggal, lokasi, durasi, puncak), statistik titik rawan, unduh CSV |
@@ -157,6 +157,18 @@ Yang sengaja **tidak** diambil, karena datanya tidak kita punya: tinggi air dala
 ## Kriteria penerimaan web untuk penyisihan
 
 - Halaman `/`, `/peta`, `/air`, `/lalu-lintas`, `/kamera/[id]`, `/riwayat` berfungsi dengan data nyata.
+
+## Halaman Lalu Lintas (12 Okt)
+
+Dibuat dari video referensi pemilik proyek (dasbor lalu lintas dengan ruas berwarna, heksagon, dan angka emisi). Yang diambil adalah gagasannya; tata letaknya tetap mengikuti arah kita: peta penuh, panel mengambang, satu lapisan menjawab satu pertanyaan, dan tidak ada angka yang tidak dikumpulkan sistem.
+
+| Lapisan | Pertanyaan | Isi | Batas yang ditulis di layar |
+|---|---|---|---|
+| Ruas jalan | Seberapa padat tiap ruas sekarang? | Satu ruas per kamera lalu lintas (`lib/geo/road-segments.json`, dipotong dari OpenStreetMap), berwarna tingkat kepadatan. Kiri: ringkasan dan batang sebaran. Kanan: ruas terpadat; memilih ruas mendekatkan peta dan menampilkan angka di balik tingkatnya, gambar kamera, grafik 24 jam, dan jenis kendaraan | Yang diwarnai hanya potongan jalan di sekitar kamera (paling jauh ±200 m ke tiap arah, lebih pendek bila ada kamera lain di jalan yang sama). Warna berarti dibanding kebiasaan, bukan kecepatan |
+| Aktivitas per jam | Kawasan mana yang biasanya ramai pada jam tertentu? | Heksagon 400 m berisi rata-rata kendaraan (atau orang) terlihat per gambar pada jam yang dipilih, dari profil yang ditulis worker ke `system_status` (`activity_profile`). Penggeser jam, tombol putar, grafik 24 batang, rincian per heksagon | Heksagon hanya ada di tempat yang punya kamera. Jam yang datanya belum cukup digambar kosong, bukan sepi. Hitungan orang ikut memuat pengendara motor |
+| Beban emisi | Ruas mana yang estimasi beban emisinya paling berat? | Kendaraan terlihat 30 menit terakhir ditimbang faktor emisi Permen LH 12/2010 (CO₂, NOx, CO); ruas diperingkat terhadap ruas lain, dalam "setara sepeda motor", dengan porsi tiap jenis kendaraan | Estimasi relatif. Bukan pengukuran udara dan bukan kg per jam, karena sistem tahu kendaraan yang terlihat, bukan yang lewat. Porsi per jenis belum diuji dengan hitungan manual |
+
+Komponen: `components/traffic/TrafficView.tsx` (lapisan dan keadaan), `TrafficMap.tsx` (peta), `RoadPanels.tsx`, `ActivityPanels.tsx`, `EmissionPanels.tsx`, `SegmentPanel.tsx`. Logika murni: `lib/traffic.ts`, `lib/activity.ts`, `lib/emission.ts`, `lib/geo/roads.ts`.
 - Status kamera berubah di browser tanpa refresh saat worker memperbarui `camera_status`.
 - Mematikan worker → banner muncul dalam 15 menit; halaman tetap menampilkan data terakhir.
 - Kamera mati tampil sebagai "Offline sejak HH:MM" dengan snapshot terakhir.
