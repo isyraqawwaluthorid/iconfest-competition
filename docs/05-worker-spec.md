@@ -145,10 +145,12 @@ Setiap kamera diproses dalam `try/except` sendiri. Error satu kamera tidak boleh
 - Untuk `crowd`, metrik utama `persons`; untuk `traffic`, `vehicle_total = cars + motorcycles + buses + trucks`.
 
 ### Baseline (`fusion/baseline.py`)
-- Job malam (02.00 WIB): untuk setiap kamera dan metrik, hitung median dan p90 per `hour_of_week` dari 28 hari terakhir dengan `n ≥ 3`.
-- `density_index = value / max(median, 1)`. Jika baseline belum ada: median 24 jam bergulir, set `baseline_is_provisional = true`.
-- Baseline sementara disimpan di memori worker (`RollingHistory`) dan diisi ulang dari `traffic_readings` 24 jam terakhir saat worker dimulai. Indeks baru dihitung setelah ada ≥ 12 pembacaan (±1 jam); sebelum itu `density_level = tidak_diketahui`.
-- **Anomali tidak dinilai selama baseline masih sementara.** Median 24 jam mencampur siang dan malam, sehingga jam sibuk harian akan selalu tampak tidak normal. Anomali aktif setelah baseline per jam-dalam-minggu tersedia.
+- **Pembanding = kamera itu sendiri pada jam yang sama di hari-hari sebelumnya** (sejak 12 Okt): median dan p90 dari pembacaan dalam jendela ±1 jam di sekitar jam yang dinilai (waktu WIB), dari 14 hari terakhir, tidak termasuk hari yang sama. Jenis hari yang sama (hari kerja atau akhir pekan) diutamakan bila punya ≥ 12 pembacaan; jika belum, semua hari dipakai.
+- `density_index = value / max(median, 1)`. Butuh ≥ 12 pembacaan pembanding; kalau jam itu belum punya data dari hari sebelumnya, `density_level = tidak_diketahui` dan web menulis "belum ada pembanding".
+- **Pembanding sementara** (`baseline_is_provisional = true`): berasal dari kurang dari 3 hari berbeda, atau dari jenis hari yang berbeda. **Anomali tidak dinilai dari pembanding sementara**, dan tingkat kepadatan belum dikirim ke LLM insight.
+- Riwayat disimpan di memori worker (`History`, per slot 5 menit dalam sehari) dan diisi ulang dari `traffic_readings` 14 hari terakhir saat worker dimulai. Dengan 14 hari data, pengisian ulang membaca ±280 ribu baris (±1 menit); bila itu mengganggu, pindahkan ke tabel `baselines` yang dihitung job malam.
+- **Kenapa bukan median 24 jam bergulir** (rancangan sementara sampai 12 Okt): median itu ikut memuat jam malam yang sepi, sehingga pada siang hari 68–70% titik terbaca "padat" (indeks sampai 15×) dan pada dini hari ±90% terbaca "lancar". Dengan pembanding per jam, data yang sama (12 Okt, 11.00–14.00 WIB) terbagi ±20% lancar, 35% normal, 22% ramai, 16% padat. Pada hari itu pembandingnya baru hari Minggu, jadi hari Senin wajar terbaca agak lebih ramai.
+- Rancangan akhir tetap median per jam-dalam-minggu dari 28 hari; itu baru mungkin setelah data beberapa minggu.
 - Metrik utama per kamera: `vehicle_total` jika kamera punya modul `traffic`, selain itu `persons` (modul `crowd`).
 - Level: `lancar` < 0,8 ≤ `normal` < 1,3 ≤ `ramai` < 1,8 ≤ `padat`.
 - Anomali: nilai > p90 **dan** index ≥ 1,5 selama 2 siklus berturut-turut.

@@ -16,14 +16,14 @@ Cara membaca:
 |---|---|---|---|---|
 | Fase 0 — Prasyarat | 5 dari 7 | – | 2 (manual) | sebelum 10 Okt |
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
-| Fase 2 — Lalu lintas, web dasar, deploy | 11 dari 14 | – | 3 | Min 11 Okt |
+| Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
 | Fase 3 — Modul air | 11 dari 14 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 4 dari 9 | – | 5 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 0 dari 8 | 1 | 7 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 5 dari 7 | 1 | 1 | – |
-| **Jumlah inti** | **51 dari 87 (59%)** | **5** | **31** | |
+| **Jumlah inti** | **52 dari 87 (60%)** | **5** | **30** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -36,7 +36,7 @@ Keadaan sistem saat dokumen ini diperbarui: worker berjalan di PC (13 siklus tan
 |---|---|---|
 | Worker berjalan terus, merekam semua kamera aktif tiap 5 menit | Sebagian | Berjalan di PC yang menetap, bukan VPS; belum terbukti semalaman di PC |
 | Modul air: kalibrasi 15–20 kamera, klasifikasi AI, status terkonfirmasi, tren, peringatan hulu–hilir | Sebagian | Peringatan hulu–hilir (T4.3, T4.4) |
-| Modul lalu lintas: hitungan YOLO, baseline, indeks kepadatan, anomali | Sebagian | Pembanding masih sementara, sehingga tingkat kepadatan menyesatkan pada siang hari dan anomali dimatikan (T2.14) |
+| Modul lalu lintas: hitungan YOLO, baseline, indeks kepadatan, anomali | Sebagian | Pembanding per jam sudah berjalan (T2.14), tetapi masih sementara sampai ada tiga hari data sejenis; anomali menyala sendiri setelah itu |
 | Hujan Open-Meteo dan minimal satu insight lintas modul | Sebagian | Hujan sudah; insight lintas modul genangan → lalu lintas belum (T4.6) |
 | Website ter-deploy: beranda, peta, panel kamera, Air, Lalu Lintas, peringatan, riwayat | Sebagian | Deploy (T2.10); halaman Air, Lalu Lintas, Riwayat (T4.8, T5.1, T5.2) |
 | Ringkasan atau insight AI otomatis | **Selesai** | – |
@@ -50,7 +50,6 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 | Tugas | Jadwal | Keadaan | Dampak bila terus tertunda |
 |---|---|---|---|
 | **T2.10** Deploy ke Vercel | Min 11 Okt | Belum; ditunda pemilik proyek 12 Okt | Juri membuka tautan, bukan `localhost`. Paling berisiko bila dikerjakan mendekati tenggat |
-| **T2.14** Pembanding lalu lintas per jam | baru (12 Okt) | Belum | Peta kepadatan hampir seluruhnya merah pada siang hari |
 | **T3.10** Uji klasifikasi malam | Sen 12 Okt | Sebagian | Akurasi malam belum pernah diperiksa terhadap penilaian manusia |
 | **T3.11** Foto referensi | Sen 12 Okt | Sebagian | Tanpa referensi yang sesuai waktu, keyakinan AI turun |
 | **T2.12** Evaluasi hitungan YOLO siang | Min 11 Okt | Belum | Angka kendaraan belum pernah dibandingkan dengan hitungan manual |
@@ -65,7 +64,7 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 
 | Paling lambat | Dikerjakan | Butuh pemilik proyek |
 |---|---|---|
-| Sen 12 Okt (sisa hari) | T2.14 pembanding lalu lintas per jam; usulan pasangan hulu–hilir untuk T4.4 | Simpan referensi malam yang kurang (T3.11) setelah gelap |
+| Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~ (selesai); usulan pasangan hulu–hilir untuk T4.4 | Simpan referensi malam yang kurang (T3.11) setelah gelap |
 | Sel 13 Okt | T2.10 deploy; T4.3 hulu–hilir; T5.4 cara mendemokan kejadian; TV.4 tren 24 jam | Akun Vercel; persetujuan pasangan hulu–hilir (T4.4); referensi siang 4 kamera jalan (T3.11) |
 | Rab 14 Okt | T4.5 kejadian; T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; T5.3 halaman Tentang; T6.5 README | Template laporan dari panitia (T0.7) |
 | Kam 15 Okt | Perbaikan bug saja (T6.4); T6.6 laporan; T6.7 video; T7.3 repo publik; T7.4 ganti kunci | Laporan, video, surat bermaterai (T6.8), pengumpulan |
@@ -140,7 +139,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T2.13 [K]** Halaman `/mosaik`: grid snapshot terbaru semua kamera, saringan modul, hanya aktif, cari nama.
 - [ ] **T2.10 [M+K]** Deploy pertama ke Vercel; isi env di dashboard Vercel. *Bukti:* link publik menampilkan peta dengan data nyata; tidak ada secret di bundle client. **Tertinggal** (jadwal 11 Okt).
 - [ ] **T2.12 [K]** Evaluasi hitungan YOLO pada siang hari (malam: sepeda motor kecil banyak terlewat); pertimbangkan model lebih besar atau ambang berbeda jika perlu. **Tertinggal.**
-- [ ] **T2.14 [K]** Pembanding lalu lintas per jam dari data sejak 10 Okt, dan keterangan "pembanding sementara" di beranda dan peta sampai itu jadi. Temuan 12 Okt: pada siang hari 40 dari 54 titik terbaca "padat" (indeks sampai 15×) karena median 24 jam ikut memuat jam malam yang sepi. *Bukti:* sebaran tingkat kepadatan siang hari tidak lagi didominasi "padat"; deteksi anomali bisa dinyalakan. **Prioritas berikutnya.**
+- [x] **T2.14 [K]** Pembanding lalu lintas per jam. Selesai 12 Okt: tiap titik dibandingkan dengan dirinya pada jam yang sama (±1 jam) di hari-hari sebelumnya, mengutamakan jenis hari yang sama; beranda, panel kecamatan, dan halaman kamera menyebut bila pembanding masih sementara. *Bukti:* pada data 12 Okt pukul 11.00–14.00, titik yang terbaca "padat" turun dari 68–70% menjadi ±16%. **Yang menyusul sendiri:** pembanding tidak lagi sementara, dan deteksi anomali menyala, setelah tiga hari data sejenis (hari kerja: sekitar Kamis 15 Okt).
 
 ## Fase 3 — Modul air (Senin 12 Okt)
 
@@ -277,4 +276,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai) |

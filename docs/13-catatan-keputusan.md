@@ -33,7 +33,7 @@ Terakhir diperbarui: 12 Oktober 2026.
 
 ### Lalu lintas
 - YOLO11n lokal dengan ukuran inferensi adaptif (640–1280).
-- Baseline bergulir 24 jam; deteksi anomali dimatikan selama baseline masih sementara.
+- **Pembanding kepadatan = titik itu sendiri pada jam yang sama (±1 jam) di hari-hari sebelumnya**, mengutamakan jenis hari yang sama (12 Okt). Sebelumnya median 24 jam bergulir, yang membuat 68–70% titik terbaca "padat" pada siang hari karena jam malam yang sepi ikut dihitung. Pembanding dari kurang dari tiga hari ditandai sementara: anomali belum dinilai dan tingkatnya belum dikirim ke insight. Jam yang belum punya data hari sebelumnya ditulis "belum ada pembanding", tidak diisi dengan angka pengganti.
 - **Sepeda motor kurang terdeteksi** (hanya 18–24% dari deteksi, padahal di lapangan dominan). Karena itu modul emisi ditunda sampai ada uji kelayakan (lihat `12-emisi-kualitas-udara.md`).
 
 ### Air
@@ -67,7 +67,7 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 - **LLM menjelaskan, aturan memutuskan.** Tingkat keseluruhan dihitung aturan dari status air terkonfirmasi dan prakiraan hujan, lalu menimpa apa pun yang ditulis LLM. Kalimat "Kondisi kota" di panel kiri juga tetap dari aturan, sehingga selalu tersedia walau LLM gagal.
 - **Setiap angka di teks LLM diperiksa terhadap fakta** sebelum disimpan. Angka yang tidak ada di fakta (atau satuan yang tidak diukur: cm, km/jam, liter) membuat item itu dibuang; bila ada di ringkasan, seluruh jawaban dibuang. Ini penerapan langsung dari aturan "jangan menampilkan angka yang tidak dikumpulkan sistem".
 - **Schema insight ditambah `cause` dan `impact`**, supaya pola Kondisi → Penyebab → Dampak → Tindakan benar-benar terpisah di data, bukan hanya di tampilan. LLM diminta menulis "belum dapat dipastikan dari data" bila penyebab tidak terlihat, dan "bersamaan dengan" bila hanya korelasi.
-- **Tingkat kepadatan lalu lintas tidak dikirim ke LLM selama pembanding masih sementara.** Pada siang hari 40 dari 54 titik terbaca "padat" (indeks sampai 15×) karena median 24 jam ikut memuat jam-jam malam yang sepi. Kalau angka itu dikirim, LLM akan menulis kota macet. **Catatan:** angka yang sama masih tampil di beranda ("Titik lebih padat dari biasanya 49 / 55") dan di tema peta kepadatan; itu perlu pembanding per jam (T5.8) atau keterangan yang lebih jelas.
+- **Tingkat kepadatan lalu lintas tidak dikirim ke LLM selama pembanding masih sementara.** Temuan awalnya: pada siang hari 40 dari 54 titik terbaca "padat" (indeks sampai 15×) karena median 24 jam ikut memuat jam-jam malam yang sepi; kalau angka itu dikirim, LLM akan menulis kota macet. Pembandingnya sudah diganti menjadi per jam pada hari yang sama (lihat bagian Lalu lintas), dan beranda kini menyebut bila pembanding masih sementara. Tingkat kepadatan mulai dikirim ke LLM setelah pembanding punya tiga hari data.
 - **Hemat:** fakta disusun tiap siklus tanpa LLM; LLM dipanggil hanya saat keadaan berubah (paling sering tiap 15 menit, segera bila tingkat naik) atau tiap 60 menit sebagai penyegaran. Satu panggilan ±$0,001.
 - **Saat tenang paling banyak dua kartu**, dan hujan ringan bukan temuan. Uji pertama menghasilkan empat kartu untuk keadaan normal, termasuk saran "perbaiki baseline" untuk perencana kota; keterbatasan sistem sekarang hanya boleh disebut, tidak dijadikan temuan.
 - Label tingkat `aman` di web adalah "Tidak ada temuan penting", karena lokasi air hanya terpantau di 9 dari 16 kecamatan.
@@ -111,7 +111,7 @@ EcoTraffic (karya rekan) dipakai sebagai referensi untuk modul emisi.
 - Grafik: tren 24 jam per kecamatan, kurva hari ini vs kebiasaan, matriks jam × hari.
 - Hubungan hulu–hilir antar lokasi (`river_links`) dan skema alirannya.
 - Kejadian, insight harian, dan insight lintas modul (genangan → lalu lintas). Insight situasi sudah berjalan sejak 12 Okt.
-- Pembanding lalu lintas per jam, agar tingkat kepadatan di beranda dan peta tidak menyesatkan pada siang hari.
+- Pembanding lalu lintas per jam-dalam-minggu dari 28 hari (rancangan akhir); versi per jam dari 14 hari sudah berjalan sejak 12 Okt.
 - Evaluasi akurasi formal (siang dan malam) dengan label manusia.
 - Halaman Air, Lalu Lintas, Riwayat, Tentang, dan mode replay.
 - Deploy ke Vercel, video demo, laporan.
