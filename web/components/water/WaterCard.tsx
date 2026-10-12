@@ -5,6 +5,8 @@ import { confidenceLabel, NOT_ASSESSED, TONE_BG, TRASH_LABEL, WATER } from "@/li
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
 import type { CameraOverview, WaterReading } from "@/lib/types";
 
+const RANK: Partial<Record<WaterReading["status"], number>> = { normal: 0, waspada: 1, siaga: 2, awas: 3 };
+
 const TRIGGER_LABEL: Record<string, string> = {
   change: "gambar berubah",
   heartbeat: "pemeriksaan berkala",
@@ -33,9 +35,12 @@ export function WaterCard({ camera, readings }: { camera: CameraOverview; readin
   }
 
   const confirmed = camera.water_status ? WATER[camera.water_status] : NOT_ASSESSED;
+  // Penilaian terakhir lebih tinggi daripada status resmi: baru indikasi awal, belum dikonfirmasi penilaian kedua.
+  const early = camera.water_status != null && (RANK[latest.status] ?? 0) > (RANK[camera.water_status] ?? 0);
   return (
     <div className="space-y-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted">Status resmi</span>
         <Badge status={confirmed} />
         {camera.water_status_since ? (
           <span className="text-xs text-muted">sejak {formatDateTimeWib(camera.water_status_since)}</span>
@@ -51,6 +56,13 @@ export function WaterCard({ camera, readings }: { camera: CameraOverview; readin
         </p>
       ) : null}
 
+      {early ? (
+        <p className={`tint tone-${WATER[latest.status].tone} rounded-control border border-dashed border-current p-2.5 text-xs`}>
+          <span className="font-semibold">Indikasi awal, belum menjadi status resmi.</span> Penilaian AI terakhir di bawah ini
+          lebih tinggi daripada status resmi. Status resmi baru naik bila penilaian berikutnya sepakat; jika tidak, indikasi ini
+          gugur.
+        </p>
+      ) : null}
       <div className="rounded-token border border-border p-3">
         <p className="text-xs text-muted">Penilaian AI terakhir</p>
         <p className="mt-1">{latest.reason || "Tanpa keterangan."}</p>
