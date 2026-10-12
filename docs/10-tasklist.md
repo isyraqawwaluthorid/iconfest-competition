@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Senin, 12 Oktober 2026, 20.40 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Senin, 12 Oktober 2026, 20.55 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -24,7 +24,7 @@ Cara membaca:
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
 | **Jumlah inti** | **62 dari 89 (70%)** | **5** | **22** | |
-| Fitur tambahan (TX) | 2 dari 8 | – | 6 | setelah inti |
+| Fitur tambahan (TX) | 2 dari 9 | – | 7 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
 
@@ -269,6 +269,7 @@ Dari `11-feature-backlog.md` dan `12-emisi-kualitas-udara.md`. Dikerjakan hanya 
 - [ ] **TX.6 [K]** Uji kelayakan hitungan arus dari klip video (2–3 klip siang dan malam, hitung manual) sebelum memutuskan emisi dalam kg/jam. Tanpa ini, emisi hanya ditampilkan sebagai estimasi relatif (TX.8).
 - [x] **TX.7 [K]** Heksagon aktivitas per jam (lapisan kedua `/lalu-lintas`). Selesai 12 Okt: worker menyimpan profil per kamera per jam (rata-rata kendaraan dan orang terlihat per gambar, WIB) ke `system_status` tiap jam; web mengelompokkannya ke heksagon 400 m dengan penggeser jam, tombol putar, grafik 24 batang, dan rincian per heksagon. Heksagon hanya ada di tempat yang punya kamera; jam yang datanya belum cukup digambar sebagai kosong, bukan sepi. *Bukti:* 4 unit test, profil 80 kamera dari 3 hari data tertulis pukul 18.32 WIB, halaman dipotret. **Polanya baru dari 3 hari data**, dan jam 07, 08, dan 10 masih kosong di sebagian kamera.
 - [x] **TX.8 [K]** Beban emisi relatif (lapisan ketiga `/lalu-lintas`). Selesai 12 Okt: kendaraan terlihat 30 menit terakhir ditimbang faktor emisi Permen LH 12/2010 untuk CO₂, NOx, dan CO; ruas diperingkat terhadap ruas lain dan ditampilkan dalam "setara sepeda motor", dengan porsi tiap jenis kendaraan. Tidak ada angka kg/jam, karena sistem tahu kendaraan yang terlihat, bukan yang lewat. *Bukti:* halaman dipotret dengan data langsung. **Porsi per jenis belum diuji dengan hitungan manual**: sepeda motor hanya 29% dari deteksi dan truk 12%, keduanya meragukan.
+- [ ] **TX.9 [K]** Peta 3D (bangunan timbul, sudut pandang miring) untuk halaman Lalu Lintas. **Ditunda atas keputusan pemilik proyek 12 Okt; dikerjakan hanya bila ada waktu, paling cepat setelah deploy berjalan.** Butuh ganti mesin peta dari Leaflet ke MapLibre GL, jadi semua yang digambar di atas peta halaman itu ditulis ulang (perkiraan 1–1,5 hari). Sumber peta yang sudah diuji terjangkau dan tanpa kunci API: OpenFreeMap (gaya `liberty`, punya lapisan bangunan 3D). Langkah pertama bila dikerjakan: halaman percobaan untuk melihat apakah data tinggi bangunan Semarang memadai.
 
 ## Ditunda sampai setelah penyisihan (17–25 Okt)
 
