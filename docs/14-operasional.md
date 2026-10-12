@@ -139,3 +139,18 @@ Efek yang wajar setelah pindah: semua lokasi air dinilai ulang pada siklus perta
 
 - `SUPABASE_SERVICE_ROLE_KEY` dan `OPENAI_API_KEY` memberi akses penuh; hanya ada di `.env` dan `web/.env.local`, tidak pernah di-commit dan tidak pernah dikirim ke browser.
 - Sebelum pengumpulan: ganti kunci rahasia Supabase, ganti `ADMIN_PASSWORD` dengan sandi yang kuat, dan pastikan kunci OpenAI belum kedaluwarsa. Setelah mengganti, perbarui `.env` di **semua** mesin dan variabel lingkungan di Vercel.
+- **`.env` di PC adalah acuan**, karena worker membaca dari sana. Perubahan nilai dilakukan di PC lebih dulu, lalu disalin ke laptop.
+
+### Memindahkan berkas rahasia antar mesin tanpa flashdisk
+
+Berkas dikunci dengan sandi lebih dulu, sehingga boleh dikirim lewat jalur apa pun (WhatsApp ke diri sendiri, Google Drive). Sandinya tidak ikut dikirim: dibaca dari layar mesin asal dan diketik di mesin tujuan. Alat penguncinya (`openssl`) ikut terpasang bersama Git for Windows.
+
+```powershell
+# Mesin asal: kunci berkas (ganti SANDI dengan sandi acak yang panjang)
+& "C:\Program Files\Git\usr\bin\openssl.exe" enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -in rahasia.zip -out rahasia.enc -pass pass:SANDI
+
+# Mesin tujuan: buka kuncinya
+& "C:\Program Files\Git\usr\bin\openssl.exe" enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in rahasia.enc -out rahasia.zip -pass pass:SANDI
+```
+
+Pesan `bad decrypt` berarti sandinya salah ketik. Setelah selesai, hapus berkas `.enc` dari jalur pengiriman dan dari folder unduhan.
