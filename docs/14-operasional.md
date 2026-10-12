@@ -132,6 +132,8 @@ Efek yang wajar setelah pindah: semua lokasi air dinilai ulang pada siklus perta
 | Status air naik padahal airnya biasa | Kalibrasi terlalu lebar, busa pompa, atau aspal mengilap | Lihat pelajaran kalibrasi di `13-catatan-keputusan.md`; uji dengan `probe_camera.py` |
 | `pip install ultralytics` merusak OpenCV | Menarik `opencv-python` (dengan GUI) | Selalu pasang dengan `--no-deps` |
 | Web lokal menampilkan versi lama | Server belum dibangun ulang | `mulai-web.ps1` |
+| Banyak "unggah snapshot gagal: [WinError 10035]" di log | Unggahan serentak lewat satu sambungan HTTP/2 | Sudah diperbaiki: klien Supabase worker memakai HTTP/1.1 (`worker/semarsight_worker/db.py`) |
+| Jam di log worker satu jam lebih maju dari WIB | Zona waktu PC diatur UTC+8 | Tidak memengaruhi data (worker memakai UTC dan WIB secara eksplisit); `status.py` sudah menampilkan WIB |
 
 ## 7. Rahasia
 

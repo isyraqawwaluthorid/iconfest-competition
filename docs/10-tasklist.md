@@ -88,7 +88,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [ ] **T5.2 [K]** `/riwayat` + `/api/export/events` (CSV).
 - [ ] **T5.3 [K]** `/tentang`: cara kerja, atribusi PANTAUSEMAR, batasan, privasi.
 - [ ] **T5.4 [K]** `/replay` dan `/replay/[eventId]`: slider waktu, snapshot, status, kecepatan 1×–60×.
-- [ ] **T5.5 [M+K]** Pindahkan worker ke VPS (systemd, `Restart=always`). *Bukti:* berjalan stabil semalaman.
+- [ ] **T5.5 [M+K]** Pindahkan worker ke VPS (systemd, `Restart=always`). *Bukti:* berjalan stabil semalaman. Sebagian 12 Okt: worker dipindah dari laptop ke PC yang menetap (mulai 12.51 WIB, mesin diatur tidak tidur); **VPS belum**, dan bukti semalaman menyusul 13 Okt pagi.
 - [ ] **T5.6 [K]** Audit empat keadaan (memuat, kosong, error, usang) di semua komponen data; uji mematikan worker.
 - [ ] **T5.7 [K]** `scripts/export_eval_sample.py` + `/admin/label` + `/api/admin/labels`.
 - [ ] **T5.8 [K]** Job malam baseline (`scripts/backfill_baselines.py`) dan sinkronisasi kamera harian (`sources/pantausemar.py`).

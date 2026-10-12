@@ -57,6 +57,7 @@ Terakhir diperbarui: 12 Oktober 2026.
 ### Keandalan
 - Worker menulis log ke berkas bergulir (`FRAMES_DIR/_state/worker.log`), meminta Windows tidak menidurkan mesin, dan menjalankan satu siklus segera setelah mesin terbangun.
 - Hanya **satu worker** yang boleh berjalan. Dua worker membuat data ganda dan biaya AI dobel.
+- **Klien Supabase di worker memakai HTTP/1.1**, bukan HTTP/2 bawaan pustaka. Di PC, 8 utas yang mengunggah lewat satu sambungan HTTP/2 membuat 10–17% unggahan snapshot gagal (WinError 10035). Uji terpisah dengan pola waktu yang sama: HTTP/2 gagal 12 dan 25 dari 64, HTTP/1.1 berhasil 128 dari 128.
 
 ## 4. Web: keputusan teknis
 
@@ -114,3 +115,4 @@ Daftar lengkap dan statusnya ada di `10-tasklist.md`.
 | 11 Okt sore | Dua salah baca AI (Banger-SD-IN, Semarang Indah_OUT) | Kalibrasi dan prompt diperbaiki; lihat pelajaran kalibrasi |
 | 11 Okt 18.10 WIB | Satu siklus terlewat tanpa jejak | Log worker kini ditulis ke berkas |
 | 12 Okt pagi | Empat jeda (total ±4 jam) saat laptop dibawa bepergian | Worker dipindah ke PC yang menetap (lihat `14-operasional.md`) |
+| 12 Okt 12.51 WIB | Worker mulai berjalan di PC (siklus terakhir laptop 12.44); dua siklus pertama gagal mengunggah 23 dan 14 snapshot | Klien Supabase dipindah ke HTTP/1.1; pembacaan kamera dan angka tidak terpengaruh, hanya gambar terbaru kamera itu yang tertinggal satu-dua siklus |
