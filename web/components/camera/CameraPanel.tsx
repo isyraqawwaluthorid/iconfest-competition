@@ -49,8 +49,9 @@ export function CountSummary({ camera }: { camera: CameraOverview }) {
         </dd>
       </div>
       <p className="col-span-3 text-xs text-muted">
-        Angka dari satu gambar terakhir, bukan hitungan presisi. Indeks membandingkan dengan kebiasaan kamera ini
-        {camera.baseline_is_provisional ? " (pembanding sementara: 24 jam terakhir)" : ""}.
+        Angka dari satu gambar terakhir, bukan hitungan presisi. Indeks membandingkan dengan kamera ini pada jam yang
+        sama di hari-hari sebelumnya
+        {camera.baseline_is_provisional ? " (pembanding sementara: kurang dari tiga hari data)" : ""}.
       </p>
     </dl>
   );

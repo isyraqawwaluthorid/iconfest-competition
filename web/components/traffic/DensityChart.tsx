@@ -9,7 +9,7 @@ type Metric = "vehicle_total" | "persons";
 
 const METRIC_LABEL: Record<Metric, string> = { vehicle_total: "Kendaraan terdeteksi", persons: "Orang terdeteksi" };
 
-/** Hitungan per siklus 24 jam terakhir, dengan garis pembanding (median baseline kamera itu sendiri). */
+/** Hitungan per siklus 24 jam terakhir, dengan garis pembanding (median kamera itu sendiri pada jam yang sama di hari sebelumnya). */
 export function DensityChart({ points, metric }: { points: TrafficPoint[]; metric: Metric }) {
   if (points.length < 2) {
     return (

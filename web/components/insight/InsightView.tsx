@@ -13,6 +13,7 @@ import { useLiveAlerts, useLiveCameras, useLiveInsight } from "@/lib/hooks";
 import {
   citySituation,
   cityStats,
+  densityNote,
   formatNumber,
   hasDensity,
   hasWaterStatus,
@@ -238,7 +239,7 @@ export function InsightView({ initialCameras, initialAlerts, initialInsight, wea
                 {tab === "traffic" ? (
                   <Ranking
                     empty="Belum ada titik lalu lintas yang punya pembanding."
-                    note="Indeks kepadatan relatif: jumlah kendaraan pada gambar terakhir dibanding median titik itu sendiri."
+                    note={densityNote(busiest)}
                     rows={busiest.map((site) => ({
                       camera: site,
                       detail: `${formatNumber(site.density_index ?? 0, 2)}× kebiasaan · ${site.vehicle_count ?? 0} kendaraan`,

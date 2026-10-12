@@ -18,7 +18,7 @@ export const THEMES: { id: Theme; label: string; explain: string }[] = [
   {
     id: "traffic",
     label: "Kepadatan lalu lintas",
-    explain: "Median indeks kepadatan relatif kamera lalu lintas di tiap kecamatan, dibanding kebiasaan masing-masing.",
+    explain: "Median indeks kepadatan relatif kamera lalu lintas di tiap kecamatan, dibanding jam yang sama di hari-hari sebelumnya.",
   },
   {
     id: "rain",
@@ -92,6 +92,14 @@ function nearestGrid(district: District, weather: GridWeather[]): GridWeather | 
 
 export function hasWaterStatus(camera: CameraOverview): boolean {
   return camera.water_status != null && camera.water_status !== "tidak_dapat_dinilai";
+}
+
+/** Keterangan pembanding kepadatan; menyebut terus terang bila pembandingnya masih dari kurang dari tiga hari. */
+export function densityNote(cameras: CameraOverview[]): string {
+  const base = "Indeks kepadatan relatif: jumlah kendaraan pada gambar terakhir dibanding titik itu sendiri pada jam yang sama di hari-hari sebelumnya.";
+  return cameras.some((cam) => cam.baseline_is_provisional)
+    ? `${base} Pembanding masih sementara (kurang dari tiga hari data), jadi hari yang sekadar lebih ramai bisa terbaca padat.`
+    : base;
 }
 
 export function hasDensity(camera: CameraOverview): boolean {
@@ -194,7 +202,9 @@ export function cityStats(cameras: CameraOverview[], weather: GridWeather[], sum
       label: "Titik lebih padat dari biasanya",
       value: trafficSites.length > 0 ? String(busy.length) : "–",
       unit: trafficSites.length > 0 ? `/ ${trafficSites.length} titik` : "",
-      hint: "Dibanding kebiasaan tiap titik",
+      hint: trafficSites.some((cam) => cam.baseline_is_provisional)
+        ? "Dibanding jam yang sama di hari sebelumnya; pembanding masih sementara"
+        : "Dibanding jam yang sama di hari-hari sebelumnya",
       tone: "density-normal",
     },
     {

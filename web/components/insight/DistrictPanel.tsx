@@ -110,7 +110,9 @@ export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props)
               <Badge status={DENSITY[densityLevel]} />
             </div>
             <p className="mt-1 text-xs text-muted">
-              Median {trafficSites.length} titik; {busy} ramai atau padat. Indeks relatif, bukan hitungan kendaraan presisi.
+              Median {trafficSites.length} titik; {busy} ramai atau padat. Dibanding jam yang sama di hari-hari sebelumnya
+              {trafficSites.some((site) => site.baseline_is_provisional) ? " (pembanding masih sementara)" : ""}; bukan hitungan
+              kendaraan presisi.
             </p>
           </div>
         )}
