@@ -1,4 +1,5 @@
 from semarsight_worker import alerts
+from semarsight_worker.fusion.upstream import Link
 from semarsight_worker.models import CameraRow
 from semarsight_worker.sources.openmeteo import GridWeather
 
@@ -141,3 +142,28 @@ def test_sync_ignores_uncalibrated_cameras_and_closes_alerts_that_no_longer_appl
     alerts.sync(database, cameras, _weather(G2=1.0))
     assert [(row["type"], row["camera_id"], row["level"]) for row in database.inserted] == [("water_rising", "calibrated", "waspada")]
     assert database.resolved == ["9"]
+
+
+def _link(up: str, down: str, *, lag: int = 15, learned: bool = False) -> Link:
+    return Link(upstream_id=up, downstream_id=down, river_system="Pompa Uji", lag_minutes=lag, lag_is_learned=learned)
+
+
+def test_rising_upstream_site_warns_the_downstream_site():
+    cameras = [_camera("in", name="Pompa Uji-IN"), _camera("out", name="Pompa Uji-OUT")]
+    statuses = {"in": {"water_status": "siaga", "water_trend": "naik_cepat"}, "out": {"water_status": "normal", "water_trend": "stabil"}}
+    [alert] = alerts.upstream_alerts(cameras, statuses, [_link("in", "out")])
+    assert (alert.type, alert.level, alert.camera_id) == ("upstream_warning", "waspada", "out")
+    assert alert.title == "Peringatan dini untuk Pompa Uji-OUT"
+    assert alert.message == (
+        "Hulu Pompa Uji-IN berstatus siaga dan naik cepat; perkiraan dampak di Pompa Uji-OUT dalam sekitar 15 menit (jeda masih perkiraan awal)."
+    )
+    [learned] = alerts.upstream_alerts(cameras, statuses, [_link("in", "out", lag=40, learned=True)])
+    assert learned.message.endswith("dalam sekitar 40 menit.")
+
+
+def test_no_upstream_warning_unless_the_upstream_site_is_raised_and_rising():
+    cameras = [_camera("in"), _camera("out")]
+    links = [_link("in", "out")]
+    assert alerts.upstream_alerts(cameras, {"in": {"water_status": "siaga", "water_trend": "stabil"}}, links) == []
+    assert alerts.upstream_alerts(cameras, {"in": {"water_status": "normal", "water_trend": "naik"}}, links) == []
+    assert alerts.upstream_alerts(cameras, {"in": {"water_status": "siaga", "water_trend": "naik"}}, []) == []

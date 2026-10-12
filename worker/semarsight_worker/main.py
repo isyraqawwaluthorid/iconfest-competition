@@ -155,7 +155,7 @@ def run_cycle(
         ]
     )
     try:
-        alerts.sync(database, all_cameras, weather)
+        alerts.sync(database, all_cameras, weather, water_pipeline.links)
     except Exception:  # noqa: BLE001 - peringatan disusun ulang pada siklus berikutnya
         log.exception("pembaruan peringatan gagal")
 
@@ -178,7 +178,7 @@ def run_cycle(
     if insight_writer is not None:
         # Setelah detak dan log siklus, supaya panggilan LLM tidak membuat siklus tampak lambat.
         try:
-            insight_writer.update(all_cameras, weather, datetime.now(timezone.utc))
+            insight_writer.update(all_cameras, weather, datetime.now(timezone.utc), water_pipeline.links)
         except Exception:  # noqa: BLE001 - insight lama tetap tampil; dicoba lagi pada siklus berikutnya
             log.exception("pembaruan insight gagal")
     return stats

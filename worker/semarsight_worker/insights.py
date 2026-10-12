@@ -23,6 +23,7 @@ from pydantic import ValidationError
 from . import alerts
 from .config import REPO_ROOT, Settings
 from .db import Database
+from .fusion.upstream import Link
 from .models import CameraRow, InsightResult
 from .openai_api import RESPONSES_URL, json_schema_format, output_text
 from .sources.openmeteo import GridWeather
@@ -66,19 +67,41 @@ def build_facts(
     weather: dict[str, GridWeather],
     active_alerts: list[dict[str, Any]],
     now: datetime,
+    links: list[Link] | None = None,
 ) -> dict[str, Any]:
     """Ringkas keadaan terbaru menjadi fakta untuk LLM. Hanya berisi yang benar-benar dikumpulkan sistem."""
+    links = links or []
+    names = {cam.id: cam.name for cam in cameras}
 
     def area(cam: CameraRow) -> str | None:
         local = weather.get(cam.weather_grid_id or "")
         return (local.grid_name or local.grid_id) if local else None
+
+    def relations(cam: CameraRow) -> dict[str, Any]:
+        """Lokasi hulu dan hilir kamera ini, untuk menjelaskan dari mana air datang dan ke mana dampaknya."""
+        return {
+            "upstream": [
+                {"name": names[link.upstream_id], "status": statuses.get(link.upstream_id, {}).get("water_status")}
+                for link in links
+                if link.downstream_id == cam.id and link.upstream_id in names
+            ],
+            "downstream": [
+                {
+                    "name": names[link.downstream_id],
+                    "eta_minutes": link.lag_minutes,
+                    "eta_source": "dipelajari dari kejadian" if link.lag_is_learned else "perkiraan awal",
+                }
+                for link in links
+                if link.upstream_id == cam.id and link.downstream_id in names
+            ],
+        }
 
     sites = [
         (cam, statuses[cam.id])
         for cam in cameras
         if "water" in cam.modules and statuses.get(cam.id, {}).get("water_status")
     ]
-    attention = [_water_fact(cam, status, area(cam), weather) for cam, status in sites if _needs_attention(status)]
+    attention = [_water_fact(cam, status, area(cam), weather) | relations(cam) for cam, status in sites if _needs_attention(status)]
     ranked = sorted((site for site in sites if site[1].get("risk_score") is not None), key=lambda site: -site[1]["risk_score"])
     trash_heavy = [{"camera_id": cam.id, "name": cam.name, "area": area(cam)} for cam, status in sites if status.get("trash") == "banyak"]
 
@@ -121,8 +144,13 @@ def build_facts(
         "Status air adalah penilaian visual AI atas gambar CCTV, bukan pengukuran tinggi air.",
         f"Lokasi air yang dipantau hanya {len(sites)} titik; wilayah tanpa titik pantau tidak diketahui kondisinya.",
     ]
-    if not any(((status.get("risk_components") or {}).get("inputs") or {}).get("upstream_status") for _, status in sites):
+    if not links:
         limits.append("Hubungan hulu-hilir antar lokasi belum diisi, jadi pengaruh kondisi hulu belum ikut dihitung dalam skor risiko.")
+    else:
+        limits.append(
+            f"Hubungan hulu-hilir baru diisi untuk {len(links)} pasangan lokasi; lokasi lain belum memperhitungkan kondisi hulu. "
+            "Jeda waktu hulu ke hilir masih perkiraan awal kecuali disebut dipelajari dari kejadian."
+        )
     if traffic_fact["baseline"] == "sementara":
         limits.append(
             "Pembanding kepadatan lalu lintas masih sementara (kurang dari tiga hari data pada jam yang sama), "
@@ -327,12 +355,14 @@ class InsightWriter:
         if self.enabled:
             self._restore()
 
-    def update(self, cameras: list[CameraRow], weather: dict[str, GridWeather], now: datetime) -> bool:
+    def update(
+        self, cameras: list[CameraRow], weather: dict[str, GridWeather], now: datetime, links: list[Link] | None = None
+    ) -> bool:
         """Dipanggil sekali per siklus, setelah status dan peringatan diperbarui. True jika insight baru ditulis."""
         if not self.enabled:
             return False
         facts = build_facts(
-            cameras, self._database.insight_inputs(), weather, self._database.active_alerts(alerts.MANAGED_TYPES), now
+            cameras, self._database.insight_inputs(), weather, self._database.active_alerts(alerts.MANAGED_TYPES), now, links
         )
         reason = self._reason(facts, now)
         if reason is None:

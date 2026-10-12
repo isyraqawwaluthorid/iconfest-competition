@@ -35,6 +35,10 @@ class FakeDatabase:
         ]
         self.inserted: list[dict] = []
         self.reads = 0
+        self.links: list[dict] = []
+
+    def river_links(self) -> list[dict]:
+        return self.links
 
     def latest_water_call_times(self) -> dict:
         return {}
@@ -138,3 +142,27 @@ def test_an_ai_reading_updates_status_trend_and_risk_together():
     assert update["risk_score"] == pytest.approx(0.68)
     assert update["risk_level"] == "tinggi"
     assert len(database.inserted) == 1
+
+
+def test_upstream_status_raises_the_risk_of_the_downstream_site():
+    database = FakeDatabase(["normal", "normal", "normal"])
+    database.links = [
+        {"upstream_camera_id": "hulu", "downstream_camera_id": "cam-1", "river_system": "Pompa Uji", "default_lag_minutes": 15, "learned_lag_minutes": None}
+    ]
+    pipeline = WaterPipeline(SETTINGS, database, _weather(0.0))
+    at = NOW + timedelta(minutes=5)
+    results = [
+        CameraResult(camera=_camera(id="hulu", name="Pompa Uji-IN"), checked_at=at, health="live"),
+        CameraResult(camera=_camera(), checked_at=at, health="live"),
+    ]
+
+    calm = pipeline.commit(results, {"hulu": {"water_status": "normal"}, "cam-1": {"water_status": "normal"}})["cam-1"]
+    assert calm["risk_score"] == 0.0
+    assert calm["risk_components"]["inputs"]["upstream_name"] == "Pompa Uji-IN"
+
+    updates = pipeline.commit(results, {"hulu": {"water_status": "siaga"}, "cam-1": {"water_status": "normal"}})
+    downstream = updates["cam-1"]
+    assert downstream["risk_components"]["upstream"] == 0.7
+    assert downstream["risk_score"] == pytest.approx(0.14)  # 0,7 x bobot hulu 20%
+    assert downstream["risk_components"]["inputs"]["upstream_status"] == "siaga"
+    assert "upstream_name" not in updates["hulu"]["risk_components"]["inputs"]  # lokasi hulu sendiri tidak punya hulu

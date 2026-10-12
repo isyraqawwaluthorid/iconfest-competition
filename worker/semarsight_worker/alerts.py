@@ -12,13 +12,14 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .db import Database
+from .fusion.upstream import Link, worst_upstream
 from .models import CameraRow
 from .sources.openmeteo import GridWeather
 
 log = logging.getLogger(__name__)
 
 # Jenis yang dikelola modul ini. Jenis lain di tabel `alerts` tidak disentuh.
-MANAGED_TYPES = ("water_rising", "road_flooded", "heavy_rain", "trash_blockage", "camera_offline")
+MANAGED_TYPES = ("water_rising", "road_flooded", "upstream_warning", "heavy_rain", "trash_blockage", "camera_offline")
 
 ELEVATED = ("waspada", "siaga", "awas")
 HEAVY_RAIN_MM = 10.0  # prakiraan 3 jam ke depan yang memunculkan peringatan hujan
@@ -157,6 +158,37 @@ def offline_alerts(cameras: list[CameraRow], statuses: dict[str, dict[str, Any]]
     return alerts
 
 
+def upstream_alerts(cameras: list[CameraRow], statuses: dict[str, dict[str, Any]], links: list[Link]) -> list[Alert]:
+    """Peringatan dini untuk lokasi hilir saat lokasi hulunya waspada ke atas dan sedang naik."""
+    by_id = {cam.id: cam for cam in cameras}
+    rising = {
+        camera_id: status["water_status"]
+        for camera_id, status in statuses.items()
+        if status.get("water_status") in ELEVATED and status.get("water_trend") in ("naik", "naik_cepat")
+    }
+    alerts = []
+    for downstream_id in dict.fromkeys(link.downstream_id for link in links):
+        found = worst_upstream(downstream_id, links, rising)
+        if found is None or downstream_id not in by_id or found[0].upstream_id not in by_id:
+            continue
+        link, level = found
+        source, target = by_id[link.upstream_id], by_id[downstream_id]
+        trend = TREND_TEXT[statuses[link.upstream_id]["water_trend"]]
+        estimate = "" if link.lag_is_learned else " (jeda masih perkiraan awal)"
+        alerts.append(
+            Alert(
+                type="upstream_warning",
+                level="waspada",
+                camera_id=downstream_id,
+                title=f"Peringatan dini untuk {target.name}",
+                message=f"Hulu {source.name} berstatus {level} dan {trend}; perkiraan dampak di {target.name} dalam sekitar {link.lag_minutes} menit{estimate}.",
+                audience=("bpbd", "pu", "warga"),
+                data={"upstream_camera_id": link.upstream_id, "upstream_status": level, "lag_minutes": link.lag_minutes, "lag_is_learned": link.lag_is_learned},
+            )
+        )
+    return alerts
+
+
 def reconcile(desired: list[Alert], active: list[dict[str, Any]]) -> Changes:
     """Bandingkan peringatan yang seharusnya aktif dengan yang aktif di database."""
     current = {(row["type"], row["camera_id"]): row for row in active}
@@ -177,7 +209,7 @@ def reconcile(desired: list[Alert], active: list[dict[str, Any]]) -> Changes:
     return Changes(insert=insert, update=update, resolve=[row["id"] for row in current.values()])
 
 
-def sync(database: Database, cameras: list[CameraRow], weather: dict[str, GridWeather]) -> Changes:
+def sync(database: Database, cameras: list[CameraRow], weather: dict[str, GridWeather], links: list[Link] | None = None) -> Changes:
     """Hitung peringatan dari keadaan terbaru lalu tulis selisihnya. Dipanggil sekali per siklus.
 
     `cameras` harus berisi semua kamera aktif, bukan hanya yang diproses siklus ini: peringatan
@@ -189,6 +221,7 @@ def sync(database: Database, cameras: list[CameraRow], weather: dict[str, GridWe
     desired = [
         *water_alerts(water_cameras, statuses, weather),
         *trash_alerts(water_cameras, statuses, weather),
+        *upstream_alerts(water_cameras, statuses, links or []),
         *offline_alerts(cameras, statuses),
     ]
     rain = rain_alert(weather, already_active=any(row["type"] == "heavy_rain" for row in active))

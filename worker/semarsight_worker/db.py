@@ -170,6 +170,14 @@ class Database:
         )
         return response.data
 
+    def river_links(self) -> list[dict[str, Any]]:
+        response = (
+            self._client.table("river_links")
+            .select("upstream_camera_id, downstream_camera_id, river_system, default_lag_minutes, learned_lag_minutes")
+            .execute()
+        )
+        return response.data
+
     def insight_inputs(self) -> dict[str, dict[str, Any]]:
         """Keadaan `camera_status` terbaru, sebatas kolom yang dirangkum menjadi fakta insight."""
         response = (

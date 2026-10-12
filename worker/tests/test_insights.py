@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from semarsight_worker import insights
+from semarsight_worker.fusion.upstream import Link
 from semarsight_worker.models import CameraRow, InsightResult
 from semarsight_worker.sources.openmeteo import GridWeather
 
@@ -260,3 +261,15 @@ def test_writer_is_disabled_without_a_key_or_in_dry_run(monkeypatch):
     assert writer.enabled is False
     assert writer.update(CAMERAS, _weather(), NOW) is False
     assert calls == []
+
+
+def test_facts_name_the_upstream_and_downstream_sites_of_a_site_needing_attention():
+    cameras = [_camera("a", "Pompa A-IN"), _camera("b", "Pompa A-OUT")]
+    statuses = {"a": _status(water_status="siaga", water_trend="naik"), "b": _status()}
+    link = Link(upstream_id="a", downstream_id="b", river_system="Pompa A", lag_minutes=15, lag_is_learned=False)
+    facts = insights.build_facts(cameras, statuses, _weather(), [], NOW, [link])
+    [site] = facts["water"]["attention"]
+    assert site["downstream"] == [{"name": "Pompa A-OUT", "eta_minutes": 15, "eta_source": "perkiraan awal"}]
+    assert site["upstream"] == []
+    assert any("1 pasangan lokasi" in note for note in facts["limits"])
+    assert any("belum diisi" in note for note in _facts()["limits"])

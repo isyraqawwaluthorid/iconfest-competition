@@ -23,14 +23,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from semarsight_worker import alerts, insights  # noqa: E402
 from semarsight_worker.config import get_settings  # noqa: E402
 from semarsight_worker.db import Database  # noqa: E402
-from semarsight_worker.fusion import risk  # noqa: E402
+from semarsight_worker.fusion import risk, upstream  # noqa: E402
 from semarsight_worker.main import refresh_weather  # noqa: E402
 
 
-def simulate_rising(cameras, statuses, weather, now) -> list[dict]:
+def simulate_rising(cameras, statuses, weather, now, links) -> list[dict]:
     """Ubah keadaan di memori menjadi kejadian air naik, lalu susun peringatannya dengan aturan yang sama dengan worker."""
     sites = [cam for cam in cameras if "water" in cam.modules and cam.is_calibrated and statuses.get(cam.id, {}).get("water_status")]
-    pump = next(cam for cam in sites if cam.water_kind != "jalan")
+    upstream_ids = {link.upstream_id for link in links}
+    # Lokasi yang punya hilir didahulukan, supaya peringatan dini hulu → hilir ikut teruji.
+    pump = next((cam for cam in sites if cam.id in upstream_ids), None) or next(cam for cam in sites if cam.water_kind != "jalan")
     road = next(cam for cam in sites if cam.water_kind == "jalan")
     for grid_id in {pump.weather_grid_id, road.weather_grid_id} - {None}:
         weather[grid_id] = replace(weather[grid_id], precip_now_mm=6.2, precip_next_1h_mm=9.4, precip_next_3h_mm=18.5, precip_prob_max_3h=90)
@@ -52,6 +54,7 @@ def simulate_rising(cameras, statuses, weather, now) -> list[dict]:
     desired = [
         *alerts.water_alerts(sites, statuses, weather),
         *alerts.trash_alerts(sites, statuses, weather),
+        *alerts.upstream_alerts(sites, statuses, links),
         alerts.rain_alert(weather, already_active=False),
     ]
     return [
@@ -71,11 +74,12 @@ def main() -> None:
     weather: dict = {}
     refresh_weather(database, weather)
     active = database.active_alerts(alerts.MANAGED_TYPES)
+    links = upstream.links_from_rows(database.river_links())
     if "naik" in args:
-        active = simulate_rising(cameras, statuses, weather, now)
+        active = simulate_rising(cameras, statuses, weather, now, links)
         print("=== KEADAAN BUATAN (tidak ditulis ke mana pun) ===")
 
-    facts = insights.build_facts(cameras, statuses, weather, active, now)
+    facts = insights.build_facts(cameras, statuses, weather, active, now, links)
     print(json.dumps(facts, ensure_ascii=False, indent=2))
     if "--facts" in args:
         return

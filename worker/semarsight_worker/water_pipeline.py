@@ -21,7 +21,7 @@ import numpy as np
 from .analyzers import water
 from .config import Settings
 from .db import Database
-from .fusion import risk, smoothing, trend
+from .fusion import risk, smoothing, trend, upstream
 from .models import CameraResult, CameraRow, QualityResult, VisionResult
 from .sources.openmeteo import GridWeather
 
@@ -53,6 +53,7 @@ class WaterPipeline:
         self._scores: dict[str, deque[float]] = defaultdict(lambda: deque(maxlen=RECENT_SCORES))
         self._levels: dict[str, list[tuple[datetime, int]]] = {}  # riwayat level per kamera, terbaru dulu
         self._references: dict[str, tuple[float, np.ndarray | None]] = {}
+        self.links: list[upstream.Link] = []  # hubungan hulu → hilir; dibaca ulang tiap siklus
         self._lock = threading.Lock()
         self._calls_day: date | None = None
         self._calls_today = 0
@@ -118,6 +119,13 @@ class WaterPipeline:
 
     def commit(self, results: list[CameraResult], previous_status: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
         """Simpan pembacaan siklus ini dan kembalikan kolom `camera_status` yang berubah, per kamera."""
+        try:
+            self.links = upstream.links_from_rows(self._database.river_links())
+        except Exception:  # noqa: BLE001 - hubungan terakhir yang diketahui tetap dipakai
+            log.exception("hubungan hulu-hilir gagal dibaca")
+        names = {result.camera.id: result.camera.name for result in results}
+        # Status terkonfirmasi semua lokasi setelah siklus ini; diisi di putaran pertama, dipakai untuk kondisi hulu.
+        confirmed_now = {camera_id: row.get("water_status") for camera_id, row in previous_status.items()}
         updates: dict[str, dict[str, Any]] = {}
         for result in results:
             observation = result.water
@@ -153,24 +161,29 @@ class WaterPipeline:
                 "trash": vision.trash,
                 "water_confidence": vision.confidence,
                 "needs_verification": needs_verification,
-            } | self._outlook(cam, confirmed, result.checked_at)
+            }
             if confirmed != before.get("water_status"):
                 update["water_status_since"] = result.checked_at.isoformat()
                 log.info("%s: status air %s -> %s", cam.name, before.get("water_status"), confirmed)
             updates[cam.id] = update
+            confirmed_now[cam.id] = confirmed
 
-        # Tren dan risiko bergantung pada waktu dan prakiraan hujan, jadi dihitung ulang setiap siklus
-        # walau AI tidak dipanggil. Kamera yang sedang mati dilewati: status airnya sudah tidak segar.
+        # Tren dan risiko bergantung pada waktu, prakiraan hujan, dan kondisi hulu, jadi dihitung ulang setiap
+        # siklus walau AI tidak dipanggil. Kamera yang sedang mati dilewati: status airnya sudah tidak segar.
         for result in results:
             cam = result.camera
-            if cam.id in updates or result.health != "live" or not self.eligible(cam):
+            if cam.id not in updates and (result.health != "live" or not self.eligible(cam)):
                 continue
-            confirmed = previous_status.get(cam.id, {}).get("water_status")
-            if confirmed is None:
+            confirmed = confirmed_now.get(cam.id)
+            if confirmed is None and cam.id not in updates:
                 continue
             if cam.id not in self._levels:
                 self._load_readings(cam)
-            updates[cam.id] = self._outlook(cam, confirmed, result.checked_at)
+            above = upstream.worst_upstream(cam.id, self.links, confirmed_now)
+            outlook = self._outlook(cam, confirmed, result.checked_at, above[1] if above else None)
+            if above and outlook["risk_components"]:
+                outlook["risk_components"]["inputs"]["upstream_name"] = names.get(above[0].upstream_id)
+            updates[cam.id] = updates.get(cam.id, {}) | outlook
         return updates
 
     def _load_readings(self, cam: CameraRow) -> list[smoothing.Reading]:
@@ -193,13 +206,13 @@ class WaterPipeline:
         ]
         return readings
 
-    def _outlook(self, cam: CameraRow, confirmed: str | None, at: datetime) -> dict[str, Any]:
-        """Tren dan skor risiko satu lokasi dari status terkonfirmasi, riwayat level, dan prakiraan hujan."""
+    def _outlook(self, cam: CameraRow, confirmed: str | None, at: datetime, upstream_status: str | None) -> dict[str, Any]:
+        """Tren dan skor risiko satu lokasi dari status terkonfirmasi, riwayat level, kondisi hulu, dan prakiraan hujan."""
         confirmed_level = smoothing.LEVELS.index(confirmed) if confirmed in smoothing.LEVELS else None
         water_trend = trend.water_trend(confirmed_level, self._levels.get(cam.id, []), at)
         local_weather = self._weather.get(cam.weather_grid_id or "")
-        # Kondisi hulu masih kosong sampai hubungan hulu-hilir (river_links) diisi.
-        assessed = risk.risk_score(confirmed, water_trend, None, local_weather.precip_next_3h_mm if local_weather else None)
+        rain_next_3h = local_weather.precip_next_3h_mm if local_weather else None
+        assessed = risk.risk_score(confirmed, water_trend, upstream_status, rain_next_3h)
         return {
             "water_trend": water_trend,
             "risk_score": assessed.score if assessed else None,
