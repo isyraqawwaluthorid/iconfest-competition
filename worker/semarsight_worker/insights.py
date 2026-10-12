@@ -50,7 +50,7 @@ LEVEL_ORDER = ("normal", *ELEVATED)
 RISING = ("naik", "naik_cepat")
 FLOODED = ("genangan_ringan", "genangan_sedang", "genangan_tinggi")
 RAIN_CLASS_BOUNDS = (1.0, 5.0, 10.0, 20.0)  # sama dengan kelas hujan di peta web
-RAIN_CLASSES = ("tidak_hujan", "ringan", "sedang", "lebat", "sangat_lebat")
+RAIN_CLASSES = ("tidak hujan", "ringan", "sedang", "lebat", "sangat lebat")  # ditulis apa adanya oleh LLM
 LEVEL_RANK = {"aman": 0, "perlu_perhatian": 1, "waspada": 2, "siaga": 3, "awas": 4}
 ITEM_RANK = {"info": 0, "waspada": 1, "siaga": 2, "awas": 3}
 # Tingkat tertinggi yang boleh dipakai satu item, mengikuti tingkat keseluruhan dari aturan.

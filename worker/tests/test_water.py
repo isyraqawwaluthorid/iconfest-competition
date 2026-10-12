@@ -105,3 +105,50 @@ def test_unknown_fields_or_values_are_rejected():
         VisionResult.model_validate(good | {"extra": 1})
     with pytest.raises(ValueError):
         VisionResult.model_validate(good | {"confidence": 1.4})
+
+
+def _vision(status: str = "normal", confidence: float = 0.8, road_flood: str = "tidak_relevan") -> VisionResult:
+    return VisionResult(
+        image_usable=True, status=status, road_flood=road_flood, trash="tidak_terlihat", water_position="-",
+        change_vs_reference="sama" if status == "normal" else "jauh_lebih_tinggi", confidence=confidence, reason=f"dinilai {status}",
+    )  # fmt: skip
+
+
+def _twice(monkeypatch, answers: list[VisionResult], **camera) -> tuple[VisionResult, dict, int]:
+    """Jalankan penilaian dengan jawaban AI yang sudah ditentukan; kembalikan hasil, raw, dan jumlah panggilan."""
+    calls = iter(answers)
+    count = []
+
+    def fake(*args, **kwargs):
+        count.append(1)
+        answer = next(calls)
+        return answer, {"output": answer.model_dump()}
+
+    monkeypatch.setattr(water, "classify_with_ai", fake)
+    result, raw = water.classify_twice_if_raised(_frame(), None, _camera(**camera), None, NOW, api_key="k", model="m")
+    return result, raw, len(count)
+
+
+def test_a_normal_reading_is_not_assessed_twice(monkeypatch):
+    result, raw, calls = _twice(monkeypatch, [_vision("normal")])
+    assert (result.status, calls, "recheck" in raw) == ("normal", 1, False)
+
+
+def test_a_raised_reading_counts_only_when_the_same_image_is_judged_raised_again(monkeypatch):
+    result, raw, calls = _twice(monkeypatch, [_vision("awas", 0.8), _vision("siaga", 0.7)])
+    assert (result.status, result.confidence, calls) == ("siaga", 0.7, 2)  # level terendah, keyakinan terkecil
+    assert raw["recheck"]["output"]["status"] == "siaga"
+
+
+def test_disagreeing_readings_of_the_same_image_are_not_trusted(monkeypatch):
+    result, _, calls = _twice(monkeypatch, [_vision("awas", 0.8), _vision("normal", 0.85)])
+    assert (result.status, calls) == ("normal", 2)
+    assert result.confidence == water.INCONSISTENT_CONFIDENCE  # di bawah ambang: tidak dihitung, ditandai perlu diperiksa
+    assert result.reason.startswith("Dua penilaian atas gambar yang sama tidak sepakat (awas, lalu normal).")
+
+
+def test_road_cameras_are_rechecked_on_a_flooded_road(monkeypatch):
+    flooded = _vision("waspada", 0.8, road_flood="genangan_ringan")
+    dry = _vision("normal", 0.9, road_flood="tidak_tergenang")
+    result, _, calls = _twice(monkeypatch, [flooded, dry], water_kind="jalan")
+    assert (result.road_flood, calls, result.confidence) == ("tidak_tergenang", 2, water.INCONSISTENT_CONFIDENCE)

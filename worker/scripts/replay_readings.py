@@ -80,7 +80,7 @@ def main() -> None:
         taken = datetime.fromisoformat(row["captured_at"])
         frame = load(row["snapshot_path"])
         assessed = quality.assess(frame, taken)
-        result, _ = water.classify_with_ai(
+        result, _ = water.classify_twice_if_raised(
             frame, references[assessed.is_night], cam, assessed, taken, api_key=settings.openai_api_key, model=settings.openai_vision_model
         )
         return cam, row, assessed, result

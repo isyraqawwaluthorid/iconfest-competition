@@ -104,7 +104,7 @@ class WaterPipeline:
         if trigger is None or not self._take_call_slot(at):
             return None
 
-        result, raw = water.classify_with_ai(
+        result, raw = water.classify_twice_if_raised(
             frame,
             self._reference(cam, quality.is_night),
             cam,

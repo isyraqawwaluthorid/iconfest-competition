@@ -40,6 +40,10 @@ LABEL_SPACING = 14  # jarak vertikal minimal antar label garis, dalam piksel
 CROP_MARGIN = 0.04  # ruang ekstra di sekeliling area, dalam porsi lebar/tinggi frame
 AI_TIMEOUT_SECONDS = 45
 MAX_ATTEMPTS = 2  # satu percobaan ulang, tidak lebih
+MAX_OUTPUT_TOKENS = 1200  # termasuk token penalaran; batas 700 sesekali memotong jawaban menjadi JSON tidak utuh
+RAISED_STATUS = ("waspada", "siaga", "awas")
+RAISED_ROAD_FLOOD = ("genangan_ringan", "genangan_sedang", "genangan_tinggi")
+INCONSISTENT_CONFIDENCE = 0.45  # di bawah ambang penghalusan: penilaian yang tidak konsisten tidak dihitung
 
 # Garis acuan: (label di gambar, warna BGR)
 LEVEL_STYLE = {
@@ -210,7 +214,7 @@ def classify_with_ai(
         "reasoning": {"effort": "low"},
         "input": [{"role": "user", "content": content}],
         "text": {"format": json_schema_format(_schema())},
-        "max_output_tokens": 700,
+        "max_output_tokens": MAX_OUTPUT_TOKENS,
     }
 
     failure = "tidak diketahui"
@@ -237,6 +241,44 @@ def classify_with_ai(
             failure = f"output tidak valid ({type(exc).__name__})"
     log.warning("%s: penilaian AI gagal: %s", cam.name, failure)
     return VisionResult.failed(failure), {"error": failure}
+
+
+def is_raised(result: VisionResult, cam: CameraRow) -> bool:
+    """Penilaian ini menyatakan keadaan di atas normal: status naik, atau jalan tergenang untuk kamera jalan."""
+    if cam.water_kind == "jalan":
+        return result.road_flood in RAISED_ROAD_FLOOD
+    return result.status in RAISED_STATUS
+
+
+def classify_twice_if_raised(
+    frame: np.ndarray,
+    reference: np.ndarray | None,
+    cam: CameraRow,
+    quality: QualityResult,
+    captured_at: datetime,
+    *,
+    api_key: str,
+    model: str,
+) -> tuple[VisionResult, dict]:
+    """Nilai kondisi air; bila hasilnya di atas normal, nilai sekali lagi gambar yang sama.
+
+    Penilaian AI atas gambar yang sulit (busa, melawan cahaya, senja) tidak selalu sama bila diulang:
+    gambar yang sama bisa dinilai "awas" lalu "normal". Penilaian naik baru dipakai bila dua penilaian
+    atas gambar itu sepakat; jika tidak, hasilnya diberi keyakinan rendah supaya tidak dihitung dan
+    lokasi ditandai perlu diperiksa. Penilaian normal tidak diulang, jadi biayanya hanya saat ada yang naik.
+    """
+    first, raw = classify_with_ai(frame, reference, cam, quality, captured_at, api_key=api_key, model=model)
+    if not is_raised(first, cam):
+        return first, raw
+    second, raw_second = classify_with_ai(frame, reference, cam, quality, captured_at, api_key=api_key, model=model)
+    raw = raw | {"recheck": raw_second}
+    if is_raised(second, cam):
+        # Keduanya menilai naik: ambil yang levelnya lebih rendah dan keyakinan yang lebih kecil.
+        lower = min(first, second, key=lambda r: (RAISED_STATUS.index(r.status) if r.status in RAISED_STATUS else -1))
+        return lower.model_copy(update={"confidence": min(first.confidence, second.confidence)}), raw
+    log.info("%s: penilaian ulang gambar yang sama tidak sepakat (%s lalu %s)", cam.name, first.status, second.status)
+    reason = f"Dua penilaian atas gambar yang sama tidak sepakat ({first.status}, lalu {second.status}). {second.reason}"
+    return second.model_copy(update={"confidence": min(second.confidence, INCONSISTENT_CONFIDENCE), "reason": reason[:200]}), raw
 
 
 def _camera_card(cam: CameraRow, quality: QualityResult, captured_at: datetime, *, has_reference: bool) -> str:

@@ -66,7 +66,7 @@ def main() -> None:
         taken = datetime.strptime(path.parent.name + path.stem, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
         assessed = quality.assess(frame, taken)
         cv2.imwrite(str(settings.frames_dir.parent / "probe_crop.jpg"), water.annotated_crop(frame, camera))
-        result, _ = water.classify_with_ai(
+        result, _ = water.classify_twice_if_raised(
             frame,
             references[assessed.is_night],
             camera,

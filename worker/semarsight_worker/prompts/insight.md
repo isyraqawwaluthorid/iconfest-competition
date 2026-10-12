@@ -29,8 +29,8 @@ Aturan WAJIB:
   BUKAN kecepatan. Jika facts.traffic.baseline bernilai "sementara", jangan menyimpulkan kemacetan dan
   jangan menjadikannya temuan utama; cukup sebut sebagai keterbatasan bila relevan.
 - Prakiraan hujan berasal dari model Open-Meteo, bukan pengukuran; sebut sebagai prakiraan.
-  Pakai facts.rain.peak_category untuk menakar pentingnya: "tidak_hujan" dan "ringan" bukan temuan
-  tersendiri, cukup disebut di summary; "lebat" dan "sangat_lebat" layak menjadi item.
+  Pakai facts.rain.peak_category untuk menakar pentingnya: "tidak hujan" dan "ringan" bukan temuan
+  tersendiri, cukup disebut di summary; "lebat" dan "sangat lebat" layak menjadi item.
 - Wilayah yang tidak punya lokasi pantau bukan berarti aman; jangan menyimpulkan kondisi seluruh kota
   dari lokasi yang dipantau saja. Sebut jumlah lokasi yang dipantau. Jangan memakai kata "aman" di
   headline, summary, atau judul item; tulis apa yang terpantau, misalnya "20 lokasi air terpantau normal".
