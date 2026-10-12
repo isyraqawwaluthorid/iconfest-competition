@@ -4,12 +4,14 @@ import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { activityBreaks, buildHexes, hourWib, type ActivityMetric, type ActivityProfile } from "@/lib/activity";
-import { useLiveCameras, useNow } from "@/lib/hooks";
+import { emissionRows, EMISSION_LEVELS, type Pollutant } from "@/lib/emission";
+import { useClassCounts, useLiveCameras, useNow } from "@/lib/hooks";
 import { roadRows, trafficSituation } from "@/lib/traffic";
 import type { CameraOverview } from "@/lib/types";
 import { ActivityPanels } from "./ActivityPanels";
+import { EmissionPanels } from "./EmissionPanels";
 import { RoadPanels } from "./RoadPanels";
-import type { Layer, Scope } from "./TrafficMap";
+import type { Layer, RoadPaint, Scope } from "./TrafficMap";
 
 // Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
 const TrafficMap = dynamic(() => import("./TrafficMap"), {
@@ -20,6 +22,7 @@ const TrafficMap = dynamic(() => import("./TrafficMap"), {
 const LAYERS: { id: Layer; label: string }[] = [
   { id: "roads", label: "Ruas jalan" },
   { id: "activity", label: "Aktivitas per jam" },
+  { id: "emission", label: "Beban emisi" },
 ];
 const SCOPES: { id: Scope; label: string }[] = [
   { id: "center", label: "Pusat kota" },
@@ -34,8 +37,9 @@ type Props = {
 };
 
 /**
- * Halaman Lalu Lintas: peta memenuhi layar dengan dua lapisan. "Ruas jalan" menjawab seberapa padat tiap ruas
- * sekarang; "Aktivitas per jam" menjawab kawasan mana yang biasanya ramai pada jam tertentu.
+ * Halaman Lalu Lintas: peta memenuhi layar dengan tiga lapisan. "Ruas jalan" menjawab seberapa padat tiap ruas
+ * sekarang; "Aktivitas per jam" menjawab kawasan mana yang biasanya ramai pada jam tertentu; "Beban emisi"
+ * menjawab ruas mana yang estimasi beban emisinya paling berat dibanding ruas lain.
  */
 export function TrafficView({ initialCameras, profile }: Props) {
   const cameras = useLiveCameras(initialCameras);
@@ -65,6 +69,15 @@ export function TrafficView({ initialCameras, profile }: Props) {
     [hexes, breaks, hour, selectedHex],
   );
 
+  const [pollutant, setPollutant] = useState<Pollutant>("co2");
+  // Hitungan per jenis kendaraan hanya dimuat saat lapisan emisi dibuka.
+  const counts = useClassCounts(layer === "emission");
+  const emission = useMemo(() => (counts.rows ? emissionRows(rows, counts.rows, pollutant) : null), [rows, counts.rows, pollutant]);
+  const emissionPaint: RoadPaint = useMemo(
+    () => new Map((emission ?? []).map((item) => [item.row.camera.id, { level: item.level, label: EMISSION_LEVELS[item.level - 1] }])),
+    [emission],
+  );
+
   const group = "flex gap-1";
   const button = (active: boolean) =>
     `rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
@@ -74,7 +87,15 @@ export function TrafficView({ initialCameras, profile }: Props) {
   return (
     <div className="relative flex flex-1 flex-col lg:min-h-[40rem]">
       <section aria-label="Peta lalu lintas" className="relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto">
-        <TrafficMap layer={layer} rows={rows} selected={selectedRoad} scope={scope} onSelect={setSelectedRoad} activity={activity} />
+        <TrafficMap
+          layer={layer}
+          rows={rows}
+          selected={selectedRoad}
+          scope={scope}
+          onSelect={setSelectedRoad}
+          activity={activity}
+          emission={emissionPaint}
+        />
 
         <div className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2 overflow-x-auto p-1">
           <div role="group" aria-label="Lapisan peta" className={group}>
@@ -106,6 +127,15 @@ export function TrafficView({ initialCameras, profile }: Props) {
 
       {layer === "roads" ? (
         <RoadPanels rows={rows} situation={situation} latest={latest} selected={selectedRoad} onSelect={setSelectedRoad} />
+      ) : layer === "emission" ? (
+        <EmissionPanels
+          rows={emission}
+          error={counts.error}
+          pollutant={pollutant}
+          selected={selectedRoad}
+          onPollutant={setPollutant}
+          onSelect={setSelectedRoad}
+        />
       ) : (
         <ActivityPanels
           profile={profile}

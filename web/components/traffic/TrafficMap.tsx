@@ -8,8 +8,11 @@ import { CENTER_BOUNDS, ROADS_BOUNDS, segmentBounds } from "@/lib/geo/roads";
 import { formatNumber } from "@/lib/insight";
 import type { RoadRow } from "@/lib/traffic";
 
-/** Yang digambar di peta: ruas jalan berwarna kepadatan, atau heksagon aktivitas pada jam yang dipilih. */
-export type Layer = "roads" | "activity";
+/** Yang digambar di peta: ruas berwarna kepadatan, heksagon aktivitas pada jam yang dipilih, atau ruas berwarna beban emisi. */
+export type Layer = "roads" | "activity" | "emission";
+
+/** Warna ruas pengganti warna kepadatan: tingkat beban emisi (1 sampai 5) dan labelnya, per id kamera. */
+export type RoadPaint = Map<string, { level: number; label: string }>;
 
 /** Cakupan peta: pusat kota (bingkai awal, cukup dekat untuk melihat bentuk jalan) atau semua ruas. */
 export type Scope = "center" | "city";
@@ -25,6 +28,8 @@ type Props = {
   scope: { kind: Scope; at: number };
   onSelect: (cameraId: string) => void;
   activity: ActivityView;
+  /** Tingkat beban emisi tiap ruas, dipakai lapisan "emission"; ruas yang tidak ada di sini digambar abu-abu. */
+  emission: RoadPaint;
 };
 
 const SCOPE_BOUNDS = { center: CENTER_BOUNDS, city: ROADS_BOUNDS };
@@ -66,7 +71,7 @@ function Focus({ rows, selected, scope, activity }: Pick<Props, "rows" | "select
 }
 
 /** Peta halaman Lalu Lintas: ruas jalan per kamera, atau heksagon aktivitas. Hanya dirender di browser (lihat TrafficView). */
-export default function TrafficMap({ layer, rows, selected, scope, onSelect, activity }: Props) {
+export default function TrafficMap({ layer, rows, selected, scope, onSelect, activity, emission }: Props) {
   const initialFraming = useMemo(() => framing(), []);
   // Yang digambar belakangan berada di atas: ruas tanpa nilai dulu, yang paling padat terakhir, yang dipilih paling atas.
   const ordered = useMemo(
@@ -93,12 +98,26 @@ export default function TrafficMap({ layer, rows, selected, scope, onSelect, act
       <AttributionControl position="bottomleft" />
       <ZoomControl position="bottomleft" />
       <Focus rows={rows} selected={selected} scope={scope} activity={activity} />
-      {layer === "activity" ? <ActivityHexes {...activity} /> : <Roads rows={ordered} selected={selected} onSelect={onSelect} />}
+      {layer === "activity" ? (
+        <ActivityHexes {...activity} />
+      ) : (
+        <Roads rows={ordered} selected={selected} onSelect={onSelect} paint={layer === "emission" ? emission : null} />
+      )}
     </MapContainer>
   );
 }
 
-function Roads({ rows: ordered, selected, onSelect }: Pick<Props, "rows" | "selected" | "onSelect">) {
+type RoadsProps = Pick<Props, "rows" | "selected" | "onSelect"> & { paint: RoadPaint | null };
+
+function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
+  // Tanpa `paint` ruas berwarna tingkat kepadatan; dengan `paint` berwarna tingkat beban emisi (abu-abu bila tidak ada).
+  const look = ({ camera, status }: RoadRow) => {
+    if (!paint) return { line: `tone-${status.tone}`, dot: `tone-${status.tone}`, label: status.label };
+    const painted = paint.get(camera.id);
+    return painted
+      ? { line: `emission-${painted.level}`, dot: "tone-unknown", label: `beban ${painted.label.toLowerCase()}` }
+      : { line: "tone-unknown", dot: "tone-unknown", label: "tidak ada gambar" };
+  };
   return (
     <>
       {/* Tepi putih semua ruas di lapisan bawah, supaya tepi satu ruas tidak menutupi warna ruas di sebelahnya. */}
@@ -117,35 +136,41 @@ function Roads({ rows: ordered, selected, onSelect }: Pick<Props, "rows" | "sele
         )}
       </Pane>
       <Pane name="road-segments" style={{ zIndex: 420 }}>
-        {ordered.map(({ camera, segment, title, status }) =>
-          segment.lines.map((line, index) => (
+        {ordered.map((row) => {
+          const { camera, segment, title } = row;
+          const { line: tone, label } = look(row);
+          return segment.lines.map((line, index) => (
             <Polyline
-              key={`${camera.id}-${index}-${status.tone}-${camera.id === selected}`}
+              key={`${camera.id}-${index}-${tone}-${camera.id === selected}`}
               positions={line}
               pathOptions={{ weight: camera.id === selected ? 9 : 6 }}
-              className={`road-segment tone-${status.tone}`}
+              className={`road-segment ${tone}`}
               eventHandlers={{ click: () => onSelect(camera.id) }}
             >
               <Tooltip sticky>
-                {title} · {status.label}
+                {title} · {label}
               </Tooltip>
             </Polyline>
-          )),
-        )}
+          ));
+        })}
       </Pane>
       {/* Titik kamera di atas garis: menunjukkan dari mana ruas itu dilihat. */}
       <Pane name="road-cameras" style={{ zIndex: 450 }}>
-        {ordered.map(({ camera, status }) => (
-          <CircleMarker
-            key={`${camera.id}-${status.tone}-${camera.id === selected}`}
-            center={[camera.lat, camera.lng]}
-            radius={camera.id === selected ? 7 : 4}
-            className={`camera-marker tone-${status.tone}${camera.id === selected ? " is-selected" : ""}`}
-            eventHandlers={{ click: () => onSelect(camera.id) }}
-          >
-            <Tooltip>Kamera {camera.name}</Tooltip>
-          </CircleMarker>
-        ))}
+        {ordered.map((row) => {
+          const { camera } = row;
+          const { dot } = look(row);
+          return (
+            <CircleMarker
+              key={`${camera.id}-${dot}-${camera.id === selected}`}
+              center={[camera.lat, camera.lng]}
+              radius={camera.id === selected ? 7 : 4}
+              className={`camera-marker ${dot}${camera.id === selected ? " is-selected" : ""}`}
+              eventHandlers={{ click: () => onSelect(camera.id) }}
+            >
+              <Tooltip>Kamera {camera.name}</Tooltip>
+            </CircleMarker>
+          );
+        })}
       </Pane>
     </>
   );

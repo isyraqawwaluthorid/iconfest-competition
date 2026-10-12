@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useState } from "react";
 import type { Insight } from "./ai-insight";
-import { getActiveAlerts, getLatestInsight, getSiteReadings, getTrafficSeries } from "./queries";
+import type { ClassCounts } from "./emission";
+import { getActiveAlerts, getLatestInsight, getRecentClassCounts, getSiteReadings, getTrafficSeries } from "./queries";
 import { getSupabase } from "./supabase/public";
 import type { Alert, CameraOverview, CameraStatusRow, SiteReading, TrafficPoint, WorkerHeartbeat } from "./types";
 
@@ -125,6 +126,31 @@ export function useTrafficSeries(cameraId: string, hours = 24): { points: Traffi
   }, [cameraId, hours]);
   const ready = loaded.id === cameraId;
   return { points: ready ? loaded.points : null, error: ready && loaded.points === null };
+}
+
+/**
+ * Hitungan per jenis kendaraan semua kamera dalam 30 menit terakhir, untuk lapisan beban emisi. Dimuat hanya
+ * saat `enabled`, lalu diperbarui tiap siklus worker (5 menit). `rows` kosong selama memuat.
+ */
+export function useClassCounts(enabled: boolean, intervalMs = 300_000): { rows: ClassCounts[] | null; error: boolean } {
+  const [state, setState] = useState<{ rows: ClassCounts[] | null; error: boolean }>({ rows: null, error: false });
+  useEffect(() => {
+    if (!enabled) return;
+    let current = true;
+    const load = () =>
+      getRecentClassCounts().then(
+        (rows) => current && setState({ rows, error: false }),
+        // Jika gagal dimuat ulang, hitungan terakhir tetap dipakai.
+        () => current && setState((previous) => ({ rows: previous.rows, error: previous.rows === null })),
+      );
+    void load();
+    const timer = setInterval(load, intervalMs);
+    return () => {
+      current = false;
+      clearInterval(timer);
+    };
+  }, [enabled, intervalMs]);
+  return state;
 }
 
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */

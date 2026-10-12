@@ -1,5 +1,6 @@
 import { activityProfileSchema, type ActivityProfile } from "./activity";
 import { insightBodySchema, type Insight } from "./ai-insight";
+import { EMISSION_WINDOW_MINUTES, type ClassCounts } from "./emission";
 import { getSupabase } from "./supabase/public";
 import type {
   Alert,
@@ -39,6 +40,19 @@ export async function getTrafficSeries(cameraId: string, hours = 24): Promise<Tr
     .order("captured_at");
   if (error) throw new Error(`Gagal memuat riwayat kepadatan: ${error.message}`);
   return data as TrafficPoint[];
+}
+
+/** Hitungan per jenis kendaraan semua kamera dalam jendela waktu lapisan beban emisi (satu baris per gambar). */
+export async function getRecentClassCounts(minutes = EMISSION_WINDOW_MINUTES): Promise<ClassCounts[]> {
+  const since = new Date(Date.now() - minutes * 60_000).toISOString();
+  const { data, error } = await getSupabase()
+    .from("traffic_readings")
+    .select("camera_id, captured_at, cars, motorcycles, buses, trucks")
+    .eq("source", "live")
+    .gte("captured_at", since)
+    .limit(1000);
+  if (error) throw new Error(`Gagal memuat hitungan kendaraan: ${error.message}`);
+  return data as ClassCounts[];
 }
 
 export async function getWaterReadings(cameraId: string, limit = 12): Promise<WaterReading[]> {

@@ -50,6 +50,13 @@
   --activity-4: #6d28d9;
   --activity-5: #3b0764;
 
+  /* Lapisan beban emisi: makin gelap makin berat. Cokelat-jingga, terpisah dari warna status. */
+  --emission-1: #fde8c8;
+  --emission-2: #f9bf7a;
+  --emission-3: #e58a2e;
+  --emission-4: #a8510f;
+  --emission-5: #5a2606;
+
   /* Peta tematik: wilayah tanpa data dan skala hujan (makin gelap makin lebat). */
   --untracked: #a1a1aa;
   --rain-0: #e0f2fe;
@@ -346,6 +353,23 @@ h1, h2, h3 {
 .hour-bar.is-current { background: var(--activity-4); }
 .hour-bar.is-empty { background: repeating-linear-gradient(45deg, var(--border) 0 2px, transparent 2px 5px); }
 .hour-bar.is-empty.is-current { outline: 2px solid var(--activity-4); outline-offset: -2px; }
+
+/* Lapisan "Beban emisi": ruas yang sama, diwarnai menurut tingkat estimasi bebannya dibanding ruas lain. */
+.road-segment.emission-1 { stroke: var(--emission-1); }
+.road-segment.emission-2 { stroke: var(--emission-2); }
+.road-segment.emission-3 { stroke: var(--emission-3); }
+.road-segment.emission-4 { stroke: var(--emission-4); }
+.road-segment.emission-5 { stroke: var(--emission-5); }
+.emission-swatch.level-1 { background: var(--emission-1); }
+.emission-swatch.level-2 { background: var(--emission-2); }
+.emission-swatch.level-3 { background: var(--emission-3); }
+.emission-swatch.level-4 { background: var(--emission-4); }
+.emission-swatch.level-5 { background: var(--emission-5); }
+.emission-card { border-left: 4px solid var(--emission-3); background: var(--surface-muted); }
+.emission-card.level-1 { border-left-color: var(--emission-1); }
+.emission-card.level-2 { border-left-color: var(--emission-2); }
+.emission-card.level-4 { border-left-color: var(--emission-4); }
+.emission-card.level-5 { border-left-color: var(--emission-5); }
 
 /* Alat kalibrasi: area air dan garis acuan digambar di atas snapshot dengan warna dari token. */
 .calib-roi {
