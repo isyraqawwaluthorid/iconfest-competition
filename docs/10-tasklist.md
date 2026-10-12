@@ -20,10 +20,10 @@ Cara membaca:
 | Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 6 dari 9 | 1 | 2 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 3 dari 8 | 1 | 4 | Rab 14 Okt |
-| Fase 6 — Evaluasi, dokumen, video | 0 dari 8 | 1 | 7 | Kam 15 Okt |
+| Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | – | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **60 dari 89 (67%)** | **5** | **24** | |
+| **Jumlah inti** | **61 dari 89 (69%)** | **4** | **24** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -41,7 +41,7 @@ Keadaan sistem saat dokumen ini diperbarui: worker berjalan di PC (13 siklus tan
 | Website ter-deploy: beranda, peta, panel kamera, Air, Lalu Lintas, peringatan, riwayat | Sebagian | Deploy (T2.10); halaman Air dan Lalu Lintas (T4.8, T5.1). Riwayat sudah ada |
 | Ringkasan atau insight AI otomatis | **Selesai** | – |
 | Penanganan kamera mati, worker offline, data kosong | Sebagian | Audit menyeluruh belum dilakukan (T5.6) |
-| README lengkap, video demo, laporan | Belum | README baru sebagian (T6.5); video dan laporan belum (T6.6, T6.7) |
+| README lengkap, video demo, laporan | Sebagian | README selesai (T6.5); video dan laporan belum (T6.6, T6.7) |
 
 ## 3. Yang tertinggal dari jadwal
 
@@ -231,7 +231,7 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 - [ ] **T6.2 [K]** `/admin/evaluasi`: akurasi keseluruhan, siang/malam, per kamera, confusion matrix. Kandidat digeser.
 - [ ] **T6.3 [K]** `/admin/sistem`: heartbeat, panggilan AI hari ini, error terbaru. Sementara ini tersedia lewat `scripts/status.py`.
 - [ ] **T6.4 [K]** Perbaiki bug kritis saja; bekukan fitur.
-- [ ] **T6.5 [K]** README lengkap: arsitektur, cara menjalankan, env, keterbatasan, atribusi data. **Sebagian:** struktur repo, stack, konfigurasi, dan cara menjalankan sudah ada; arsitektur, keterbatasan, dan atribusi data belum.
+- [x] **T6.5 [K]** README lengkap: arsitektur, cara menjalankan, env, keterbatasan, atribusi data. Selesai 12 Okt: ringkasan dan status, dua tangkapan layar, prinsip rancangan, diagram arsitektur, daftar halaman, cara menjalankan dengan tabel variabel, alat uji, delapan keterbatasan, privasi, dan sumber data. Perlu diperbarui lagi setelah deploy (tautan publik) dan setelah evaluasi akurasi.
 - [ ] **T6.6 [M]** Laporan penyisihan sesuai template panitia (kerangka di `09-demo-evaluation-report.md`).
 - [ ] **T6.7 [M]** Rekam video demo.
 - [ ] **T6.8 [M]** Surat pernyataan orisinalitas bermaterai, discan.
@@ -292,4 +292,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser; README lengkap (T6.5 selesai) |
