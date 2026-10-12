@@ -95,11 +95,14 @@ Membangun web memakai banyak CPU dan bisa membuat pengambilan gambar worker keha
 cd worker
 .\.venv\Scripts\python.exe scripts\status.py            # detak worker, 20 lokasi air, peringatan, jeda 24 jam
 .\.venv\Scripts\python.exe scripts\status.py --hours 48
+.\.venv\Scripts\python.exe scripts\calibration_check.py       # kalibrasi semua kamera air: yang perlu dilihat ditulis lebih dulu
 .\.venv\Scripts\python.exe scripts\probe_camera.py "JRAKAH"   # uji penilaian AI satu kamera, tanpa menulis
 .\.venv\Scripts\python.exe scripts\replay_readings.py "Kartini-OUT" --odd   # nilai ulang gambar bukti yang dulu bukan normal
 .\.venv\Scripts\python.exe scripts\replay_readings.py --all 3               # semua lokasi, setelah mengubah kalibrasi atau prompt
 .\.venv\Scripts\python.exe scripts\probe_insight.py           # uji ringkasan AI atas keadaan sekarang, tanpa menulis
 ```
+
+**Kalibrasi dinilai tiap sesi.** Jalankan `calibration_check.py` di awal sesi dan setiap kali ada penilaian yang bukan normal. Penilaian bukan normal dilihat dulu gambarnya (`replay_readings.py "<nama>" --odd`) sebelum dianggap kejadian: sampai 12 Okt, semuanya salah baca akibat kalibrasi atau busa pompa. Referensi malam hanya bisa disimpan setelah gelap (sekitar 17.30 WIB) dan referensi siang hanya saat terang, jadi kerjakan begitu waktunya memungkinkan.
 
 Setelah mengganti foto referensi, muat ulang worker (`muat-ulang-worker.ps1`): foto referensi disimpan sementara di memori worker.
 

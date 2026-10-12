@@ -51,7 +51,7 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 |---|---|---|---|
 | **T2.10** Deploy ke Vercel | Min 11 Okt | Belum; ditunda pemilik proyek 12 Okt | Juri membuka tautan, bukan `localhost`. Paling berisiko bila dikerjakan mendekati tenggat |
 | **T3.10** Uji klasifikasi malam | Sen 12 Okt | Sebagian | Akurasi malam belum pernah diperiksa terhadap penilaian manusia |
-| **T3.11** Foto referensi | Sen 12 Okt | Sebagian | Tanpa referensi yang sesuai waktu, keyakinan AI turun |
+| **T3.11** Foto referensi malam (3 kamera) | Sen 12 Okt | Sebagian; referensi siang sudah lengkap | Tanpa referensi malam, keyakinan AI malam turun (DPU-Mberok2-OUT: 0,51) |
 | **T2.12** Evaluasi hitungan YOLO siang | Min 11 Okt | Belum | Angka kendaraan belum pernah dibandingkan dengan hitungan manual |
 | **T0.6** Email izin ke Diskominfo | sebelum 10 Okt | Belum [M] | Dasar pemanfaatan data untuk laporan |
 | **T0.7** Jam tenggat dan template laporan | sebelum 10 Okt | Belum [M] | Laporan tidak bisa disusun tanpa template |
@@ -65,7 +65,7 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 | Paling lambat | Dikerjakan | Butuh pemilik proyek |
 |---|---|---|
 | Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~ (selesai); usulan pasangan hulu–hilir untuk T4.4 | Simpan referensi malam yang kurang (T3.11) setelah gelap |
-| Sel 13 Okt | T2.10 deploy; T4.3 hulu–hilir; T5.4 cara mendemokan kejadian; TV.4 tren 24 jam | Akun Vercel; persetujuan pasangan hulu–hilir (T4.4); referensi siang 4 kamera jalan (T3.11) |
+| Sel 13 Okt | T2.10 deploy; T4.3 hulu–hilir; T5.4 cara mendemokan kejadian; TV.4 tren 24 jam | Akun Vercel; persetujuan pasangan hulu–hilir (T4.4); memeriksa kalibrasi yang diubah (T3.13) |
 | Rab 14 Okt | T4.5 kejadian; T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; T5.3 halaman Tentang; T6.5 README | Template laporan dari panitia (T0.7) |
 | Kam 15 Okt | Perbaikan bug saja (T6.4); T6.6 laporan; T6.7 video; T7.3 repo publik; T7.4 ganti kunci | Laporan, video, surat bermaterai (T6.8), pengumpulan |
 | Jum 16 Okt | Cadangan; T7.1 cek tautan dari perangkat lain; T7.2 pengumpulan bila belum | Pengumpulan |
@@ -76,8 +76,8 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 
 | Tugas | Paling lambat | Keterangan |
 |---|---|---|
-| **T3.11** Referensi malam: Banger-IN, Semarang Indah_IN, DPU-Mberok2-OUT | Sen 12 Okt malam | Satu klik per kamera di halaman kalibrasi, setelah gelap |
-| **T3.11** Referensi siang: JRAKAH, SP. AKPOL, Jembatan Mberok, DPU_Pahlawan | Sel 13 Okt siang | Sama, pada siang hari |
+| **T3.11** Referensi malam: DPU-Mberok2-OUT (paling mendesak), Banger-IN, Semarang Indah_IN | Sen 12 Okt malam | Satu klik per kamera di halaman kalibrasi, setelah gelap (sekitar 17.30 WIB) |
+| **Rutin** Menilai kalibrasi | tiap sesi | Lihat bagian "Perlu dilihat" dari `calibration_check.py`; asisten mengingatkan di awal tiap sesi |
 | **T3.13** Memeriksa tiga kalibrasi yang diubah atau diragukan 12 Okt | Sel 13 Okt | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; rinciannya di tabel kalibrasi per kamera |
 | **T2.10** Akun Vercel dan langkah deploy | Sel 13 Okt | Dipandu langkah demi langkah |
 | **T4.4** Menyetujui usulan pasangan hulu–hilir | Sel 13 Okt | Usulan disusun dari nama dan lokasi kamera |
@@ -153,7 +153,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T3.8 [K]** `fusion/smoothing.py`: konfirmasi naik (2 pembacaan), turun (3 pembacaan), keyakinan rendah → `needs_verification`. Unit test.
 - [x] **T3.9 [K]** `sources/openmeteo.py`: ingest per `weather_grid` tiap 30 menit; 9 titik dalam satu permintaan; pemicu hujan modul air aktif.
 - [ ] **T3.10 [K]** Uji klasifikasi siang dan malam; sesuaikan prompt dan ambang. **Sebagian.** Siang selesai 11 Okt (prompt dan gambar anotasi disesuaikan; dua salah baca diperbaiki lewat kalibrasi). Malam: worker sudah membuat 453 penilaian malam (448 normal, 4 waspada, 1 tidak dapat dinilai; keyakinan rata-rata 0,74 dibanding 0,80 pada siang hari), tetapi **belum pernah diperiksa terhadap penilaian manusia**.
-- [ ] **T3.11 [M]** Simpan foto referensi untuk kamera terkalibrasi. **Sebagian:** 19 dari 22 punya referensi malam dan 18 dari 22 punya referensi siang. Kurang referensi malam: Banger-IN, Semarang Indah_IN, DPU-Mberok2-OUT. Kurang referensi siang: JRAKAH, SP. AKPOL, Jembatan Mberok, DPU_Pahlawan.
+- [ ] **T3.11 [M]** Simpan foto referensi untuk kamera terkalibrasi. **Sebagian:** referensi siang kini lengkap, 22 dari 22 (empat kamera jalan disimpan 12 Okt pukul 14.18–14.19, jalan kering, lalu 16 gambar bukti dinilai ulang dan tetap normal). Referensi malam 19 dari 22; kurang: **DPU-Mberok2-OUT** (unggulan, paling mendesak), Banger-IN, Semarang Indah_IN.
 - [x] **T3.12 [K]** Pemeriksaan salah baca 12 Okt. Ke-22 penilaian bukan normal sejak 11 Okt ditinjau (yang terjadi 12 Okt dari gambar buktinya, sisanya lewat nilai ulang); tidak ada yang menunjukkan kejadian nyata. Hasil: pembacaan naik butuh keyakinan ≥ 0,65 agar dihitung; referensi siang Kartini-OUT dan KP.Kali-OUT diganti dengan keadaan normal yang paling tinggi (foto lama dicadangkan); garis W/S KP.Kali-OUT yang tertukar dibetulkan; `scripts/replay_readings.py` untuk menilai ulang gambar bukti. *Bukti:* nilai ulang 130 gambar dari 20 lokasi tidak lagi menghasilkan pembacaan naik (sebelumnya 8).
 - [x] **T3.14 [K]** Halaman kalibrasi menolak garis acuan yang urutannya tertukar, dan menampilkan sebabnya.
 - [ ] **T3.13 [M]** Periksa kalibrasi yang diubah atau diragukan 12 Okt (lihat tabel di bawah): setujui atau ganti referensi baru KP.Kali-OUT dan Kartini-OUT; naikkan sedikit garis N di IPdome-Polder Tawang.
@@ -182,10 +182,12 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 | Trimulyo_OUT | pompa keluar | N W S A | ada | ada | 0,75 / 0,75 | Baik |
 | IPdome-Polder Tawang | kolam | N W S A | ada | ada | 0,81 / 0,77 | Dua "waspada" 12 Okt karena garis N berimpit dengan muka air. **Naikkan garis N sedikit (T3.13)** |
 | Jinunjung_Halaman | kolam | N W S A | ada | ada | 0,81 / 0,75 | Baik |
-| DPU_Pahlawan | jalan | – | **belum** | ada | 0,95 / 0,90 | Butuh referensi siang |
-| JRAKAH | jalan | – | **belum** | ada | 0,88 / 0,82 | Butuh referensi siang |
-| Jembatan Mberok | jalan | – | **belum** | ada | 0,87 / 0,79 | Butuh referensi siang |
-| SP. AKPOL | jalan | – | **belum** | ada | 0,91 / 0,63 | Butuh referensi siang. Malam hari gelap: 9 penilaian rendah, satu "waspada" lemah dari aspal mengilap |
+| DPU_Pahlawan | jalan | – | ada (12 Okt) | ada | 0,95 / 0,90 | Baik |
+| JRAKAH | jalan | – | ada (12 Okt) | ada | 0,88 / 0,82 | Baik |
+| Jembatan Mberok | jalan | – | ada (12 Okt) | ada | 0,87 / 0,79 | Baik |
+| SP. AKPOL | jalan | – | ada (12 Okt) | ada | 0,91 / 0,63 | Malam hari gelap: 9 penilaian rendah, satu "waspada" lemah dari aspal mengilap. Pantau |
+
+Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi kerja dan setiap kali ada penilaian yang bukan normal; tabel ini diperbarui dari hasilnya.
 
 ## Fase 4 — Fusi dan insight (Selasa 13 Okt)
 
@@ -288,4 +290,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 10 Okt | Fase 0 dan sebagian besar Fase 1: worker merekam 146 kamera |
 | 11 Okt | Fase 2 kecuali deploy; modul air end-to-end; tren, risiko, peringatan; arah visual "insight dulu" (TV.1–TV.3, TV.7) |
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
-| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai) |
+| 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; usulan pasangan hulu–hilir (T4.4) |
