@@ -92,8 +92,8 @@ def build_facts(
         and statuses.get(cam.id, {}).get("health") == "live"
         and statuses[cam.id].get("density_index") is not None
     ]
-    # Pembanding sementara mencampur siang dan malam, jadi tingkat kepadatannya tidak ikut dikirim:
-    # yang tidak layak disimpulkan tidak perlu sampai ke LLM.
+    # Pembanding sementara berasal dari kurang dari tiga hari, jadi tingkat kepadatannya tidak ikut dikirim:
+    # yang belum layak disimpulkan tidak perlu sampai ke LLM.
     comparable = [(cam, status) for cam, status in traffic if not status.get("baseline_is_provisional")]
     traffic_fact: dict[str, Any] = {
         "sites_with_index": len(traffic),
@@ -125,8 +125,8 @@ def build_facts(
         limits.append("Hubungan hulu-hilir antar lokasi belum diisi, jadi pengaruh kondisi hulu belum ikut dihitung dalam skor risiko.")
     if traffic_fact["baseline"] == "sementara":
         limits.append(
-            "Indeks kepadatan lalu lintas masih memakai pembanding sementara yang mencampur siang dan malam, "
-            "sehingga belum dapat dipakai untuk menyimpulkan kepadatan."
+            "Pembanding kepadatan lalu lintas masih sementara (kurang dari tiga hari data pada jam yang sama), "
+            "sehingga belum dipakai untuk menyimpulkan kepadatan."
         )
     limits.append("Prakiraan hujan berasal dari model Open-Meteo, bukan pengukuran di lokasi." if rain_areas else "Data hujan belum tersedia.")
 

@@ -91,7 +91,7 @@ def test_provisional_traffic_baseline_sends_no_density_levels():
     statuses = {"a": _status(), "t": {"health": "live", "density_index": 15.0, "density_level": "padat", "baseline_is_provisional": True}}
     facts = _facts(statuses, cameras=cameras)
     assert facts["traffic"] == {"sites_with_index": 1, "baseline": "sementara"}
-    assert any("pembanding sementara" in note for note in facts["limits"])
+    assert any("masih sementara" in note for note in facts["limits"])
 
 
 def test_comparable_traffic_baseline_reports_levels_and_anomalies():

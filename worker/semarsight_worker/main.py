@@ -104,7 +104,7 @@ def run_cycle(
     settings: Settings,
     database: Database,
     frame_states: dict[str, FrameState],
-    history: baseline.RollingHistory,
+    history: baseline.History,
     water_pipeline: WaterPipeline,
     weather: dict[str, openmeteo.GridWeather],
     *,
@@ -227,20 +227,20 @@ def refresh_weather(database: Database, weather: dict[str, openmeteo.GridWeather
         log.exception("pembaruan cuaca gagal")
 
 
-def seed_history(history: baseline.RollingHistory, database: Database) -> None:
-    """Isi baseline bergulir dari pembacaan 24 jam terakhir, agar tidak mulai dari nol saat restart."""
+def seed_history(history: baseline.History, database: Database) -> None:
+    """Isi riwayat pembanding dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart."""
     metric_by_camera = {cam.id: _density_metric(cam) for cam in database.active_cameras()}
-    rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.WINDOW)
+    rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.HISTORY)
     for row in rows:
         metric = metric_by_camera.get(row["camera_id"])
         if metric is None or not _usable_for_baseline(row["quality"], row["is_night"]):
             continue
         history.add(row["camera_id"], datetime.fromisoformat(row["captured_at"]), row[metric])
-    log.info("baseline bergulir diisi dari %d pembacaan 24 jam terakhir", len(rows))
+    log.info("riwayat pembanding lalu lintas diisi dari %d pembacaan %d hari terakhir", len(rows), baseline.HISTORY.days)
 
 
-def _evaluate_traffic(result: CameraResult, history: baseline.RollingHistory) -> TrafficReading:
-    """Bandingkan hitungan frame ini dengan baseline kamera, lalu catat ke riwayat bergulir."""
+def _evaluate_traffic(result: CameraResult, history: baseline.History) -> TrafficReading:
+    """Bandingkan hitungan frame ini dengan pembanding kamera pada jam yang sama, lalu catat ke riwayat."""
     cam, counts = result.camera, result.counts
     assert counts is not None
     value = getattr(counts, _density_metric(cam))
@@ -394,7 +394,7 @@ def main(argv: list[str] | None = None) -> int:
     database = Database(settings, dry_run=args.dry_run)
     state_path = settings.frames_dir / FRAME_STATE_FILE
     frame_states = acquisition.load_frame_states(state_path)
-    history = baseline.RollingHistory()
+    history = baseline.History()
     seed_history(history, database)
     weather: dict[str, openmeteo.GridWeather] = {}
     refresh_weather(database, weather)
