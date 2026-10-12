@@ -14,6 +14,9 @@ SETTINGS = SimpleNamespace(
     openai_vision_model="test-model",
     water_only_featured=True,
     ai_daily_call_cap=100,
+    rain_trigger_mm=2.0,
+    water_heartbeat_minutes=30,
+    water_rain_heartbeat_minutes=10,
 )
 
 
@@ -142,7 +145,7 @@ def test_an_ai_reading_updates_status_trend_and_risk_together():
     assert update["risk_score"] == pytest.approx(0.68)
     assert update["risk_level"] == "tinggi"
     assert len(database.inserted) == 1
-    assert database.inserted[0]["raw"]["smoothing"] == {"level": "siaga", "previous": "normal", "confirmed": "siaga", "needed": 2}
+    assert database.inserted[0]["raw"]["smoothing"] == {"level": "siaga", "previous": "normal", "confirmed": "siaga", "needed": 2, "recheck_minutes": 30}
 
 
 def test_a_first_raised_reading_is_recorded_as_counted_but_not_yet_confirmed():
@@ -161,10 +164,10 @@ def test_a_first_raised_reading_is_recorded_as_counted_but_not_yet_confirmed():
 
     sure = observe(0.8)
     assert (sure["water_status"], sure["needs_verification"]) == ("normal", False)
-    assert sure["smoothing"] == {"level": "waspada", "previous": "normal", "confirmed": "normal", "needed": 2}
+    assert sure["smoothing"] == {"level": "waspada", "previous": "normal", "confirmed": "normal", "needed": 2, "recheck_minutes": 30}
     unsure = observe(0.55)  # busa pompa: dinilai naik dengan keyakinan rendah, jadi tidak dihitung
     assert (unsure["water_status"], unsure["needs_verification"]) == ("normal", True)
-    assert unsure["smoothing"] == {"level": None, "previous": "normal", "confirmed": "normal", "needed": 2}
+    assert unsure["smoothing"] == {"level": None, "previous": "normal", "confirmed": "normal", "needed": 2, "recheck_minutes": 30}
     assert database.inserted[-1]["raw"]["usage"] == {}  # isi raw yang lain tetap ada
 
 

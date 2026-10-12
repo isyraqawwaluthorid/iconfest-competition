@@ -148,6 +148,7 @@ class WaterPipeline:
                 "previous": before.get("water_status"),
                 "confirmed": confirmed,
                 "needed": smoothing.READINGS_TO_RISE,  # penilaian sepakat yang dibutuhkan untuk naik
+                "recheck_minutes": self._recheck_minutes(cam),  # penilaian berikutnya paling lambat sekian menit lagi
             }
             self._database.insert_water_reading(
                 {
@@ -219,6 +220,12 @@ class WaterPipeline:
             if (level := smoothing.level_of(reading, cam.water_kind)) is not None
         ]
         return readings
+
+    def _recheck_minutes(self, cam: CameraRow) -> int:
+        """Jeda pemeriksaan berkala lokasi ini: lebih rapat saat hujan (sama dengan aturan pemicu AI)."""
+        local_weather = self._weather.get(cam.weather_grid_id or "")
+        raining = local_weather is not None and local_weather.rain_for_trigger_mm > self._settings.rain_trigger_mm
+        return self._settings.water_rain_heartbeat_minutes if raining else self._settings.water_heartbeat_minutes
 
     def _outlook(self, cam: CameraRow, confirmed: str | None, at: datetime, upstream_status: str | None) -> dict[str, Any]:
         """Tren dan skor risiko satu lokasi dari status terkonfirmasi, riwayat level, kondisi hulu, dan prakiraan hujan."""

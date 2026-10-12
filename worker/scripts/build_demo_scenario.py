@@ -68,9 +68,9 @@ REASONS = {
 STEPS = [
     (0, "Keadaan awal: semua lokasi air normal dan hujan belum diprakirakan.", {UPSTREAM_SITE: "normal"}),
     (15, "Prakiraan hujan 3 jam ke depan naik menjadi 12,5 mm. Aturan membuka peringatan hujan lebat; di kamera belum ada yang berubah.", {UPSTREAM_SITE: "normal"}),
-    (30, "AI menilai Progo-IN \"waspada\" untuk pertama kali. Status resmi belum berubah: naik butuh dua penilaian yang sepakat.", {UPSTREAM_SITE: "normal"}),
-    (40, "Penilaian kedua sepakat, jadi Progo-IN resmi waspada. Peringatan dini otomatis dibuat untuk Progo-OUT di hilirnya, dan ringkasan AI ditulis ulang.", {UPSTREAM_SITE: "waspada", DOWNSTREAM_SITE: "normal"}),
-    (50, "AI menilai Progo-IN \"siaga\" dan jalan JRAKAH tergenang ringan, masing-masing baru sekali. Keduanya belum dikonfirmasi.", {UPSTREAM_SITE: "waspada", ROAD_SITE: "normal"}),
+    (30, "AI kamera menilai Progo-IN \"waspada\" untuk pertama kali. Ini baru indikasi awal: status resminya tetap Normal sampai penilaian kedua sepakat.", {UPSTREAM_SITE: "normal"}),
+    (40, "Penilaian kedua sepakat, jadi status resmi Progo-IN naik menjadi Waspada. Peringatan dini otomatis dibuat untuk Progo-OUT di hilirnya, dan ringkasan AI ditulis ulang.", {UPSTREAM_SITE: "waspada", DOWNSTREAM_SITE: "normal"}),
+    (50, "AI kamera menilai Progo-IN \"siaga\" dan jalan JRAKAH tergenang ringan, masing-masing baru sekali. Keduanya masih indikasi awal: status resmi belum berubah.", {UPSTREAM_SITE: "waspada", ROAD_SITE: "normal"}),
     (60, "Keduanya terkonfirmasi: Progo-IN siaga dan JRAKAH waspada karena genangan ringan. Tingkat keseluruhan naik menjadi siaga.", {UPSTREAM_SITE: "siaga", ROAD_SITE: "waspada", DOWNSTREAM_SITE: "normal"}),
     (75, "Progo-OUT di hilir ikut waspada setelah dua penilaian, sementara hujan mulai reda.", {UPSTREAM_SITE: "siaga", DOWNSTREAM_SITE: "waspada"}),
     (115, "Setelah tiga penilaian normal berturut-turut, semua lokasi kembali normal dan peringatannya ditutup otomatis.", {UPSTREAM_SITE: "normal", DOWNSTREAM_SITE: "normal", ROAD_SITE: "normal"}),
@@ -108,6 +108,18 @@ def main() -> None:
     wet_grids = {by_name[name].weather_grid_id for name in (UPSTREAM_SITE, DOWNSTREAM_SITE, ROAD_SITE)}
 
     history: list[dict] = []  # semua penilaian AI buatan sejauh ini, urut waktu
+    # Tiga penilaian tenang sebelum skenario dimulai, supaya riwayat tiap lokasi tidak tiba-tiba mulai dari "waspada".
+    for minutes in (90, 60, 30):
+        for name in (UPSTREAM_SITE, DOWNSTREAM_SITE, ROAD_SITE):
+            cam = by_name[name]
+            road = "tidak_tergenang" if cam.water_kind == "jalan" else "tidak_relevan"
+            history.append(
+                {
+                    "camera_id": cam.id, "captured_at": (start - timedelta(minutes=minutes)).isoformat(), "status": "normal", "road_flood": road,
+                    "confidence": 0.84, "level": "normal", "previous": "normal", "confirmed": "normal", "needed": smoothing.READINGS_TO_RISE,
+                    "recheck_minutes": settings.water_heartbeat_minutes, "reason": REASONS[road if cam.water_kind == "jalan" else "normal"],
+                }
+            )  # fmt: skip
     kept = json.loads(OUTPUT.read_text(encoding="utf-8"))["steps"] if "--keep-insights" in sys.argv else None
     active: dict[tuple, dict] = {}  # peringatan aktif: kunci (jenis, kamera) → baris
     alert_seq = 0
@@ -136,6 +148,10 @@ def main() -> None:
                     "camera_id": cam.id, "captured_at": at.isoformat(), "status": status, "road_flood": road_flood, "confidence": confidence,
                     "level": smoothing.LEVELS[level] if level is not None else None, "previous": before, "confirmed": confirmed,
                     "needed": smoothing.READINGS_TO_RISE, "reason": REASONS[road_flood if cam.water_kind == "jalan" else status],
+                    # Sama dengan worker: saat hujan, lokasi diperiksa lebih rapat.
+                    "recheck_minutes": settings.water_rain_heartbeat_minutes
+                    if weather[cam.weather_grid_id].rain_for_trigger_mm > settings.rain_trigger_mm
+                    else settings.water_heartbeat_minutes,
                 }
             )  # fmt: skip
             statuses[cam.id] |= {"water_status": confirmed, "road_flood": road_flood, "water_confidence": confidence, "needs_verification": needs_verification}
