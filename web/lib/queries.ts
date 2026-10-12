@@ -65,7 +65,7 @@ export async function getSiteReadings(hours = 2): Promise<SiteReading[]> {
     .gte("captured_at", since)
     .order("captured_at");
   if (error) throw new Error(`Gagal memuat perkembangan penilaian: ${error.message}`);
-  type Outcome = Pick<SiteReading, "level" | "previous" | "confirmed" | "needed">;
+  type Outcome = Pick<SiteReading, "level" | "previous" | "confirmed" | "needed" | "recheck_minutes">;
   return data.map(({ smoothing, ...row }) => ({ ...row, ...((smoothing as Outcome | null) ?? {}) })) as SiteReading[];
 }
 

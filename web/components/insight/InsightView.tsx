@@ -78,11 +78,11 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
   const realNow = useNow();
   const now = clock ?? realNow;
   const progress = useMemo(() => (now === null ? [] : siteProgress(cameras, readings, now)), [cameras, readings, now]);
-  const pending = useMemo(
-    () => new Map(progress.flatMap((row) => (row.pending && row.latest ? [[row.camera.id, { level: row.pending, reading: row.latest }] as const] : []))),
+  const progressBySite = useMemo(() => new Map(progress.map((row) => [row.camera.id, row] as const)), [progress]);
+  const pendingLevels = useMemo(
+    () => new Map(progress.flatMap((row) => (row.pending ? [[row.camera.id, row.pending] as const] : []))),
     [progress],
   );
-  const pendingLevels = useMemo(() => new Map([...pending].map(([id, item]) => [id, item.level] as const)), [pending]);
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("insight");
@@ -229,7 +229,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                 summary={selectedSummary}
                 insight={insight}
                 cameraNames={cameraNames}
-                pending={pending}
+                progress={progressBySite}
                 clock={clock}
                 onClose={() => setSelected(null)}
               />

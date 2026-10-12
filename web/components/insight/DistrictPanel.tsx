@@ -6,24 +6,24 @@ import { useNow } from "@/lib/hooks";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
-import type { SiteReading, WaterStatus } from "@/lib/types";
+import type { SiteProgress } from "@/lib/progress";
 import { InsightCard } from "./AiInsight";
 import { RainOutlook, TrafficTrend } from "./DistrictTrend";
-import { PendingReading } from "./PendingReading";
+import { PendingReading, ReadingHistory } from "./PendingReading";
 
 type Props = {
   summary: DistrictSummary;
   insight: Insight | null;
   cameraNames: Map<string, string>;
-  /** Lokasi yang baru sekali dinilai naik oleh AI dan belum dikonfirmasi: id kamera → level dan penilaiannya. */
-  pending: Map<string, { level: WaterStatus; reading: SiteReading }>;
+  /** Lokasi air yang sedang bergerak (indikasi awal, status naik, atau baru berubah): id kamera → perkembangannya. */
+  progress: Map<string, SiteProgress>;
   /** Jam yang dipakai panel (ms); diisi halaman simulasi dengan jam skenario. */
   clock?: number;
   onClose: () => void;
 };
 
 /** Rincian satu kecamatan: temuan AI, air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
-export function DistrictPanel({ summary, insight, cameraNames, pending, clock, onClose }: Props) {
+export function DistrictPanel({ summary, insight, cameraNames, progress, clock, onClose }: Props) {
   const { district, cameras, online, waterSites, trafficSites, densityIndex, densityLevel, busy, rain } = summary;
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
@@ -88,7 +88,8 @@ export function DistrictPanel({ summary, insight, cameraNames, pending, clock, o
           <ul className="space-y-2">
             {sites.map((site) => {
               const status = site.water_status ? WATER[site.water_status] : NOT_ASSESSED;
-              const waiting = pending.get(site.id);
+              const moving = progress.get(site.id);
+              const waiting = moving?.pending && moving.latest ? { level: moving.pending, reading: moving.latest } : null;
               return (
                 <li key={site.id} className={`tint tone-${status.tone} accent-left rounded-control p-3`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -104,7 +105,11 @@ export function DistrictPanel({ summary, insight, cameraNames, pending, clock, o
                     {site.water_trend ? `Tren ${TREND_LABEL[site.water_trend]}` : "Tren belum diketahui"}
                     {site.risk_score != null ? ` · skor risiko ${formatNumber(site.risk_score, 2)}` : ""}
                   </p>
-                  {waiting ? <PendingReading level={waiting.level} reading={waiting.reading} simulated={clock !== undefined} /> : null}
+                  {waiting ? (
+                    <PendingReading status={site.water_status} level={waiting.level} reading={waiting.reading} simulated={clock !== undefined} />
+                  ) : null}
+                  {/* Lokasi yang sedang bergerak memperlihatkan tiap penilaiannya, supaya perubahan statusnya bisa ditelusuri. */}
+                  {moving ? <ReadingHistory readings={moving.readings} /> : null}
                 </li>
               );
             })}

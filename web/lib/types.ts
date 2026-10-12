@@ -46,6 +46,8 @@ export type SiteReading = {
   confirmed?: WaterStatus | null;
   /** Jumlah penilaian sepakat yang dibutuhkan aturan untuk menaikkan status. */
   needed?: number;
+  /** Jeda pemeriksaan berkala lokasi ini saat penilaian dibuat (menit): penilaian berikutnya paling lambat sekian menit kemudian. */
+  recheck_minutes?: number;
   /** Alasan singkat dari AI kamera untuk penilaian ini. */
   reason?: string | null;
   /** Gambar yang dinilai, di Storage; kosong untuk penilaian simulasi. */

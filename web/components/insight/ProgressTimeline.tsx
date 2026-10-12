@@ -12,7 +12,7 @@ const clock = (at: number | string) => formatTimeWib(new Date(at).toISOString())
 
 /** Kalimat keadaan satu lokasi: menunggu konfirmasi, status sekarang, atau perlu diperiksa. */
 function stateOf({ camera, pending }: SiteProgress): string {
-  if (pending) return `AI menilai ${WATER[pending].label.toLowerCase()} sekali · menunggu penilaian kedua`;
+  if (pending) return `Indikasi awal ${WATER[pending].label.toLowerCase()} · status resmi belum berubah`;
   const since = camera.water_status_since ? ` sejak ${clock(camera.water_status_since)}` : "";
   if (isElevated(camera.water_status)) return `${WATER[camera.water_status ?? "normal"].label}${since}`;
   return camera.needs_verification ? "Penilaian terakhir kurang yakin · perlu diperiksa" : `Kembali normal${since}`;
@@ -33,8 +33,9 @@ export function ProgressTimeline({ rows, now, simulated }: { rows: SiteProgress[
   if (rows.length === 0) return null;
   const start = now - PROGRESS_WINDOW_MINUTES * 60_000;
   // "Sekarang" tidak ditaruh di tepi kanan: sisa ruangnya memperlihatkan warna status yang baru saja berubah.
-  const position = (at: number) => (at >= now ? "100%" : `${Math.max(0, ((at - start) / (now - start)) * NOW_AT)}%`);
   const dot = (at: number) => `${Math.min(NOW_AT, Math.max(0, ((at - start) / (now - start)) * NOW_AT))}%`;
+  // Akhir rentang yang masih berjalan (`Infinity`) memanjang sampai tepi kanan; awal rentang tidak pernah melewati "sekarang".
+  const position = (at: number) => (at === Infinity ? "100%" : dot(at));
   return (
     <section aria-label="Perkembangan lokasi air" className="map-panel relative mt-3 p-4 text-sm">
       <p className="label-caps">Perkembangan 2 jam terakhir</p>
@@ -47,7 +48,7 @@ export function ProgressTimeline({ rows, now, simulated }: { rows: SiteProgress[
               </Link>
             </div>
             {row.pending && row.latest ? (
-              <PendingReading level={row.pending} reading={row.latest} simulated={simulated} />
+              <PendingReading status={row.camera.water_status} level={row.pending} reading={row.latest} simulated={simulated} compact />
             ) : (
               <p className="text-xs text-muted">{stateOf(row)}</p>
             )}
@@ -56,7 +57,7 @@ export function ProgressTimeline({ rows, now, simulated }: { rows: SiteProgress[
                 <span
                   key={span.from}
                   className={`status-band accent tone-${tone(span.status)} absolute bottom-0 h-1.5`}
-                  style={{ left: position(span.from), right: `calc(100% - ${position(span.to)})` }}
+                  style={{ left: dot(span.from), right: `calc(100% - ${position(span.to)})` }}
                 />
               ))}
               {row.readings.map((reading) => (
@@ -79,8 +80,8 @@ export function ProgressTimeline({ rows, now, simulated }: { rows: SiteProgress[
       </div>
       {rows.length > MAX_ROWS ? <p className="mt-1 text-xs text-muted">dan {rows.length - MAX_ROWS} lokasi lain</p> : null}
       <p className="mt-2 border-t border-border pt-2 text-[11px] leading-snug text-muted">
-        Titik = satu penilaian AI; titik penuh dihitung aturan, titik kosong tidak. Pita = status resmi, yang baru naik
-        setelah dua penilaian sepakat.
+        Titik = satu penilaian AI kamera (penuh = dihitung aturan, kosong = tidak). Pita = status resmi, yang baru naik
+        setelah dua penilaian sepakat. Klik lokasinya di peta untuk rincian tiap penilaian.
       </p>
     </section>
   );

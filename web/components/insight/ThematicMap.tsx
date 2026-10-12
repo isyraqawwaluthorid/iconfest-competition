@@ -7,6 +7,7 @@ import {
   CircleMarker,
   MapContainer,
   Marker,
+  Pane,
   Polygon,
   TileLayer,
   Tooltip,
@@ -61,14 +62,19 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
     () =>
       DISTRICTS.map((district) => ({
         district,
-        icon: L.divIcon({ className: "district-label", html: `<span>${shortName(district.name)}</span>`, iconSize: [0, 0] }),
+        icon: L.divIcon({
+          className: "district-label",
+          html: `<span>${shortName(district.name)}</span>`,
+          iconSize: [0, 0],
+        }),
       })),
     [],
   );
   const initialFraming = useMemo(() => framing(), []);
   // Yang digambar belakangan berada di atas: lokasi biasa dulu, lalu yang statusnya naik, lalu yang menunggu konfirmasi.
   const ordered = useMemo(() => {
-    const weight = (camera: CameraOverview) => (theme !== "risk" ? 0 : pending.has(camera.id) ? 2 : isElevated(camera.water_status) ? 1 : 0);
+    const weight = (camera: CameraOverview) =>
+      theme !== "risk" ? 0 : pending.has(camera.id) ? 2 : isElevated(camera.water_status) ? 1 : 0;
     return [...sources].sort((a, b) => weight(a) - weight(b));
   }, [sources, pending, theme]);
 
@@ -111,45 +117,50 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
       {labels.map(({ district, icon }) => (
         <Marker key={district.name} position={district.center} icon={icon} interactive={false} keyboard={false} />
       ))}
-      {ordered.map((camera, index) => {
-        const status =
-          theme === "risk"
-            ? camera.water_status
-              ? WATER[camera.water_status]
-              : NOT_ASSESSED
-            : DENSITY[camera.density_level ?? "tidak_diketahui"];
-        // Pada tema risiko air, lokasi yang bergerak dibuat menonjol: menunggu konfirmasi atau sudah naik.
-        const waiting = theme === "risk" ? pending.get(camera.id) : undefined;
-        const raised = theme === "risk" && isElevated(camera.water_status);
-        const tone = waiting ? WATER[waiting].tone : status.tone;
-        return (
-          <CircleMarker
-            key={`${camera.id}-${tone}-${waiting ? "pending" : raised ? "raised" : "plain"}`}
-            center={[camera.lat, camera.lng]}
-            radius={waiting ? 12 : raised ? 9 : 4}
-            className={`camera-marker tone-${tone}${waiting ? " is-pending" : raised ? " is-raised" : ""}`}
-            eventHandlers={{
-              click: () => {
-                const district = districtOf(camera.lat, camera.lng);
-                if (district) onSelect(district);
-              },
-            }}
-          >
-            {/* Lokasi yang bergerak diberi label tetap, supaya terlihat tanpa harus diarahkan kursor. */}
-            {waiting || raised ? (
-              <Tooltip permanent direction={index % 2 ? "bottom" : "top"} offset={[0, index % 2 ? 12 : -12]} className="site-label">
-                <strong>{camera.name}</strong>
-                <br />
-                {waiting ? `AI menilai ${WATER[waiting].label.toLowerCase()} · 1 dari 2` : status.label}
-              </Tooltip>
-            ) : (
-              <Tooltip>
-                {camera.name} · {status.label}
-              </Tooltip>
-            )}
-          </CircleMarker>
-        );
-      })}
+      {/* Lapisan sendiri di atas poligon: poligon dibuat ulang saat warnanya berubah dan kalau selapis akan menutupi titik lokasi. */}
+      <Pane name="sites" style={{ zIndex: 450 }}>
+        {ordered.map((camera, index) => {
+          const status =
+            theme === "risk"
+              ? camera.water_status
+                ? WATER[camera.water_status]
+                : NOT_ASSESSED
+              : DENSITY[camera.density_level ?? "tidak_diketahui"];
+          // Pada tema risiko air, lokasi yang bergerak dibuat menonjol: menunggu konfirmasi atau sudah naik.
+          const waiting = theme === "risk" ? pending.get(camera.id) : undefined;
+          const raised = theme === "risk" && isElevated(camera.water_status);
+          const tone = waiting ? WATER[waiting].tone : status.tone;
+          return (
+            <CircleMarker
+              key={`${camera.id}-${tone}-${waiting ? "pending" : raised ? "raised" : "plain"}`}
+              center={[camera.lat, camera.lng]}
+              radius={waiting ? 12 : raised ? 9 : 4}
+              className={`camera-marker tone-${tone}${waiting ? " is-pending" : raised ? " is-raised" : ""}`}
+              eventHandlers={{
+                click: () => {
+                  const district = districtOf(camera.lat, camera.lng);
+                  if (district) onSelect(district);
+                },
+              }}
+            >
+              {/* Lokasi yang bergerak diberi label tetap, supaya terlihat tanpa harus diarahkan kursor. */}
+              {waiting || raised ? (
+                <Tooltip permanent direction={index % 2 ? "bottom" : "top"} offset={[0, index % 2 ? 12 : -12]} className="site-label">
+                  <strong>{camera.name}</strong>
+                  <br />
+                  {waiting
+                    ? `Resmi: ${status.label.toLowerCase()} · indikasi ${WATER[waiting].label.toLowerCase()} (1 dari 2)`
+                    : status.label}
+                </Tooltip>
+              ) : (
+                <Tooltip>
+                  {camera.name} · {status.label}
+                </Tooltip>
+              )}
+            </CircleMarker>
+          );
+        })}
+      </Pane>
     </MapContainer>
   );
 }
