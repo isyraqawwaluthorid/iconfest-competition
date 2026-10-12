@@ -3,6 +3,8 @@
 **Tenggat penyisihan: Jumat, 16 Oktober 2026** (jam batas belum diketahui; tanyakan panitia dan targetkan pengumpulan Kamis malam).
 **Final luring: Senin, 26 Oktober 2026.**
 
+**Status terkini, daftar yang tertinggal, dan rencana harian ada di `10-tasklist.md`** (diperbarui tiap sesi). Dokumen ini adalah rencana awal; centang di bawah disamakan terakhir pada 12 Okt.
+
 Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditambah di atas sistem yang sudah berjalan. Tiap hari diakhiri dengan versi yang bisa dibuka di link deploy.
 
 ## Fase 1 — Penyisihan (10–16 Okt)
@@ -11,7 +13,7 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 - [x] Repo GitHub (monorepo `web/`, `worker/`, `supabase/`, `docs/`, `data/`), README awal, `.gitignore`, `.env.example`.
 - [x] Proyek Supabase: jalankan `schema.sql` lalu `seed_cameras.sql`.
 - [x] Worker minimal: akuisisi + kesehatan + kualitas + simpan frame lokal + unggah `latest/` + `camera_status` + heartbeat.
-- [ ] **Jalankan worker di laptop malam ini** untuk semua kamera aktif (data mentah untuk baseline, kalibrasi, dan evaluasi).
+- [x] **Jalankan worker di laptop malam ini** untuk semua kamera aktif (data mentah untuk baseline, kalibrasi, dan evaluasi).
 - [ ] Kirim email permohonan izin ke Diskominfo Kota Semarang.
 
 **Selesai jika:** `camera_status` terisi untuk 146 kamera, snapshot terbaru ada di Storage, frame lokal bertambah tiap 5 menit.
@@ -28,14 +30,14 @@ Prinsip: **data mulai terkumpul hari pertama**, deploy sejak awal, fitur ditamba
 - [x] Halaman admin: login, `/admin/kamera`, **`/admin/kalibrasi/[id]`** (ROI, garis acuan, referensi siang/malam).
 - [x] Kalibrasi kamera unggulan (±5 menit/kamera).
 - [x] Deteksi perubahan (SSIM) + klasifikasi AI vision (schema) + penghalusan + `water_readings`.
-- [ ] Ingest Open-Meteo per grid.
-- [ ] Uji klasifikasi pada sampel **siang dan malam** sejak awal; sesuaikan prompt dan ambang.
+- [x] Ingest Open-Meteo per grid.
+- [ ] Uji klasifikasi pada sampel **siang dan malam** sejak awal; sesuaikan prompt dan ambang. (Siang selesai; malam belum diperiksa terhadap penilaian manusia.)
 
 ### Selasa 13 Okt — Fusi + insight
-- [ ] Tren, skor risiko (komponen terbuka), `river_links` (admin `/admin/sungai`), peringatan hulu → hilir.
-- [ ] Peringatan (template) + `/air` dengan diagram hulu → hilir.
+- [ ] Tren, skor risiko (komponen terbuka), `river_links` (admin `/admin/sungai`), peringatan hulu → hilir. (Tren dan skor risiko selesai 11 Okt; hulu → hilir belum.)
+- [ ] Peringatan (template) + `/air` dengan diagram hulu → hilir. (Peringatan selesai 11 Okt; `/air` belum.)
 - [ ] Kejadian (events) dan **insight lintas modul genangan → lalu lintas** (12 kamera ganda + radius 1 km).
-- [ ] Insight situasi 15 menit (LLM) → beranda `/` "Denyut Kota".
+- [x] Insight situasi 15 menit (LLM) → beranda `/` "Denyut Kota". (Selesai 12 Okt.)
 
 ### Rabu 14 Okt — Kelengkapan + keandalan
 - [ ] `/lalu-lintas`, `/riwayat` (+ unduh CSV), `/tentang` (cara kerja, atribusi, batasan, privasi).
