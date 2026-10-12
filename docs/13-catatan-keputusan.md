@@ -73,6 +73,12 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 - **Saat tenang paling banyak dua kartu**, dan hujan ringan bukan temuan. Uji pertama menghasilkan empat kartu untuk keadaan normal, termasuk saran "perbaiki baseline" untuk perencana kota; keterbatasan sistem sekarang hanya boleh disebut, tidak dijadikan temuan.
 - Label tingkat `aman` di web adalah "Tidak ada temuan penting", karena lokasi air hanya terpantau di 9 dari 16 kecamatan.
 
+### Simulasi kejadian (12 Okt)
+- **Belum pernah ada kejadian air naik yang nyata**, jadi tidak ada yang bisa diputar ulang, dan saat demo kemungkinan besar juga tidak ada. Halaman `/simulasi` dibuat supaya alur lengkapnya tetap bisa diperlihatkan.
+- **Hanya masukannya yang dibuat-buat** (penilaian AI untuk Progo-IN, Progo-OUT, dan JRAKAH, serta prakiraan hujan). Status, tren, skor risiko, peringatan hulu–hilir, dan ringkasan AI di tiap langkah dihasilkan kode yang sama dengan worker, termasuk panggilan LLM dan pemeriksaan angkanya. Skrip penyusunnya gagal bila hasil aturan tidak sesuai dengan cerita tiap langkah, sehingga simulasi tidak bisa diam-diam menyimpang dari sistem.
+- **Tidak ada yang ditulis ke database.** Skenario disimpan sebagai berkas di repo (`web/lib/demo/scenario.json`) dan ditimpakan di browser ke data langsung; tabel `camera_status`, `alerts`, dan `insights` tidak tersentuh, jadi beranda tidak mungkin ikut menampilkan data simulasi.
+- **Label selalu terlihat:** pita "SIMULASI · Bukan data langsung" dengan jam simulasi dan penjelasan langkah. Snapshot, lalu lintas, dan halaman kamera tetap data langsung, dan itu ditulis di pita yang sama.
+
 ### Keandalan
 - Worker menulis log ke berkas bergulir (`FRAMES_DIR/_state/worker.log`), meminta Windows tidak menidurkan mesin, dan menjalankan satu siklus segera setelah mesin terbangun.
 - Hanya **satu worker** yang boleh berjalan. Dua worker membuat data ganda dan biaya AI dobel.

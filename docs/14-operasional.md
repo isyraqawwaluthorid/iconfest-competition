@@ -100,6 +100,7 @@ cd worker
 .\.venv\Scripts\python.exe scripts\replay_readings.py "Kartini-OUT" --odd   # nilai ulang gambar bukti yang dulu bukan normal
 .\.venv\Scripts\python.exe scripts\replay_readings.py --all 3               # semua lokasi, setelah mengubah kalibrasi atau prompt
 .\.venv\Scripts\python.exe scripts\probe_insight.py           # uji ringkasan AI atas keadaan sekarang, tanpa menulis
+.\.venv\Scripts\python.exe scripts\build_demo_scenario.py     # susun ulang skenario halaman /simulasi (±$0,01), lalu bangun ulang web
 ```
 
 **Kalibrasi dinilai tiap sesi.** Jalankan `calibration_check.py` di awal sesi dan setiap kali ada penilaian yang bukan normal. Penilaian bukan normal dilihat dulu gambarnya (`replay_readings.py "<nama>" --odd`) sebelum dianggap kejadian: sampai 12 Okt, semuanya salah baca akibat kalibrasi atau busa pompa. Referensi malam hanya bisa disimpan setelah gelap (sekitar 17.30 WIB) dan referensi siang hanya saat terang, jadi kerjakan begitu waktunya memungkinkan.
