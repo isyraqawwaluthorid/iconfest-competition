@@ -126,6 +126,8 @@ Jika tidak ada jawaban yang lolos, insight lama tetap tampil dan web menandainya
 }
 ```
 
+`water.pending_confirmation` (sejak 12 Okt) berisi lokasi yang baru sekali dinilai naik oleh AI kamera, sudah dihitung aturan, tetapi belum dikonfirmasi penilaian kedua: nama, status resmi, level yang dinilai, keyakinan, waktu, dan jumlah penilaian yang dibutuhkan. Adanya isi di daftar ini menjadikan tingkat keseluruhan `perlu_perhatian`, dan LLM diminta menyebutnya sebagai "menunggu penilaian kedua", bukan sebagai kenaikan.
+
 Selama pembanding lalu lintas masih sementara (median 24 jam yang mencampur siang dan malam), tingkat kepadatan **tidak dikirim** ke LLM: yang tidak layak disimpulkan tidak perlu sampai ke sana. Setelah pembanding per jam tersedia, `traffic` memuat `by_level`, `anomalies`, dan `busiest`.
 
 Uji tanpa menulis: `python scripts/probe_insight.py` (keadaan nyata) atau `python scripts/probe_insight.py naik` (keadaan buatan di memori: satu pompa siaga, satu jalan tergenang, hujan lebat).
