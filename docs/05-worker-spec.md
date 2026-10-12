@@ -221,7 +221,14 @@ Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status
 - **Sudah berjalan (12 Okt):** `river_links` dibaca ulang tiap siklus. Status terkonfirmasi terburuk di antara lokasi hulu sebuah lokasi menjadi komponen hulu skor risikonya (nama lokasi hulu ikut disimpan di `risk_components.inputs.upstream_name`), dan fakta insight menyebut lokasi hulu dan hilir.
 - **Isi tabel saat ini:** empat pasangan sisi masuk → sisi keluar rumah pompa yang sama (Bulu Drain, Kartini, Progo, Trimulyo), jeda awal 15 menit. Pasangan antar lokasi yang berbeda belum diisi karena butuh pengetahuan aliran setempat.
 - Untuk setiap `river_links`: jika status hulu ≥ waspada dan naik, buat/perbarui peringatan `upstream_warning` (tingkat waspada) pada kamera hilir: "Hulu {nama} berstatus {status} dan {tren}; perkiraan dampak di {hilir} dalam sekitar {lag} menit". `lag = learned_lag_minutes ?? default_lag_minutes`; selama belum dipelajari, pesannya menyebut "jeda masih perkiraan awal".
-- **Belum:** belajar jeda (butuh kejadian, T4.5) dan halaman admin `/admin/sungai`; sementara ini pasangan diisi lewat skrip.
+- **Belum:** halaman admin `/admin/sungai`; sementara ini pasangan diisi lewat skrip.
+
+### Kejadian (`fusion/events.py`, berjalan sejak 12 Okt)
+- Satu baris `events` per periode sebuah lokasi berstatus resmi di atas normal. Dasarnya status terkonfirmasi, jadi penilaian AI tunggal tidak pernah membuka kejadian.
+- **Buka** saat status resmi naik dari normal (`kind`: `genangan_jalan` untuk kamera jalan, selain itu `luapan_sungai`). **Perbarui** `peak_status` dan `peak_at` bila status melampaui puncak, dan tambahkan gambar bukti (maksimal 12). **Tutup** saat status resmi kembali normal, dengan `duration_minutes`.
+- Hanya lokasi yang dinilai AI pada siklus itu yang diperiksa, dan tabel `events` baru dibaca bila ada status di atas normal, sehingga siklus yang tenang tidak menambah pembacaan.
+- `rain_total_mm` dibiarkan kosong: sistem menyimpan prakiraan dan hujan sesaat, bukan total hujan terukur. `traffic_impact` diisi kelak oleh analisis lintas modul.
+- Jeda dipelajari saat kejadian di hilir dibuka (lihat butir di bawah).
 - **Belajar jeda:** setelah kejadian di hilir dimulai, cari waktu kenaikan hulu terakhir sebelumnya (maks. 6 jam). Perbarui `learned_lag_minutes` sebagai median jeda dari semua kejadian; naikkan `learned_from_events`.
 
 ## Lintas modul (`fusion/cross_module.py`)
