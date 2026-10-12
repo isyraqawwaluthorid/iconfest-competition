@@ -10,7 +10,8 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any
 
-from supabase import Client, create_client
+import httpx
+from supabase import Client, ClientOptions, create_client
 
 from .config import Settings
 from .models import CameraRow
@@ -19,13 +20,21 @@ from .sources.openmeteo import GridPoint
 log = logging.getLogger(__name__)
 
 PAGE_SIZE = 1000  # batas baris per permintaan PostgREST
+HTTP_TIMEOUT_SECONDS = 30.0
 
 
 class Database:
     def __init__(self, settings: Settings, *, dry_run: bool = False) -> None:
         if not settings.supabase_url or not settings.supabase_service_role_key:
             raise RuntimeError("SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY belum diisi di .env")
-        self._client: Client = create_client(settings.supabase_url, settings.supabase_service_role_key)
+        # HTTP/1.1, bukan HTTP/2 bawaan pustaka: unggahan serentak dari banyak utas lewat satu sambungan
+        # HTTP/2 sebagian gagal di Windows (WinError 10035). Dengan HTTP/1.1 tiap utas memakai sambungan sendiri.
+        http_client = httpx.Client(http2=False, timeout=HTTP_TIMEOUT_SECONDS, follow_redirects=True)
+        self._client: Client = create_client(
+            settings.supabase_url,
+            settings.supabase_service_role_key,
+            options=ClientOptions(httpx_client=http_client),
+        )
         self._bucket = settings.supabase_storage_bucket
         self.dry_run = dry_run
 
