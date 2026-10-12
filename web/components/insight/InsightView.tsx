@@ -24,7 +24,7 @@ import {
   type Theme,
 } from "@/lib/insight";
 import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
-import { formatTimeWib } from "@/lib/time";
+import { formatDateTimeWib, formatTimeWib, minutesSince } from "@/lib/time";
 import { siteProgress } from "@/lib/progress";
 import type { Alert, CameraOverview, GridWeather, SiteReading } from "@/lib/types";
 import { AiInsightPanel } from "./AiInsight";
@@ -38,6 +38,7 @@ const ThematicMap = dynamic(() => import("./ThematicMap"), {
 });
 
 const TOP_COUNT = 6;
+const STALE_AFTER_MINUTES = 15; // tiga siklus worker; sama dengan ambang banner sistem
 type Tab = "insight" | "alerts" | "water" | "traffic";
 
 type Props = {
@@ -99,6 +100,10 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
     (max, c) => (c.status_updated_at && (!max || c.status_updated_at > max) ? c.status_updated_at : max),
     null,
   );
+
+  // Data langsung yang tidak diperbarui lebih dari tiga siklus dianggap tertunda: kondisi terakhir tetap
+  // ditampilkan, tetapi tidak lagi disebut sebagai kondisi "sekarang".
+  const outdated = clock === undefined && now !== null && latest !== null && minutesSince(latest, now) > STALE_AFTER_MINUTES;
 
   const riskiest = cameras
     .filter(hasWaterStatus)
@@ -177,9 +182,9 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
       {/* Kolom kiri bisa digulir bila isinya melebihi tinggi layar; bagian kosongnya tidak menghalangi klik ke peta. */}
       <div className="p-3 lg:pointer-events-none lg:absolute lg:top-3 lg:bottom-3 lg:left-3 lg:w-[22rem] lg:overflow-y-auto lg:p-0 lg:[&>*]:pointer-events-auto">
         <section aria-label="Kondisi kota sekarang" className="map-panel relative overflow-hidden">
-          <div className={`tint tone-${situation.tone} p-4`}>
+          <div className={`tint tone-${outdated ? "unknown" : situation.tone} p-4`}>
             <div className="flex items-center justify-between gap-2">
-              <p className="label-caps">Kondisi kota sekarang</p>
+              <p className="label-caps">{outdated ? "Data tertunda" : "Kondisi kota sekarang"}</p>
               <button
                 type="button"
                 onClick={() => setSummaryOpen((open) => !open)}
@@ -190,8 +195,15 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                 <Icon name={summaryOpen ? "chevron-up" : "chevron-down"} size={18} />
               </button>
             </div>
-            <h1 className="mt-1 text-xl leading-tight font-extrabold">{situation.headline}</h1>
-            {summaryOpen ? <p className="mt-1.5 text-sm">{situation.points.join(" ")}</p> : null}
+            <h1 className="mt-1 text-xl leading-tight font-extrabold">
+              {outdated && latest ? `Belum ada pembaruan sejak ${formatDateTimeWib(latest)}` : situation.headline}
+            </h1>
+            {summaryOpen ? (
+              <p className="mt-1.5 text-sm">
+                {outdated ? "Sistem sedang tidak mengirim data, jadi keadaan sekarang tidak diketahui. Keadaan terakhir yang tercatat: " : ""}
+                {situation.points.join(" ")}
+              </p>
+            ) : null}
           </div>
           {summaryOpen ? (
             <div className="p-4">
