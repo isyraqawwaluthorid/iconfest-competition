@@ -5,7 +5,7 @@ import { SnapshotView } from "@/components/camera/SnapshotView";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { ROAD_REACH_M } from "@/lib/geo/roads";
+import { ROAD_EXTENDED_M, ROAD_REACH_M } from "@/lib/geo/roads";
 import { useNow, useTrafficSeries } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
 import { isOnline } from "@/lib/status";
@@ -29,8 +29,8 @@ export function SegmentPanel({ row, onClose }: { row: RoadRow; onClose: () => vo
           <p className="label-caps text-muted">Ruas jalan</p>
           <h2 className="mt-1 text-xl leading-tight font-extrabold">{title}</h2>
           <p className="mt-1 text-xs text-muted">
-            Dilihat dari kamera {camera.name}. Yang diwarnai hanya potongan jalan di sekitar kamera, paling jauh ±
-            {ROAD_REACH_M} m ke tiap arah, karena hanya itu yang terlihat.
+            Dilihat dari kamera {camera.name}. Garis tebal (±{ROAD_REACH_M} m dari kamera) adalah yang terlihat; garis tipis
+            sampai ±{ROAD_EXTENDED_M / 1000} km di jalan yang sama adalah perkiraan dari kamera ini.
           </p>
         </div>
         <button

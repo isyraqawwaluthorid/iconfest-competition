@@ -43,6 +43,9 @@
   --density-ramai: var(--status-waspada);
   --density-padat: var(--status-awas);
 
+  /* Jalan utama yang tidak punya kamera: tergambar jelas, tetapi netral. */
+  --road-untracked: #8a93a6;
+
   /* Lapisan aktivitas: makin gelap makin ramai. Ungu, supaya tidak terbaca sebagai status bahaya. */
   --activity-1: #ede9fe;
   --activity-2: #c4b5fd;
@@ -72,6 +75,7 @@
 }
 
 @theme inline {
+  --color-road-untracked: var(--road-untracked);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
@@ -290,8 +294,9 @@ h1, h2, h3 {
 
 /* Halaman Lalu Lintas: ruas jalan di sekitar tiap kamera, diwarnai menurut tingkat kepadatannya. */
 .road-map .leaflet-tile-pane {
-  /* Peta dasar diredam, tetapi nama dan bentuk jalan tetap terbaca saat didekati. */
-  filter: grayscale(1) opacity(0.6);
+  /* Peta dasar diredam secukupnya: warna asli jalannya tidak boleh menyaingi warna ruas, tetapi nama jalan dan
+     bangunan tetap terbaca saat didekati. */
+  filter: grayscale(0.8) opacity(0.75);
 }
 .road-map.leaflet-container {
   background: var(--surface-muted);
@@ -316,6 +321,22 @@ h1, h2, h3 {
 .road-segment.tone-density-ramai { stroke: var(--density-ramai); }
 .road-segment.tone-density-padat { stroke: var(--density-padat); }
 .road-segment.tone-offline { stroke: var(--status-offline); stroke-dasharray: 2 9; }
+/* Jalan yang sama lebih jauh dari kamera: warna yang sama, lebih tipis dan sedikit tembus, karena itu perkiraan. */
+.road-segment.is-extended { stroke-opacity: 0.8; }
+/* Jalan utama tanpa kamera: tergambar, tanpa warna status. */
+.road-network {
+  stroke: var(--road-untracked);
+  stroke-opacity: 0.9;
+  fill: none;
+  pointer-events: none;
+}
+.camera-halo { stroke: none; fill-opacity: 0.28; pointer-events: none; }
+.camera-halo.tone-density-lancar { fill: var(--density-lancar); }
+.camera-halo.tone-density-normal { fill: var(--density-normal); }
+.camera-halo.tone-density-ramai { fill: var(--density-ramai); }
+.camera-halo.tone-density-padat { fill: var(--density-padat); }
+.camera-halo.tone-unknown { fill: var(--status-unknown); }
+.camera-halo.tone-offline { fill: var(--status-offline); }
 
 /* Lapisan "Aktivitas per jam": satu heksagon per kawasan yang punya kamera; tingkat 0 berarti belum ada data. */
 .activity-hex {

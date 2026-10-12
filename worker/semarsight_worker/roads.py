@@ -1,8 +1,10 @@
 """Ruas jalan di sekitar kamera lalu lintas, dipotong dari geometri jalan OpenStreetMap.
 
-Kamera hanya melihat jalan di dekatnya, jadi yang diwarnai di peta adalah potongan jalan sepanjang
-`REACH_M` ke tiap arah dari titik terdekat kamera, bukan seluruh jalan. Modul ini murni geometri:
-tidak mengambil data dari jaringan dan tidak menyentuh database (lihat `scripts/build_road_segments.py`).
+Kamera hanya melihat jalan di dekatnya. Karena itu tiap kamera punya dua potongan: ruas dekat sepanjang
+`REACH_M` ke tiap arah (yang kira-kira terlihat), dan perpanjangannya di jalan yang sama sampai `EXTENDED_M`
+(perkiraan; digambar lebih tipis di peta). Jalan utama tanpa kamera tetap digambar, tanpa warna.
+Modul ini murni geometri: tidak mengambil data dari jaringan dan tidak menyentuh database
+(lihat `scripts/build_road_segments.py`).
 """
 
 from __future__ import annotations
@@ -12,7 +14,8 @@ from dataclasses import dataclass
 
 Point = tuple[float, float]  # (lat, lng)
 
-REACH_M = 200.0  # panjang ruas ke tiap arah dari titik terdekat kamera
+REACH_M = 200.0  # panjang ruas ke tiap arah dari titik terdekat kamera: bagian yang kira-kira terlihat kamera
+EXTENDED_M = 1000.0  # jalan yang sama diwarnai sampai sejauh ini sebagai perkiraan dari kamera itu
 MIN_REACH_M = 60.0  # ruas tidak dipendekkan lebih dari ini walau kamera tetangganya sangat dekat
 SAME_SPOT_M = 30.0  # kamera sedekat ini berada di tiang yang sama dan melihat ruas yang sama
 MATCH_M = 60.0  # kamera dianggap berada di jalan yang jaraknya paling jauh sekian meter
@@ -77,6 +80,11 @@ def ways_from_overpass(elements: list[dict]) -> list[Way]:
             )
         )
     return ways
+
+
+def network_lines(ways: list[Way]) -> list[tuple[Point, ...]]:
+    """Garis semua jalan utama, untuk digambar sebagai latar jaringan jalan (termasuk yang tidak punya kamera)."""
+    return [way.points for way in ways if way.is_major]
 
 
 def _xy(point: Point, origin: Point) -> tuple[float, float]:

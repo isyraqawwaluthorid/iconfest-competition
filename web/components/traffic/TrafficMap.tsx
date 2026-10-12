@@ -1,9 +1,10 @@
 "use client";
 
 import L from "leaflet";
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { AttributionControl, CircleMarker, MapContainer, Pane, Polygon, Polyline, TileLayer, Tooltip, useMap, ZoomControl } from "react-leaflet";
 import { activityLevel, hexTitle, type Hex } from "@/lib/activity";
+import { ROAD_NETWORK } from "@/lib/geo/road-network";
 import { CENTER_BOUNDS, ROADS_BOUNDS, segmentBounds } from "@/lib/geo/roads";
 import { formatNumber } from "@/lib/insight";
 import type { RoadRow } from "@/lib/traffic";
@@ -120,15 +121,39 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
   };
   return (
     <>
-      {/* Tepi putih semua ruas di lapisan bawah, supaya tepi satu ruas tidak menutupi warna ruas di sebelahnya. */}
+      {/* Semua jalan utama sebagai satu garis tanpa warna: jalan tanpa kamera terlihat sebagai tidak terpantau. */}
+      <Pane name="road-network" style={{ zIndex: 402 }}>
+        <Polyline positions={ROAD_NETWORK} pathOptions={{ weight: 3 }} className="road-network" interactive={false} />
+      </Pane>
+      {/* Jalan yang sama lebih jauh dari kamera: warna kamera itu sebagai perkiraan, lebih tipis daripada ruas yang terlihat. */}
+      <Pane name="road-extended" style={{ zIndex: 406 }}>
+        {ordered.map((row) => {
+          const { camera, segment, title } = row;
+          const { line: tone, label } = look(row);
+          return segment.extended.map((line, index) => (
+            <Polyline
+              // Leaflet hanya membaca className saat garis dibuat, jadi garis dibuat ulang saat warnanya berubah.
+              key={`${camera.id}-${index}-${tone}`}
+              positions={line}
+              pathOptions={{ weight: 4 }}
+              className={`road-segment is-extended ${tone}`}
+              eventHandlers={{ click: () => onSelect(camera.id) }}
+            >
+              <Tooltip sticky>
+                {title} · {label} (perkiraan dari kamera {camera.name})
+              </Tooltip>
+            </Polyline>
+          ));
+        })}
+      </Pane>
+      {/* Tepi putih ruas yang terlihat kamera, di bawah warnanya, supaya menonjol dari perpanjangannya. */}
       <Pane name="road-casings" style={{ zIndex: 410 }}>
         {ordered.map(({ camera, segment }) =>
           segment.lines.map((line, index) => (
             <Polyline
-              // Leaflet hanya membaca className saat garis dibuat, jadi garis dibuat ulang saat pilihannya berubah.
               key={`${camera.id}-${index}-${camera.id === selected}`}
               positions={line}
-              pathOptions={{ weight: camera.id === selected ? 16 : 11 }}
+              pathOptions={{ weight: camera.id === selected ? 15 : 10 }}
               className={`road-casing${camera.id === selected ? " is-selected" : ""}`}
               eventHandlers={{ click: () => onSelect(camera.id) }}
             />
@@ -160,15 +185,23 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
           const { camera } = row;
           const { dot } = look(row);
           return (
-            <CircleMarker
-              key={`${camera.id}-${dot}-${camera.id === selected}`}
-              center={[camera.lat, camera.lng]}
-              radius={camera.id === selected ? 7 : 4}
-              className={`camera-marker ${dot}${camera.id === selected ? " is-selected" : ""}`}
-              eventHandlers={{ click: () => onSelect(camera.id) }}
-            >
-              <Tooltip>Kamera {camera.name}</Tooltip>
-            </CircleMarker>
+            // Lingkaran luar tembus pandang membuat titik kamera terlihat dari jauh; yang bisa diklik adalah titik dalamnya.
+            <Fragment key={`${camera.id}-${dot}-${camera.id === selected}`}>
+              <CircleMarker
+                center={[camera.lat, camera.lng]}
+                radius={camera.id === selected ? 15 : 11}
+                className={`camera-halo ${dot}`}
+                interactive={false}
+              />
+              <CircleMarker
+                center={[camera.lat, camera.lng]}
+                radius={camera.id === selected ? 8 : 6}
+                className={`camera-marker ${dot}${camera.id === selected ? " is-selected" : ""}`}
+                eventHandlers={{ click: () => onSelect(camera.id) }}
+              >
+                <Tooltip>Kamera {camera.name}</Tooltip>
+              </CircleMarker>
+            </Fragment>
           );
         })}
       </Pane>

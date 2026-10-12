@@ -10,7 +10,14 @@ import { SegmentPanel } from "./SegmentPanel";
 import { PANEL_BOTTOM, PANEL_LEFT, PANEL_RIGHT } from "./layout";
 
 const TOP_COUNT = 8;
-const LEGEND = [DENSITY.lancar, DENSITY.normal, DENSITY.ramai, DENSITY.padat, DENSITY.tidak_diketahui, { ...HEALTH.dead, label: "Kamera mati" }];
+const LEGEND = [
+  DENSITY.lancar,
+  DENSITY.normal,
+  DENSITY.ramai,
+  DENSITY.padat,
+  DENSITY.tidak_diketahui,
+  { ...HEALTH.dead, label: "Kamera mati" },
+];
 
 type Props = {
   rows: RoadRow[];
@@ -38,9 +45,14 @@ export function RoadPanels({ rows, situation, latest, selected, onSelect }: Prop
                 {item.label}
               </li>
             ))}
+            <li className="flex items-center gap-1.5">
+              <span aria-hidden className="h-1 w-5 rounded-full bg-road-untracked" />
+              Tanpa kamera
+            </li>
           </ul>
           <p className="mt-1 text-center text-[11px] text-muted">
-            Warna ruas: kendaraan terlihat dibanding kebiasaan ruas itu pada jam yang sama. Bukan kecepatan.
+            Dibanding kebiasaan pada jam yang sama, bukan kecepatan. Garis tebal: terlihat kamera. Garis tipis: perkiraan
+            untuk jalan yang sama.
           </p>
         </div>
       </div>

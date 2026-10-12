@@ -75,6 +75,13 @@ def test_reach_stops_halfway_to_the_next_camera_on_the_same_road():
     assert roads.shared_reach(camera, [(LAT, 110.4051)]) == roads.REACH_M  # tiang yang sama
 
 
+def test_network_keeps_major_roads_only():
+    main = east_west(1, "Jalan Pemuda", 0, 3)
+    link = east_west(2, "", 0, 3, highway="primary_link")
+    alley = east_west(3, "Gang Kecil", 0, 3, highway="residential")
+    assert roads.network_lines([main, link, alley]) == [main.points, link.points]
+
+
 def test_far_road_is_flagged_and_no_road_gives_none():
     road = east_west(1, "Jalan Pemuda", 0, 11)
     far = roads.segment_for((LAT + 0.0008, 110.405), [road])  # ±89 m dari jalan

@@ -3,9 +3,10 @@ import data from "./road-segments.json";
 
 /**
  * Ruas jalan di sekitar tiap kamera lalu lintas, dipotong dari OpenStreetMap (© kontributor OpenStreetMap, ODbL)
- * oleh `worker/scripts/build_road_segments.py`. Kamera hanya melihat jalan di dekatnya, jadi satu ruas paling
- * jauh ±200 m ke tiap arah dari kamera, dan lebih pendek bila ada kamera lain di jalan yang sama.
- * Jalan dua jalur punya dua garis.
+ * oleh `worker/scripts/build_road_segments.py`. Kamera hanya melihat jalan di dekatnya: `lines` adalah bagian
+ * yang kira-kira terlihat (paling jauh ±200 m ke tiap arah), `extended` adalah jalan yang sama sampai ±1 km,
+ * yang diwarnai sebagai perkiraan dari kamera itu. Keduanya berhenti di tengah jarak ke kamera lain di jalan
+ * yang sama. Jalan dua jalur punya dua garis.
  */
 export type RoadSegment = {
   camera_id: string;
@@ -14,14 +15,17 @@ export type RoadSegment = {
   road_class: string;
   length_m: number;
   lines: LatLng[][];
+  /** Jalan yang sama, lebih jauh dari kamera: perkiraan, digambar lebih tipis. Memuat juga bagian `lines`. */
+  extended: LatLng[][];
 };
 
 const segments = data.segments as unknown as RoadSegment[];
 
 export const ROAD_SEGMENTS: ReadonlyMap<string, RoadSegment> = new Map(segments.map((segment) => [segment.camera_id, segment]));
 
-/** Jangkauan ruas ke tiap arah dari kamera, dalam meter. */
+/** Jangkauan ruas ke tiap arah dari kamera, dalam meter: bagian yang terlihat, dan perpanjangannya sebagai perkiraan. */
 export const ROAD_REACH_M: number = data.reach_m;
+export const ROAD_EXTENDED_M: number = data.extended_m;
 
 function boundsOf(points: LatLng[]): [LatLng, LatLng] {
   return [

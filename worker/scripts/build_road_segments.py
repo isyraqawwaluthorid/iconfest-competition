@@ -1,8 +1,9 @@
 """Bangun ruas jalan di sekitar tiap kamera lalu lintas dari OpenStreetMap, untuk halaman Lalu Lintas.
 
-Hasilnya `web/lib/geo/road-segments.json`: satu ruas per kamera, yang diwarnai web menurut tingkat
-kepadatan kamera itu. Dijalankan sekali, dan diulang bila daftar kamera lalu lintas berubah. Hanya
-membaca database; yang ditulis hanya berkas JSON itu.
+Hasilnya dua berkas di `web/lib/geo/`: `road-segments.json` (per kamera: ruas dekat yang kira-kira
+terlihat, dan perpanjangannya di jalan yang sama) yang diwarnai web menurut tingkat kepadatan kamera itu,
+dan `road-network.json` (semua jalan utama, digambar tanpa warna sebagai latar). Dijalankan sekali, dan
+diulang bila daftar kamera lalu lintas berubah. Hanya membaca database; yang ditulis hanya dua berkas itu.
 
     python scripts/build_road_segments.py                 # ambil dari Overpass, tulis JSON
     python scripts/build_road_segments.py --cache raw.json  # simpan/pakai ulang jawaban Overpass
@@ -27,9 +28,16 @@ from semarsight_worker.config import get_settings  # noqa: E402
 from semarsight_worker.db import Database  # noqa: E402
 
 OVERPASS_URLS = ("https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter")
-SEARCH_M = 450  # cukup untuk menyusuri REACH_M ke tiap arah dari jalan sejauh FALLBACK_M
+SEARCH_M = 1250  # cukup untuk menyusuri EXTENDED_M ke tiap arah dari jalan sejauh FALLBACK_M
 HIGHWAYS = "motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street"
-OUTPUT = Path(__file__).resolve().parents[2] / "web" / "lib" / "geo" / "road-segments.json"
+GEO_DIR = Path(__file__).resolve().parents[2] / "web" / "lib" / "geo"
+OUTPUT = GEO_DIR / "road-segments.json"
+NETWORK_OUTPUT = GEO_DIR / "road-network.json"
+SOURCE = "OpenStreetMap (Overpass API), © kontributor OpenStreetMap, ODbL"
+
+
+def _rounded(lines, digits: int) -> list[list[list[float]]]:
+    return [[[round(lat, digits), round(lng, digits)] for lat, lng in line] for line in lines]
 
 
 def fetch_ways(cameras: list[dict]) -> list[dict]:
@@ -83,6 +91,8 @@ def main() -> None:
         if segment is None:
             missing.append(camera["name"])
             continue
+        # Perpanjangan di jalan yang sama: perkiraan dari kamera ini, juga berhenti di tengah jarak ke kamera tetangga.
+        far = roads.segment_for(point, nearby_ways[cid], hints[cid], roads.shared_reach(point, neighbours, roads.EXTENDED_M))
         flag = "  PERIKSA" if segment.needs_review else ""
         print(
             f"  {camera['name'][:34]:34} -> {segment.road_name or '(tanpa nama)':32} {segment.road_class:11}"
@@ -96,7 +106,8 @@ def main() -> None:
                 "distance_m": segment.distance_m,
                 "length_m": segment.length_m,
                 "needs_review": segment.needs_review,
-                "lines": [[[round(lat, 6), round(lng, 6)] for lat, lng in line] for line in segment.lines],
+                "lines": _rounded(segment.lines, 6),
+                "extended": _rounded(far.lines if far else segment.lines, 5),
             }
         )
     if missing:
@@ -106,8 +117,9 @@ def main() -> None:
         json.dumps(
             {
                 "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "source": "OpenStreetMap (Overpass API), © kontributor OpenStreetMap, ODbL",
+                "source": SOURCE,
                 "reach_m": roads.REACH_M,
+                "extended_m": roads.EXTENDED_M,
                 "segments": segments,
             },
             ensure_ascii=False,
@@ -116,6 +128,10 @@ def main() -> None:
         encoding="utf-8",
     )
     print(f"{len(segments)} ruas ditulis ke {OUTPUT}")
+
+    network = _rounded(roads.network_lines(ways), 5)
+    NETWORK_OUTPUT.write_text(json.dumps({"source": SOURCE, "lines": network}, separators=(",", ":")), encoding="utf-8")
+    print(f"{len(network)} garis jalan utama ditulis ke {NETWORK_OUTPUT} ({NETWORK_OUTPUT.stat().st_size // 1024} KB)")
 
 
 if __name__ == "__main__":
