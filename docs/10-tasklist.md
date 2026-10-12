@@ -19,11 +19,11 @@ Cara membaca:
 | Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
 | Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 6 dari 9 | 1 | 2 | Sel 13 Okt |
-| Fase 5 — Kelengkapan dan keandalan | 3 dari 8 | 1 | 4 | Rab 14 Okt |
+| Fase 5 — Kelengkapan dan keandalan | 3 dari 8 | 2 | 3 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | – | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **61 dari 89 (69%)** | **4** | **24** | |
+| **Jumlah inti** | **61 dari 89 (69%)** | **5** | **23** | |
 | Fitur tambahan (TX) | 0 dari 6 | – | 6 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -221,7 +221,7 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 - [x] **T5.3 [K]** `/tentang`: cara kerja, atribusi PANTAUSEMAR, batasan, privasi. Selesai 12 Okt: cakupan dari data langsung (146 kamera, 20 lokasi air, 9 dari 16 kecamatan), empat langkah cara kerja, bobot skor risiko, tujuh batasan yang ditulis terus terang, privasi dan retensi, serta sumber data dan lisensinya.
 - [x] **T5.4 [K]** Cara mendemokan kejadian. Selesai 12 Okt sebagai halaman `/simulasi`: skenario 8 langkah (115 menit) dengan masukan buatan (penilaian AI tiga lokasi dan prakiraan hujan) yang dijalankan melalui aturan dan LLM asli, lalu diputar di layar yang sama dengan beranda dengan label "SIMULASI · Bukan data langsung" dan penjelasan tiap langkah. Tidak menulis apa pun ke database; data langsung tidak tersentuh. Disusun ulang dengan `worker/scripts/build_demo_scenario.py` bila aturan atau prompt berubah. `/replay` dari kejadian nyata menunggu ada kejadian yang terekam.
 - [ ] **T5.5 [M+K]** Pindahkan worker ke VPS (systemd, `Restart=always`). *Bukti:* berjalan stabil semalaman. **Sebagian** 12 Okt: worker dipindah dari laptop ke PC yang menetap (mulai 12.51 WIB, mesin diatur tidak tidur); VPS belum, dan bukti semalaman menyusul 13 Okt pagi. Worker belum menyala sendiri setelah PC restart.
-- [ ] **T5.6 [K]** Audit empat keadaan (memuat, kosong, error, usang) di semua komponen data; uji mematikan worker.
+- [ ] **T5.6 [K]** Audit empat keadaan (memuat, kosong, error, usang) di semua komponen data; uji mematikan worker. **Sebagian** 12 Okt: halaman baru (Riwayat, Tentang, Simulasi, tren di panel kecamatan) punya keadaan memuat, kosong, dan gagal; beranda menulis "Data tertunda · belum ada pembaruan sejak …" bila data langsung tidak diperbarui lebih dari 15 menit, alih-alih tetap menyebut kondisi "sekarang". **Belum:** uji dengan worker benar-benar dimatikan (sengaja ditunda agar tidak ada jeda data), dan pemeriksaan halaman kamera serta admin.
 - [ ] **T5.7 [K]** `scripts/export_eval_sample.py` + `/admin/label` + `/api/admin/labels`. Kandidat digeser.
 - [ ] **T5.8 [K]** Sinkronisasi kamera harian (`sources/pantausemar.py`) dan job malam baseline. Bagian baseline dikerjakan lebih dulu sebagai T2.14.
 
