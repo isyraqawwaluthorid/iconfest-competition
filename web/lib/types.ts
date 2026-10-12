@@ -106,6 +106,8 @@ export type GridWeather = {
   precip_next_3h_mm: number;
   precip_next_6h_mm: number;
   precip_prob_max_3h: number | null;
+  /** Prakiraan per jam ke depan (hingga 12 jam); `time` adalah akhir jam itu, dalam detik epoch. */
+  hourly: { time: number; precipitation: number; probability: number | null }[];
 };
 
 /** Baris tabel `camera_status` seperti yang dikirim Supabase Realtime. */

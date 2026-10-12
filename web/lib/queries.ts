@@ -92,7 +92,7 @@ export async function getWeather(): Promise<GridWeather[]> {
     supabase.from("weather_grid").select("id, name, lat, lng"),
     supabase
       .from("weather_readings")
-      .select("grid_id, fetched_at, precip_now_mm, precip_next_1h_mm, precip_next_3h_mm, precip_next_6h_mm, precip_prob_max_3h")
+      .select("grid_id, fetched_at, precip_now_mm, precip_next_1h_mm, precip_next_3h_mm, precip_next_6h_mm, precip_prob_max_3h, hourly")
       .eq("source", "live")
       .order("fetched_at", { ascending: false })
       .limit(36),
@@ -117,6 +117,7 @@ export async function getWeather(): Promise<GridWeather[]> {
         precip_next_3h_mm: row.precip_next_3h_mm ?? 0,
         precip_next_6h_mm: row.precip_next_6h_mm ?? 0,
         precip_prob_max_3h: row.precip_prob_max_3h,
+        hourly: Array.isArray(row.hourly) ? (row.hourly as GridWeather["hourly"]) : [],
       },
     ];
   });

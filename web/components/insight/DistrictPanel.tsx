@@ -2,10 +2,12 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
 import type { Insight } from "@/lib/ai-insight";
+import { useNow } from "@/lib/hooks";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
 import { InsightCard } from "./AiInsight";
+import { RainOutlook, TrafficTrend } from "./DistrictTrend";
 
 type Props = {
   summary: DistrictSummary;
@@ -20,6 +22,12 @@ export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props)
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
   // Temuan AI yang menyangkut lokasi di kecamatan ini; temuan tanpa lokasi hanya tampil di ringkasan kota.
+  const now = useNow();
+  // Status terkonfirmasi yang berganti dalam 24 jam terakhir; penilaian AI tunggal tidak dihitung sebagai perubahan.
+  const changed = sites.filter(
+    (site) => now !== null && site.water_status_since != null && now - new Date(site.water_status_since).getTime() < 24 * 3_600_000,
+  );
+  const trafficIds = cameras.filter((camera) => camera.modules.includes("traffic")).map((camera) => camera.id);
   const local = new Set(cameras.map((camera) => camera.id));
   const findings = insight?.items.filter((item) => item.camera_ids.some((id) => local.has(id))) ?? [];
   return (
@@ -90,6 +98,15 @@ export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props)
             })}
           </ul>
         )}
+        {sites.length > 0 && now !== null ? (
+          <p className="text-xs text-muted">
+            {changed.length === 0
+              ? "Tidak ada perubahan status dalam 24 jam terakhir."
+              : `Perubahan status 24 jam terakhir: ${changed
+                  .map((site) => `${site.name} menjadi ${WATER[site.water_status ?? "tidak_dapat_dinilai"].label.toLowerCase()} ${formatDateTimeWib(site.water_status_since as string)}`)
+                  .join("; ")}.`}
+          </p>
+        ) : null}
       </section>
 
       <section className="space-y-2">
@@ -116,6 +133,7 @@ export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props)
             </p>
           </div>
         )}
+        {trafficIds.length > 0 ? <TrafficTrend cameraIds={trafficIds} /> : null}
       </section>
 
       <section className="space-y-2">
@@ -146,6 +164,7 @@ export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props)
               Prakiraan Open-Meteo, titik {rain.name}, diambil {formatTimeWib(rain.fetched_at)}
               {rain.precip_prob_max_3h != null ? `. Peluang hujan hingga ${rain.precip_prob_max_3h}%` : ""}.
             </p>
+            <RainOutlook rain={rain} />
           </div>
         ) : (
           <p className="rounded-control bg-surface-muted p-3 text-muted">Data hujan belum tersedia.</p>
