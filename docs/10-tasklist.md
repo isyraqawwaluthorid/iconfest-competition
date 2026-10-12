@@ -194,7 +194,19 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 - [x] **T4.7 [K]** `insights.py`: insight situasi dari LLM teks. Selesai 12 Okt: fakta dari `camera_status`, cuaca, dan peringatan; tingkat keseluruhan dari aturan; setiap angka di jawaban LLM diperiksa terhadap fakta sebelum disimpan; dipanggil hanya saat keadaan berubah atau tiap 60 menit; 22 unit test; `scripts/probe_insight.py` untuk uji tanpa menulis. Insight harian dan lintas modul belum (ikut T4.6).
 - [x] **T4.9 [K]** Beranda "Denyut Kota". Digantikan cakupan TV.5, selesai 12 Okt.
 - [ ] **T4.3 [K]** `/admin/sungai` + `/api/admin/river-links`; `fusion/upstream.py` (peringatan hulu → hilir, belajar jeda). *Bukti:* komponen hulu di skor risiko tidak lagi selalu 0.
-- [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan. Tabel masih kosong. Usulan pasangan disusun lebih dulu untuk disetujui.
+- [ ] **T4.4 [M]** Isi `river_links` untuk sistem sungai kamera unggulan. Tabel masih kosong. **Usulan 12 Okt, menunggu persetujuan pemilik proyek:**
+
+  | Hulu (sisi masuk) | Hilir (sisi keluar) | Jarak | Dasar | Keyakinan |
+  |---|---|---|---|---|
+  | Bulu Drain-IN | Bulu Drain-OUT | 20 m | Pompa yang sama | Tinggi |
+  | Kartini-IN | Kartini-OUT | 140 m | Pompa yang sama | Tinggi |
+  | Progo-IN | Progo-OUT | 0 m | Pompa yang sama | Tinggi |
+  | Trimulyo_Depan | Trimulyo_OUT | 20 m | Pompa yang sama | Tinggi |
+  | IPdome-Polder Tawang | DPU-Mberok2-OUT | 440 m | Berdekatan; perlu dipastikan polder ini memang dibuang lewat pompa Mberok | Perlu dipastikan |
+  | DPU-Mberok2-OUT | Jembatan Mberok (jalan) | 10 m | Jalan tepat di samping pompa; untuk insight genangan | Perlu dipastikan |
+  | Bulu Drain-OUT | KS-OUT-2 | 710 m | Berdekatan; perlu dipastikan satu aliran | Perlu dipastikan |
+
+  Tidak diusulkan karena tidak ada dasar dari nama atau jarak: Banger-SD-IN, Manggis-IN, KP.Kali-OUT, Semarang Indah_OUT (pasangannya, Semarang Indah_IN, bukan kamera unggulan), Jinunjung_Halaman, dan kamera jalan lainnya. Yang juga perlu diputuskan: di rumah pompa, sisi mana yang memengaruhi risiko sisi lainnya (air masuk yang tinggi membebani pompa; air keluar yang tinggi menghambat pembuangan).
 - [ ] **T4.5 [K]** `fusion/events.py`: buka, perbarui puncak, tutup kejadian. Tabel `events` masih kosong.
 - [ ] **T4.6 [K]** `fusion/cross_module.py`: genangan → lalu lintas (kamera ganda + radius 1 km), simpan `events.traffic_impact`, dan insight lintas modul. Bergantung pada T2.14 dan T4.5.
 - [ ] **T4.8 [K]** `/air`: daftar kamera urut risiko, diagram hulu → hilir, hujan per grid, kejadian aktif. Kandidat digeser.
