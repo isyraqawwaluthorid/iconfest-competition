@@ -23,7 +23,7 @@ from . import acquisition, alerts, housekeeping, quality, storage
 from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
-from .fusion import baseline
+from .fusion import baseline, events, upstream
 from .insights import InsightWriter
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
 from .sources import openmeteo
@@ -155,6 +155,10 @@ def run_cycle(
         ]
     )
     try:
+        record_events(database, recordable, before, water_updates, water_pipeline.links)
+    except Exception:  # noqa: BLE001 - kejadian dicatat ulang pada penilaian berikutnya; status dan peringatan tidak ikut tertahan
+        log.exception("pencatatan kejadian gagal")
+    try:
         alerts.sync(database, all_cameras, weather, water_pipeline.links)
     except Exception:  # noqa: BLE001 - peringatan disusun ulang pada siklus berikutnya
         log.exception("pembaruan peringatan gagal")
@@ -182,6 +186,48 @@ def run_cycle(
         except Exception:  # noqa: BLE001 - insight lama tetap tampil; dicoba lagi pada siklus berikutnya
             log.exception("pembaruan insight gagal")
     return stats
+
+
+def record_events(
+    database: Database,
+    results: list[CameraResult],
+    before: dict[str, dict[str, Any]],
+    water_updates: dict[str, dict[str, Any]],
+    links: list[upstream.Link],
+) -> None:
+    """Buka, perbarui, atau tutup kejadian untuk lokasi yang dinilai AI pada siklus ini, lalu pelajari jeda hulu → hilir."""
+    assessed = [r for r in results if "water_status" in water_updates.get(r.camera.id, {})]
+    pairs = {r.camera.id: (before.get(r.camera.id, {}).get("water_status"), water_updates[r.camera.id]["water_status"]) for r in assessed}
+    if not any(status in events.LEVELS[1:] for pair in pairs.values() for status in pair):
+        return  # tidak ada yang di atas normal, sebelum maupun sesudah: tidak ada kejadian yang perlu disentuh
+
+    open_events = database.open_events()
+    opened = set()
+    for result in assessed:
+        cam = result.camera
+        previous, current = pairs[cam.id]
+        change = events.step(cam.id, cam.water_kind, previous, current, open_events.get(cam.id), result.checked_at, result.evidence_path)
+        if change is None:
+            continue
+        if change.insert:
+            database.insert_event(change.insert)
+            opened.add(cam.id)
+            log.info("kejadian dibuka: %s berstatus %s", cam.name, current)
+        if change.update:
+            event_id, fields = change.update
+            database.update_event(event_id, fields)
+            if "ended_at" in fields:
+                log.info("kejadian ditutup: %s kembali normal setelah %d menit", cam.name, fields["duration_minutes"])
+
+    for link in links:
+        if link.downstream_id not in opened:
+            continue
+        starts = database.event_starts([link.upstream_id, link.downstream_id])
+        learned = events.learned_lag(starts.get(link.upstream_id, []), starts.get(link.downstream_id, []))
+        if learned:
+            lag_minutes, count = learned
+            database.update_river_link_lag(link.upstream_id, link.downstream_id, lag_minutes, count)
+            log.info("jeda hulu-hilir %s dipelajari: %d menit dari %d kejadian", link.river_system, lag_minutes, count)
 
 
 def split_unreachable(results: list[CameraResult]) -> tuple[list[CameraResult], list[CameraResult]]:

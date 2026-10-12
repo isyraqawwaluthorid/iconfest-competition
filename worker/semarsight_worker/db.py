@@ -178,6 +178,54 @@ class Database:
         )
         return response.data
 
+    def update_river_link_lag(self, upstream_id: str, downstream_id: str, lag_minutes: int, from_events: int) -> None:
+        if self.dry_run:
+            return
+        (
+            self._client.table("river_links")
+            .update({"learned_lag_minutes": lag_minutes, "learned_from_events": from_events})
+            .eq("upstream_camera_id", upstream_id)
+            .eq("downstream_camera_id", downstream_id)
+            .execute()
+        )
+
+    def open_events(self) -> dict[str, dict[str, Any]]:
+        """Kejadian `live` yang belum ditutup, per kamera."""
+        response = (
+            self._client.table("events")
+            .select("id, camera_id, started_at, peak_status, snapshot_paths")
+            .eq("source", "live")
+            .is_("ended_at", "null")
+            .execute()
+        )
+        return {row["camera_id"]: row for row in response.data}
+
+    def event_starts(self, camera_ids: list[str]) -> dict[str, list[datetime]]:
+        """Waktu mulai semua kejadian `live` kamera-kamera ini, untuk mempelajari jeda hulu → hilir."""
+        response = (
+            self._client.table("events")
+            .select("camera_id, started_at")
+            .eq("source", "live")
+            .in_("camera_id", camera_ids)
+            .order("started_at")
+            .limit(PAGE_SIZE)
+            .execute()
+        )
+        starts: dict[str, list[datetime]] = defaultdict(list)
+        for row in response.data:
+            starts[row["camera_id"]].append(datetime.fromisoformat(row["started_at"]))
+        return starts
+
+    def insert_event(self, row: dict[str, Any]) -> None:
+        if self.dry_run:
+            return
+        self._client.table("events").insert(row).execute()
+
+    def update_event(self, event_id: str, fields: dict[str, Any]) -> None:
+        if self.dry_run:
+            return
+        self._client.table("events").update(fields).eq("id", event_id).execute()
+
     def insight_inputs(self) -> dict[str, dict[str, Any]]:
         """Keadaan `camera_status` terbaru, sebatas kolom yang dirangkum menjadi fakta insight."""
         response = (
