@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const NAV = [
   { href: "/", label: "Beranda" },
+  { href: "/riwayat", label: "Riwayat" },
   { href: "/simulasi", label: "Simulasi" },
 ];
 // Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.

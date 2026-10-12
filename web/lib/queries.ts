@@ -8,6 +8,7 @@ import type {
   ReferenceLine,
   SiteReading,
   TrafficPoint,
+  WaterEvent,
   WaterReading,
   WorkerHeartbeat,
 } from "./types";
@@ -98,6 +99,21 @@ export async function getActiveAlerts(): Promise<Alert[]> {
     .order("created_at", { ascending: false });
   if (error) throw new Error(`Gagal memuat peringatan: ${error.message}`);
   return (data as Alert[]).sort((a, b) => ALERT_RANK[a.level] - ALERT_RANK[b.level]);
+}
+
+/** Kejadian yang tercatat, terbaru lebih dulu. Hanya data langsung; simulasi tidak pernah masuk tabel ini. */
+export async function getEvents(limit = 200): Promise<WaterEvent[]> {
+  const { data, error } = await getSupabase()
+    .from("events")
+    .select("id, camera_id, kind, started_at, peak_at, peak_status, ended_at, duration_minutes, cameras(name)")
+    .eq("source", "live")
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`Gagal memuat riwayat kejadian: ${error.message}`);
+  return data.map(({ cameras, ...row }) => ({
+    ...row,
+    camera_name: (cameras as unknown as { name: string } | null)?.name ?? "Lokasi tidak dikenal",
+  })) as WaterEvent[];
 }
 
 /** Hujan terbaru per titik grid cuaca. Kosong jika worker belum pernah mengambil cuaca. */

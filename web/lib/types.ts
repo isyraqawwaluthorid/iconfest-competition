@@ -118,6 +118,20 @@ export type Alert = {
   message: string;
 };
 
+/** Satu kejadian: periode sebuah lokasi air berstatus resmi di atas normal (tabel `events`). */
+export type WaterEvent = {
+  id: string;
+  camera_id: string;
+  camera_name: string;
+  kind: "luapan_sungai" | "genangan_jalan";
+  started_at: string;
+  peak_at: string | null;
+  peak_status: WaterStatus | null;
+  /** Kosong selama kejadian masih berlangsung. */
+  ended_at: string | null;
+  duration_minutes: number | null;
+};
+
 /** Hujan terbaru untuk satu titik grid cuaca (Open-Meteo). */
 export type GridWeather = {
   grid_id: string;
