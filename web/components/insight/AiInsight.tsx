@@ -22,8 +22,9 @@ type CameraNames = Map<string, string>;
  * Ringkasan dan kartu insight yang ditulis AI dari angka dan status sistem.
  * Kondisi resmi tetap yang dihitung aturan (panel kiri); bagian ini menjelaskan dan menyarankan tindakan.
  */
-export function AiInsightPanel({ insight, cameraNames }: { insight: Insight | null; cameraNames: CameraNames }) {
-  const now = useNow();
+export function AiInsightPanel({ insight, cameraNames, clock }: { insight: Insight | null; cameraNames: CameraNames; clock?: number }) {
+  const realNow = useNow();
+  const now = clock ?? realNow;
   if (!insight) {
     return (
       <div className="rounded-control bg-surface-muted p-3">

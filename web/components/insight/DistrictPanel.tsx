@@ -13,16 +13,19 @@ type Props = {
   summary: DistrictSummary;
   insight: Insight | null;
   cameraNames: Map<string, string>;
+  /** Jam yang dipakai panel (ms); diisi halaman simulasi dengan jam skenario. */
+  clock?: number;
   onClose: () => void;
 };
 
 /** Rincian satu kecamatan: temuan AI, air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
-export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props) {
+export function DistrictPanel({ summary, insight, cameraNames, clock, onClose }: Props) {
   const { district, cameras, online, waterSites, trafficSites, densityIndex, densityLevel, busy, rain } = summary;
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
   // Temuan AI yang menyangkut lokasi di kecamatan ini; temuan tanpa lokasi hanya tampil di ringkasan kota.
-  const now = useNow();
+  const realNow = useNow();
+  const now = clock ?? realNow;
   // Status terkonfirmasi yang berganti dalam 24 jam terakhir; penilaian AI tunggal tidak dihitung sebagai perubahan.
   const changed = sites.filter(
     (site) => now !== null && site.water_status_since != null && now - new Date(site.water_status_since).getTime() < 24 * 3_600_000,

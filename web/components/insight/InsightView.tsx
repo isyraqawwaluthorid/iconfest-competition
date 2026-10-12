@@ -45,15 +45,30 @@ type Props = {
   weather: GridWeather[];
 };
 
-/**
- * Beranda: peta memenuhi layar dan semua ringkasan mengambang di atasnya sebagai panel.
- * Kiri: kondisi kota. Kanan: peringatan dan peringkat, atau rincian kecamatan yang dipilih.
- * Di layar sempit, panel turun ke bawah peta.
- */
+/** Beranda dengan data langsung: kamera, peringatan, dan ringkasan AI ikut berubah lewat Realtime. */
 export function InsightView({ initialCameras, initialAlerts, initialInsight, weather }: Props) {
   const cameras = useLiveCameras(initialCameras);
   const alerts = useLiveAlerts(initialAlerts);
   const insight = useLiveInsight(initialInsight);
+  return <InsightScreen cameras={cameras} alerts={alerts} insight={insight} weather={weather} />;
+}
+
+type ScreenProps = {
+  cameras: CameraOverview[];
+  alerts: Alert[];
+  insight: Insight | null;
+  weather: GridWeather[];
+  /** Jam yang dipakai layar (ms). Diisi halaman simulasi dengan jam skenario; kosong berarti jam sebenarnya. */
+  clock?: number;
+};
+
+/**
+ * Layar utama: peta memenuhi layar dan semua ringkasan mengambang di atasnya sebagai panel.
+ * Kiri: kondisi kota. Kanan: peringatan dan peringkat, atau rincian kecamatan yang dipilih.
+ * Di layar sempit, panel turun ke bawah peta. Tidak tahu dari mana datanya berasal:
+ * beranda mengisinya dengan data langsung, halaman simulasi dengan langkah skenario.
+ */
+export function InsightScreen({ cameras, alerts, insight, weather, clock }: ScreenProps) {
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("insight");
@@ -198,6 +213,7 @@ export function InsightView({ initialCameras, initialAlerts, initialInsight, wea
                 summary={selectedSummary}
                 insight={insight}
                 cameraNames={cameraNames}
+                clock={clock}
                 onClose={() => setSelected(null)}
               />
             </div>
@@ -220,8 +236,8 @@ export function InsightView({ initialCameras, initialAlerts, initialInsight, wea
                 ))}
               </div>
               <div className="overflow-y-auto p-4 text-sm">
-                {tab === "insight" ? <AiInsightPanel insight={insight} cameraNames={cameraNames} /> : null}
-                {tab === "alerts" ? <AlertList alerts={alerts} /> : null}
+                {tab === "insight" ? <AiInsightPanel insight={insight} cameraNames={cameraNames} clock={clock} /> : null}
+                {tab === "alerts" ? <AlertList alerts={alerts} simulated={clock !== undefined} /> : null}
                 {tab === "water" ? (
                   <Ranking
                     empty="Belum ada lokasi air yang dinilai."
@@ -260,7 +276,7 @@ export function InsightView({ initialCameras, initialAlerts, initialInsight, wea
   );
 }
 
-function AlertList({ alerts }: { alerts: Alert[] }) {
+function AlertList({ alerts, simulated }: { alerts: Alert[]; simulated: boolean }) {
   if (alerts.length === 0) {
     return (
       <div className="tint tone-normal accent-left rounded-control p-3">
@@ -269,6 +285,15 @@ function AlertList({ alerts }: { alerts: Alert[] }) {
           Peringatan muncul otomatis saat status air naik, hujan lebat diprakirakan, atau lokasi unggulan tidak
           terpantau.
         </p>
+        {simulated ? null : (
+          <p className="mt-2 text-xs">
+            Ingin melihat seperti apa saat air naik?{" "}
+            <Link href="/simulasi" className="font-semibold underline underline-offset-2">
+              Buka simulasi kejadian
+            </Link>
+            .
+          </p>
+        )}
       </div>
     );
   }

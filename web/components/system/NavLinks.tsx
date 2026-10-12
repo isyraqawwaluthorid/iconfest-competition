@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV = [{ href: "/", label: "Beranda" }];
+const NAV = [
+  { href: "/", label: "Beranda" },
+  { href: "/simulasi", label: "Simulasi" },
+];
 // Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.
 const SOURCES = [
   { href: "/kamera", label: "Kamera" },
