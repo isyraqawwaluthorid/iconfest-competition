@@ -181,9 +181,10 @@ h1, h2, h3 {
 .reading-dot { border: 2px solid var(--tone, var(--status-unknown)); background: var(--surface); }
 .reading-dot.is-counted { background: var(--tone, var(--status-unknown)); }
 
-/* Arsiran untuk "tidak terpantau": dipakai di legenda; di peta memakai pola SVG yang setara. */
+/* "Tidak terpantau" di legenda: kotak kosong bergaris tepi, sama seperti wilayahnya di peta (hanya garis batas). */
 .swatch-untracked {
-  background: repeating-linear-gradient(45deg, var(--untracked) 0 2px, var(--neutral-bg) 2px 5px);
+  background: transparent;
+  border-color: var(--muted);
 }
 
 /* Warna penanda peta mengikuti token; `data-tone` diisi dari lib/status.ts. */
@@ -267,16 +268,19 @@ h1, h2, h3 {
 .district.tone-rain-2 { fill: var(--rain-2); fill-opacity: 0.8; }
 .district.tone-rain-3 { fill: var(--rain-3); fill-opacity: 0.8; }
 .district.tone-rain-4 { fill: var(--rain-4); fill-opacity: 0.8; }
+/* Wilayah tanpa sumber data: hanya garis batasnya, tanpa isi. Isinya tetap ada (tembus penuh) supaya bisa diklik. */
 .district.tone-untracked {
-  fill: url(#untracked-stripes);
-  fill-opacity: 0.55;
-  stroke: var(--untracked);
+  fill: var(--surface);
+  fill-opacity: 0;
+  stroke: var(--muted);
 }
+.district.tone-untracked:hover { fill-opacity: 0.18; }
 .district.is-selected {
   stroke: var(--primary-strong);
   stroke-width: 3.5;
   fill-opacity: 0.6;
 }
+.district.tone-untracked.is-selected { fill-opacity: 0.22; }
 /* Nama kecamatan di atas poligon; tidak menangkap klik agar poligon di bawahnya tetap bisa dipilih. */
 .district-label {
   background: none;
@@ -417,6 +421,9 @@ h1, h2, h3 {
 .map-dark .district { stroke: var(--surface); stroke-opacity: 0.9; fill-opacity: 0.5; }
 .map-dark .district:hover { fill-opacity: 0.65; }
 .map-dark .district.is-selected { stroke: var(--primary-soft); fill-opacity: 0.7; }
+.map-dark .district.tone-untracked { fill-opacity: 0; }
+.map-dark .district.tone-untracked:hover { fill-opacity: 0.12; }
+.map-dark .district.tone-untracked.is-selected { fill-opacity: 0.16; }
 .map-dark .district-label span {
   color: var(--surface);
   text-shadow: 0 0 3px var(--text), 0 0 3px var(--text), 0 0 3px var(--text);

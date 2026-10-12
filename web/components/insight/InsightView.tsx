@@ -130,16 +130,6 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
 
   return (
     <div className="relative flex flex-1 flex-col lg:min-h-[40rem]">
-      {/* Pola arsiran untuk kecamatan tanpa sumber data; dirujuk dari CSS peta lewat url(#untracked-stripes). */}
-      <svg aria-hidden width="0" height="0" className="absolute">
-        <defs>
-          <pattern id="untracked-stripes" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
-            <rect width="7" height="7" style={{ fill: "var(--neutral-bg)" }} />
-            <line x1="0" y1="0" x2="0" y2="7" strokeWidth="3" style={{ stroke: "var(--untracked)" }} />
-          </pattern>
-        </defs>
-      </svg>
-
       <section
         aria-label="Peta kondisi per kecamatan"
         className={`relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto ${mapThemeClass(mapTheme)}`}

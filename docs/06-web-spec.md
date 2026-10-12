@@ -140,7 +140,7 @@ web/
 
 Sejak 11 Okt tampilan dikerjakan langsung di repo ini (tidak lagi menunggu desainer). Gaya visual mengambil acuan dari rancangan "SemarSight Command Center" yang dibuat di Stitch, dengan isi tiap layar dikurangi: satu layar menjawab satu pertanyaan, rincian muncul setelah kecamatan dipilih.
 
-Yang diambil dari acuan: huruf (Plus Jakarta Sans untuk judul dan angka, Inter untuk teks), biru `#2563eb` sebagai warna utama, kartu putih bergaris tipis dengan sudut 12 px, lencana status berbentuk pil, panel berwarna lembut dengan garis kiri sesuai status, label kecil huruf besar, dan arsiran diagonal untuk wilayah tidak terpantau.
+Yang diambil dari acuan: huruf (Plus Jakarta Sans untuk judul dan angka, Inter untuk teks), biru `#2563eb` sebagai warna utama, kartu putih bergaris tipis dengan sudut 12 px, lencana status berbentuk pil, panel berwarna lembut dengan garis kiri sesuai status, label kecil huruf besar, dan arsiran diagonal untuk wilayah tidak terpantau (arsiran itu dilepas 12 Okt; lihat butir 3 di bawah).
 
 Yang sengaja **tidak** diambil, karena datanya tidak kita punya: tinggi air dalam cm, kecepatan dalam km/jam, jumlah dan debit pompa, kualitas udara, identitas petugas, dan tanda "diverifikasi petugas". Semua angka di layar harus berasal dari data yang benar-benar dikumpulkan sistem.
 
@@ -149,7 +149,7 @@ Yang sengaja **tidak** diambil, karena datanya tidak kita punya: tinggi air dala
    - Kelas `tint tone-*` memberi latar dan teks sesuai status; `accent-left` menambah garis kiri; `label-caps` untuk label kecil huruf besar.
    - Font dimuat lewat `next/font` (di-host sendiri, tanpa permintaan ke Google saat halaman dibuka).
 2. **Komponen UI primitif** di `components/ui/` (Card, Badge, Button, Stat, Icon, EmptyState, ErrorState, Skeleton), tanpa library desain. Ikon berupa SVG garis sederhana dan hanya hiasan; makna selalu ada di teks.
-3. **Status tidak boleh hanya dibedakan warna:** selalu ada label teks. Wilayah tidak terpantau diberi arsiran, bukan sekadar abu-abu.
+3. **Status tidak boleh hanya dibedakan warna:** selalu ada label teks. Wilayah tidak terpantau digambar **hanya garis batasnya, tanpa isi** (sejak 12 Okt malam, keputusan pemilik proyek: arsiran membuat peta terasa penuh dan kusam); namanya tetap tertulis, dan legenda serta tooltip menyebut "Tidak terpantau". Yang tidak boleh berubah: wilayah itu tidak pernah diberi warna hijau.
 4. **Hanya tema terang.** Peta dasar OpenStreetMap berwarna terang dan diredam (abu-abu, transparan) agar warna wilayah menonjol; tema gelap otomatis dihapus karena bertabrakan dengan peta.
 5. **Mobile-first:** semua halaman bisa dipakai di layar 360 px; peta dan panel berganti menjadi tampilan bertumpuk.
 6. **Setiap komponen data wajib punya empat keadaan:** memuat (skeleton), kosong (penjelasan + kenapa), error (pesan + coba lagi), dan data usang/offline (penanda kesegaran).
