@@ -1,15 +1,27 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
+import type { Insight } from "@/lib/ai-insight";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
-import { formatTimeWib } from "@/lib/time";
+import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
+import { InsightCard } from "./AiInsight";
 
-/** Rincian satu kecamatan: air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
-export function DistrictPanel({ summary, onClose }: { summary: DistrictSummary; onClose: () => void }) {
+type Props = {
+  summary: DistrictSummary;
+  insight: Insight | null;
+  cameraNames: Map<string, string>;
+  onClose: () => void;
+};
+
+/** Rincian satu kecamatan: temuan AI, air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
+export function DistrictPanel({ summary, insight, cameraNames, onClose }: Props) {
   const { district, cameras, online, waterSites, trafficSites, densityIndex, densityLevel, busy, rain } = summary;
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
+  // Temuan AI yang menyangkut lokasi di kecamatan ini; temuan tanpa lokasi hanya tampil di ringkasan kota.
+  const local = new Set(cameras.map((camera) => camera.id));
+  const findings = insight?.items.filter((item) => item.camera_ids.some((id) => local.has(id))) ?? [];
   return (
     <div className="space-y-5 text-sm">
       <div>
@@ -32,6 +44,22 @@ export function DistrictPanel({ summary, onClose }: { summary: DistrictSummary; 
           </span>
         </div>
       </div>
+
+      {findings.length > 0 ? (
+        <section className="space-y-2">
+          <h3 className="label-caps flex items-center gap-1.5 text-muted">
+            <Icon name="alert" size={14} /> Temuan AI di sini
+          </h3>
+          <ul className="space-y-2">
+            {findings.map((item, index) => (
+              <li key={`${insight?.id}-${index}`}>
+                <InsightCard item={item} cameraNames={cameraNames} />
+              </li>
+            ))}
+          </ul>
+          {insight ? <p className="text-xs text-muted">Ditulis AI dari data sistem, {formatDateTimeWib(insight.created_at)}.</p> : null}
+        </section>
+      ) : null}
 
       <section className="space-y-2">
         <h3 className="label-caps flex items-center gap-1.5 text-muted">

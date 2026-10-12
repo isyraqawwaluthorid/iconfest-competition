@@ -153,6 +153,7 @@ h1, h2, h3 {
 .accent.tone-siaga { --tone: var(--status-siaga); }
 .accent.tone-awas { --tone: var(--status-awas); }
 .accent.tone-unknown { --tone: var(--status-unknown); }
+.accent.tone-density-normal { --tone: var(--primary); }
 
 /* Arsiran untuk "tidak terpantau": dipakai di legenda; di peta memakai pola SVG yang setara. */
 .swatch-untracked {

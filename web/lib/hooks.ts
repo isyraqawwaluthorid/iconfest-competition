@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { getActiveAlerts } from "./queries";
+import type { Insight } from "./ai-insight";
+import { getActiveAlerts, getLatestInsight } from "./queries";
 import { getSupabase } from "./supabase/public";
 import type { Alert, CameraOverview, CameraStatusRow, WorkerHeartbeat } from "./types";
 
@@ -68,6 +69,28 @@ export function useLiveAlerts(initial: Alert[]): Alert[] {
   }, [channelId]);
 
   return alerts;
+}
+
+/** Insight situasi terbaru; dimuat ulang setiap kali worker menulis insight baru. */
+export function useLiveInsight(initial: Insight | null): Insight | null {
+  const [insight, setInsight] = useState(initial);
+  const channelId = useId();
+
+  useEffect(() => {
+    const supabase = getSupabase();
+    const channel = supabase
+      .channel(`insights-${channelId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "insights" }, () => {
+        // Jika gagal dimuat ulang, insight terakhir tetap ditampilkan.
+        getLatestInsight().then(setInsight, () => undefined);
+      })
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [channelId]);
+
+  return insight;
 }
 
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */

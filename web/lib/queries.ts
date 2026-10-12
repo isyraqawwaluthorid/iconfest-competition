@@ -1,3 +1,4 @@
+import { insightBodySchema, type Insight } from "./ai-insight";
 import { getSupabase } from "./supabase/public";
 import type {
   Alert,
@@ -119,6 +120,25 @@ export async function getWeather(): Promise<GridWeather[]> {
       },
     ];
   });
+}
+
+/**
+ * Insight situasi terbaru yang ditulis LLM. `null` jika belum ada, atau jika isinya tidak sesuai schema
+ * (lebih baik tidak menampilkan apa pun daripada menampilkan isi yang tidak bisa dipastikan bentuknya).
+ */
+export async function getLatestInsight(): Promise<Insight | null> {
+  const { data, error } = await getSupabase()
+    .from("insights")
+    .select("id, created_at, model, body")
+    .eq("scope", "situasi")
+    .eq("source", "live")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Gagal memuat insight: ${error.message}`);
+  if (!data) return null;
+  const body = insightBodySchema.safeParse(data.body);
+  return body.success ? { id: data.id, created_at: data.created_at, model: data.model, ...body.data } : null;
 }
 
 export async function getWorkerHeartbeat(): Promise<WorkerHeartbeat | null> {

@@ -7,8 +7,9 @@ import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
 import { Skeleton } from "@/components/ui/Skeleton";
+import type { Insight } from "@/lib/ai-insight";
 import { districtOf } from "@/lib/geo/districts";
-import { useLiveAlerts, useLiveCameras } from "@/lib/hooks";
+import { useLiveAlerts, useLiveCameras, useLiveInsight } from "@/lib/hooks";
 import {
   citySituation,
   cityStats,
@@ -24,6 +25,7 @@ import {
 import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
 import { formatTimeWib } from "@/lib/time";
 import type { Alert, CameraOverview, GridWeather } from "@/lib/types";
+import { AiInsightPanel } from "./AiInsight";
 import { DistrictPanel } from "./DistrictPanel";
 
 // Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
@@ -33,27 +35,34 @@ const ThematicMap = dynamic(() => import("./ThematicMap"), {
 });
 
 const TOP_COUNT = 6;
-type Tab = "alerts" | "water" | "traffic";
+type Tab = "insight" | "alerts" | "water" | "traffic";
 
-type Props = { initialCameras: CameraOverview[]; initialAlerts: Alert[]; weather: GridWeather[] };
+type Props = {
+  initialCameras: CameraOverview[];
+  initialAlerts: Alert[];
+  initialInsight: Insight | null;
+  weather: GridWeather[];
+};
 
 /**
  * Beranda: peta memenuhi layar dan semua ringkasan mengambang di atasnya sebagai panel.
  * Kiri: kondisi kota. Kanan: peringatan dan peringkat, atau rincian kecamatan yang dipilih.
  * Di layar sempit, panel turun ke bawah peta.
  */
-export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
+export function InsightView({ initialCameras, initialAlerts, initialInsight, weather }: Props) {
   const cameras = useLiveCameras(initialCameras);
   const alerts = useLiveAlerts(initialAlerts);
+  const insight = useLiveInsight(initialInsight);
   const [theme, setTheme] = useState<Theme>("risk");
   const [selected, setSelected] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("alerts");
+  const [tab, setTab] = useState<Tab>("insight");
   const [summaryOpen, setSummaryOpen] = useState(true);
 
   const summaries = useMemo(() => summarizeDistricts(cameras, weather), [cameras, weather]);
   const situation = useMemo(() => citySituation(cameras, weather), [cameras, weather]);
   const stats = useMemo(() => cityStats(cameras, weather, summaries), [cameras, weather, summaries]);
   const sources = useMemo(() => themeSources(cameras, theme), [cameras, theme]);
+  const cameraNames = useMemo(() => new Map(cameras.map((camera) => [camera.id, camera.name])), [cameras]);
   const selectedSummary = summaries.find((s) => s.district.name === selected) ?? null;
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0];
   const latest = cameras.reduce<string | null>(
@@ -75,6 +84,7 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
   };
 
   const tabs: { id: Tab; label: string }[] = [
+    { id: "insight", label: "Insight" },
     { id: "alerts", label: `Peringatan (${alerts.length})` },
     { id: "water", label: "Risiko air" },
     { id: "traffic", label: "Lalu lintas" },
@@ -183,7 +193,12 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
         <aside className="map-panel relative flex flex-col overflow-hidden lg:max-h-full">
           {selectedSummary ? (
             <div className="overflow-y-auto p-4">
-              <DistrictPanel summary={selectedSummary} onClose={() => setSelected(null)} />
+              <DistrictPanel
+                summary={selectedSummary}
+                insight={insight}
+                cameraNames={cameraNames}
+                onClose={() => setSelected(null)}
+              />
             </div>
           ) : (
             <>
@@ -195,7 +210,7 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
                     role="tab"
                     aria-selected={item.id === tab}
                     onClick={() => setTab(item.id)}
-                    className={`flex-1 rounded-control px-2 py-1.5 text-sm transition-colors ${
+                    className={`flex-1 rounded-control px-1.5 py-1.5 text-[13px] whitespace-nowrap transition-colors ${
                       item.id === tab ? "bg-primary-soft font-semibold text-primary-strong" : "font-medium text-muted hover:bg-surface-muted hover:text-text"
                     }`}
                   >
@@ -204,6 +219,7 @@ export function InsightView({ initialCameras, initialAlerts, weather }: Props) {
                 ))}
               </div>
               <div className="overflow-y-auto p-4 text-sm">
+                {tab === "insight" ? <AiInsightPanel insight={insight} cameraNames={cameraNames} /> : null}
                 {tab === "alerts" ? <AlertList alerts={alerts} /> : null}
                 {tab === "water" ? (
                   <Ranking
