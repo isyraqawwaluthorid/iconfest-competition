@@ -148,7 +148,7 @@ export default function AboutPage() {
             {[
               ["Gambar CCTV", "PANTAUSEMAR, Pemerintah Kota Semarang"],
               ["Prakiraan hujan", "Open-Meteo (model cuaca, diperbarui tiap 30 menit)"],
-              ["Peta, jalan, dan batas kecamatan", "© kontributor OpenStreetMap, lisensi ODbL"],
+              ["Peta, jalan, dan batas kecamatan", "© kontributor OpenStreetMap, lisensi ODbL; peta 3D disajikan OpenFreeMap"],
               ["Penghitungan kendaraan", "YOLO11n, dijalankan di mesin sendiri"],
               ["Penilaian air dan ringkasan", "Model OpenAI, dengan keluaran terstruktur yang divalidasi"],
             ].map(([label, value]) => (

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useLiveCameras, useLiveReadings, useNow } from "@/lib/hooks";
 import { formatNumber, hasTrashStatus, rainDisplay } from "@/lib/insight";
+import { supportsWebGl } from "@/lib/map-gl";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { siteProgress } from "@/lib/progress";
 import { HEALTH, NOT_ASSESSED, TONE_BG, WATER } from "@/lib/status";
@@ -19,8 +20,9 @@ import type { CameraOverview, GridWeather, SiteReading } from "@/lib/types";
 import { waterRows, waterSituation, wettest, type RiverLink, type WaterRow } from "@/lib/water";
 import { SitePanel } from "./SitePanel";
 
-// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
-const WaterMap = dynamic(() => import("./WaterMap"), {
+// Peta 3D (MapLibre GL) adalah bawaan; peta datar (Leaflet) dipakai bila browser tidak mendukung WebGL.
+// Keduanya membutuhkan `window`, jadi hanya dimuat di browser.
+const WaterMap = dynamic(() => (supportsWebGl() ? import("./WaterMap3D") : import("./WaterMap")), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full rounded-none" />,
 });

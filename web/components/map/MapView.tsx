@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useLiveCameras } from "@/lib/hooks";
+import { supportsWebGl } from "@/lib/map-gl";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { isOnline, MAP_LAYERS, type MapLayer } from "@/lib/status";
 import type { CameraOverview } from "@/lib/types";
 import { Legend } from "./Legend";
 import { MapThemeToggle } from "./MapThemeToggle";
 
-// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
-const CityMap = dynamic(() => import("./CityMap"), {
+// Peta 3D (MapLibre GL) adalah bawaan; peta datar (Leaflet) dipakai bila browser tidak mendukung WebGL.
+// Keduanya membutuhkan `window`, jadi hanya dimuat di browser.
+const CityMap = dynamic(() => (supportsWebGl() ? import("./CityMap3D") : import("./CityMap")), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });

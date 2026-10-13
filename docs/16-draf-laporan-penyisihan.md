@@ -144,7 +144,7 @@ Pengguna utama adalah pemerintah kota: BPBD, Dinas PU dan operator rumah pompa, 
 | Bagian | Teknologi | Alasan pemilihan |
 |---|---|---|
 | Website | Next.js (App Router), TypeScript, Tailwind CSS | Halaman cepat dimuat, mudah di-deploy, tipe data terjaga |
-| Peta dan grafik | Leaflet (react-leaflet), OpenStreetMap, Recharts | Gratis, tanpa kunci API, data jalan terbuka |
+| Peta dan grafik | MapLibre GL dengan peta vektor OpenFreeMap (peta 3D), Leaflet sebagai cadangan, data OpenStreetMap, Recharts | Gratis, tanpa kunci API, data jalan dan bangunan terbuka |
 | Basis data, gambar, pembaruan langsung | Supabase (PostgreSQL, Storage, Realtime) | Satu layanan untuk tiga kebutuhan; hak baca publik dipisah dari hak tulis |
 | Worker | Python, ffmpeg, OpenCV | Pengambilan gambar dari tayangan dan pengolahan gambar |
 | Hitung kendaraan dan orang | Ultralytics YOLO11 (yolo11s), berjalan lokal | Tanpa biaya per gambar; cukup cepat untuk 146 kamera per siklus |

@@ -237,6 +237,22 @@ h1, h2, h3 {
   text-align: center;
 }
 
+/* Peta 3D (MapLibre GL): keterangan yang muncul saat kursor di atas pin, ruas, atau wilayah. */
+.gl-tip { pointer-events: none; max-width: 18rem !important; }
+.gl-tip .maplibregl-popup-content {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-float);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 4px 8px;
+}
+.gl-tip .maplibregl-popup-tip { display: none; }
+.maplibregl-map { font-family: inherit; }
+
 /* Peta tematik: satu poligon per kecamatan, diwarnai menurut tema yang dipilih. */
 .thematic-map .leaflet-tile-pane {
   /* Peta dasar tetap berwarna supaya kota terlihat hidup; warna wilayah di atasnya dibuat tembus pandang. */

@@ -78,7 +78,7 @@ data/           daftar 146 kamera publik (seed)
 docs/           brief, arsitektur, spesifikasi, catatan keputusan, tasklist
 scripts/        skrip bantu Windows: menyalakan worker dan web, mencegah mesin tidur
 supabase/       skema database dan seed kamera
-web/            Next.js (App Router), TypeScript, Tailwind, react-leaflet, Recharts
+web/            Next.js (App Router), TypeScript, Tailwind, MapLibre GL (peta 3D) + react-leaflet (cadangan), Recharts
 worker/         Python: akuisisi, YOLO, AI vision, aturan, peringatan, kejadian, insight
 ```
 
@@ -175,7 +175,7 @@ Hanya CCTV publik milik pemerintah kota yang dipakai; kamera lingkungan RT/RW ti
 |---|---|
 | Gambar CCTV | PANTAUSEMAR, Pemerintah Kota Semarang |
 | Prakiraan hujan | [Open-Meteo](https://open-meteo.com/) |
-| Peta, jalan, dan batas kecamatan | © kontributor [OpenStreetMap](https://www.openstreetmap.org/copyright), lisensi ODbL |
+| Peta, jalan, dan batas kecamatan | © kontributor [OpenStreetMap](https://www.openstreetmap.org/copyright), lisensi ODbL; peta vektor 3D disajikan [OpenFreeMap](https://openfreemap.org) (skema OpenMapTiles) |
 
 Angka di situs ini adalah perkiraan dari gambar, bukan pengukuran resmi, dan tidak menggantikan informasi dari BPBD atau BMKG.
 

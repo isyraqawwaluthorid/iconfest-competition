@@ -1,13 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { activityBreaks, buildHexes, emptyHexRings, hourWib, type ActivityMetric, type ActivityProfile } from "@/lib/activity";
 import { emissionRows, EMISSION_LEVELS, type Pollutant } from "@/lib/emission";
 import { useClassCounts, useLiveCameras, useNow } from "@/lib/hooks";
+import { supportsWebGl } from "@/lib/map-gl";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { roadRows, trafficSituation } from "@/lib/traffic";
 import type { CameraOverview } from "@/lib/types";
@@ -16,8 +16,9 @@ import { EmissionPanels } from "./EmissionPanels";
 import { RoadPanels } from "./RoadPanels";
 import type { Layer, RoadPaint, Scope } from "./TrafficMap";
 
-// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
-const TrafficMap = dynamic(() => import("./TrafficMap"), {
+// Peta 3D (MapLibre GL) adalah bawaan; peta datar (Leaflet) dipakai bila browser tidak mendukung WebGL.
+// Keduanya membutuhkan `window`, jadi hanya dimuat di browser.
+const TrafficMap = dynamic(() => (supportsWebGl() ? import("./TrafficMap3D") : import("./TrafficMap")), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full rounded-none" />,
 });
@@ -133,13 +134,6 @@ export function TrafficView({ initialCameras, profile }: Props) {
             ))}
           </div>
           <span aria-hidden className="h-5 w-px bg-border" />
-          <Link
-            href="/lalu-lintas/3d"
-            title="Percobaan: ruas jalan di atas peta 3D dengan bangunan timbul"
-            className="rounded-control px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-muted transition-colors hover:bg-surface-muted hover:text-text"
-          >
-            3D
-          </Link>
           <MapThemeToggle />
         </div>
       </section>

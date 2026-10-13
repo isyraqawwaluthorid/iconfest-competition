@@ -12,14 +12,16 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { hourRange, hourWib, peakHour, type ActivityProfile } from "@/lib/activity";
 import { useLiveCameras, useNow } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
+import { supportsWebGl } from "@/lib/map-gl";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { CROWD, placeViews, type PlaceView, type SpotView } from "@/lib/public-places";
 import { isOnline, TONE_BG } from "@/lib/status";
 import { formatDateTimeWib } from "@/lib/time";
 import type { CameraOverview } from "@/lib/types";
 
-// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
-const PlacesMap = dynamic(() => import("./PlacesMap"), {
+// Peta 3D (MapLibre GL) adalah bawaan; peta datar (Leaflet) dipakai bila browser tidak mendukung WebGL.
+// Keduanya membutuhkan `window`, jadi hanya dimuat di browser.
+const PlacesMap = dynamic(() => (supportsWebGl() ? import("./PlacesMap3D") : import("./PlacesMap")), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });

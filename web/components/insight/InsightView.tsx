@@ -27,6 +27,7 @@ import {
 } from "@/lib/insight";
 import { ALERT, DENSITY, isOnline, NOT_ASSESSED, RISK, TONE_BG, TREND_LABEL, WATER, type StatusDisplay } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib, minutesSince } from "@/lib/time";
+import { supportsWebGl } from "@/lib/map-gl";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { siteProgress } from "@/lib/progress";
 import type { Alert, CameraOverview, GridWeather, SiteReading } from "@/lib/types";
@@ -34,8 +35,9 @@ import { AiInsightPanel } from "./AiInsight";
 import { DistrictPanel } from "./DistrictPanel";
 import { ProgressTimeline } from "./ProgressTimeline";
 
-// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
-const ThematicMap = dynamic(() => import("./ThematicMap"), {
+// Peta 3D (MapLibre GL) adalah bawaan; peta datar (Leaflet) dipakai bila browser tidak mendukung WebGL.
+// Keduanya membutuhkan `window`, jadi hanya dimuat di browser.
+const ThematicMap = dynamic(() => (supportsWebGl() ? import("./ThematicMap3D") : import("./ThematicMap")), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full rounded-none" />,
 });
