@@ -59,6 +59,7 @@ Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web 
 |---|---|
 | `/` | **Beranda.** Peta penuh per kecamatan dengan tiga tema (risiko air, kepadatan lalu lintas, hujan 3 jam ke depan). Kiri: kondisi kota dari aturan, dan linimasa lokasi yang sedang bergerak. Kanan: ringkasan AI, peringatan, peringkat lokasi, atau rincian kecamatan yang dipilih (termasuk tren 24 jam). |
 | `/simulasi` | **Simulasi kejadian.** Skenario air naik delapan langkah di layar yang sama dengan beranda, berlabel "SIMULASI · Bukan data langsung". Hanya masukannya yang buatan; status, peringatan, dan ringkasan AI dihasilkan aturan dan model yang sama dengan sistem. |
+| `/air` | **Kondisi air per lokasi.** Satu pin per lokasi air berwarna status resminya; rincian tiap lokasi memuat gambar kamera dengan garis acuan, asal skor risikonya, dan hubungan hulu → hilir. |
 | `/lalu-lintas` | **Lalu lintas dari dekat**, tiga lapisan di satu peta. *Ruas jalan*: potongan jalan di sekitar tiap kamera, berwarna tingkat kepadatan dibanding kebiasaannya. *Aktivitas per jam*: heksagon dengan penggeser jam, dari rata-rata hitungan yang sudah terkumpul. *Beban emisi*: estimasi relatif per ruas dari kendaraan terlihat dan faktor emisi resmi, bukan kg per jam. |
 | `/riwayat` | Kejadian yang tercatat (mulai, puncak, lama) dengan unduhan CSV. |
 | `/tentang` | Cara kerja, batasan, privasi, dan sumber data. |

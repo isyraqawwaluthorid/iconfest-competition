@@ -2,6 +2,7 @@ import { activityProfileSchema, type ActivityProfile } from "./activity";
 import { insightBodySchema, type Insight } from "./ai-insight";
 import { EMISSION_WINDOW_MINUTES, type ClassCounts } from "./emission";
 import { getSupabase } from "./supabase/public";
+import type { RiverLink } from "./water";
 import type {
   Alert,
   AlertLevel,
@@ -100,6 +101,22 @@ export async function getCalibration(cameraId: string): Promise<Calibration> {
     referenceDay: data?.reference_image_day ?? null,
     referenceNight: data?.reference_image_night ?? null,
   };
+}
+
+/** Pasangan hulu → hilir yang sudah diisi; jeda memakai yang dipelajari dari kejadian bila ada. */
+export async function getRiverLinks(): Promise<RiverLink[]> {
+  const { data, error } = await getSupabase()
+    .from("river_links")
+    .select("river_system, upstream_camera_id, downstream_camera_id, default_lag_minutes, learned_lag_minutes")
+    .order("river_system");
+  if (error) throw new Error(`Gagal memuat hubungan hulu-hilir: ${error.message}`);
+  return data.map((row) => ({
+    river_system: row.river_system,
+    upstream_camera_id: row.upstream_camera_id,
+    downstream_camera_id: row.downstream_camera_id,
+    lag_minutes: row.learned_lag_minutes ?? row.default_lag_minutes,
+    learned: row.learned_lag_minutes != null,
+  }));
 }
 
 const ALERT_RANK: Record<AlertLevel, number> = { awas: 0, siaga: 1, waspada: 2, info: 3 };

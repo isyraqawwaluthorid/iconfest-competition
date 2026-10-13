@@ -64,7 +64,7 @@ Kebutuhan data baru: batas 16 kecamatan (GeoJSON), pemetaan kamera → kecamatan
 | `/mosaik` | Semarang Saat Ini | Grid snapshot terbaru semua kamera dari Storage (bukan video live), saringan modul, hanya kamera aktif, cari nama |
 | `/udara` | Kualitas Udara (direncanakan) | Kartu "Kondisi luar ruang": kualitas udara (model Open-Meteo, terukur BMKG jika ada akses) dengan label sumber dan kategori ISPU, suhu terasa, indeks UV, hujan; grafik 24 jam + prakiraan 48 jam |
 | `/emisi` | Emisi (setelah uji kelayakan) | Peta estimasi emisi per kamera, arus per jenis kendaraan, kotak "Metode & asumsi" (lihat `12-emisi-kualitas-udara.md`) |
-| `/air` | Air & Genangan | Daftar kamera air diurutkan risiko; **diagram hulu → hilir** per sistem sungai; hujan per grid; kejadian aktif |
+| `/air` | Air | **Berjalan sejak 13 Okt.** Peta penuh dengan satu pin per lokasi air yang dikalibrasi, berwarna status resmi. Kiri: kondisi sekarang, jumlah per status, hujan 3 jam ke depan, pasangan hulu → hilir, linimasa perkembangan. Kanan: lokasi yang paling perlu diperhatikan, atau rincian lokasi (status resmi, gambar dengan garis acuan, rincian skor risiko, hulu–hilir, lalu lintas di sekitarnya). Komponen: `components/water/WaterView.tsx`, `WaterMap.tsx`, `SitePanel.tsx`; logika: `lib/water.ts` |
 | `/lalu-lintas` | Lalu Lintas | **Berjalan sejak 12 Okt.** Peta penuh dengan tiga lapisan (rincian di bawah tabel): Ruas jalan, Aktivitas per jam, Beban emisi |
 | `/ruang-publik` | Ruang Publik | Keramaian kawasan wisata; pola per jam; "waktu terbaik berkunjung" |
 | `/insight` | Insight | Insight lintas modul (genangan → lalu lintas, hujan → keramaian, sampah + hujan); laporan harian |

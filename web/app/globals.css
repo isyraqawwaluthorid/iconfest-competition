@@ -334,6 +334,10 @@ h1, h2, h3 {
 .road-segment.is-network.is-far { stroke-opacity: 0.4; }
 .road-segment.is-network.tone-unknown { stroke: var(--road-untracked); }
 .camera-halo { stroke: none; fill-opacity: 0.28; pointer-events: none; }
+.camera-halo.tone-normal { fill: var(--status-normal); }
+.camera-halo.tone-waspada { fill: var(--status-waspada); }
+.camera-halo.tone-siaga { fill: var(--status-siaga); }
+.camera-halo.tone-awas { fill: var(--status-awas); }
 .camera-halo.tone-density-lancar { fill: var(--density-lancar); }
 .camera-halo.tone-density-normal { fill: var(--density-normal); }
 .camera-halo.tone-density-ramai { fill: var(--density-ramai); }

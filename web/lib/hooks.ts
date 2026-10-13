@@ -3,7 +3,15 @@
 import { useEffect, useId, useState } from "react";
 import type { Insight } from "./ai-insight";
 import type { ClassCounts } from "./emission";
-import { getActiveAlerts, getLatestInsight, getRecentClassCounts, getSiteReadings, getTrafficSeries } from "./queries";
+import {
+  getActiveAlerts,
+  getCalibration,
+  getLatestInsight,
+  getRecentClassCounts,
+  getSiteReadings,
+  getTrafficSeries,
+  type Calibration,
+} from "./queries";
 import { getSupabase } from "./supabase/public";
 import type { Alert, CameraOverview, CameraStatusRow, SiteReading, TrafficPoint, WorkerHeartbeat } from "./types";
 
@@ -151,6 +159,23 @@ export function useClassCounts(enabled: boolean, intervalMs = 300_000): { rows: 
     };
   }, [enabled, intervalMs]);
   return state;
+}
+
+/** Kalibrasi satu kamera air (garis acuan), dimuat di browser saat lokasinya dipilih. `null` selama memuat atau bila gagal. */
+export function useCalibration(cameraId: string): Calibration | null {
+  const [loaded, setLoaded] = useState<{ id: string; calibration: Calibration | null }>({ id: "", calibration: null });
+  useEffect(() => {
+    let current = true;
+    getCalibration(cameraId).then(
+      (calibration) => current && setLoaded({ id: cameraId, calibration }),
+      // Tanpa garis acuan, gambar kamera tetap tampil.
+      () => current && setLoaded({ id: cameraId, calibration: null }),
+    );
+    return () => {
+      current = false;
+    };
+  }, [cameraId]);
+  return loaded.id === cameraId ? loaded.calibration : null;
 }
 
 /** Heartbeat worker terbaru, diperbarui lewat Realtime. */
