@@ -1,20 +1,29 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo } from "react";
 import { SnapshotView } from "@/components/camera/SnapshotView";
+import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { HourBars } from "@/components/traffic/ActivityPanels";
 import { Badge } from "@/components/ui/Badge";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { hourRange, hourWib, peakHour, type ActivityProfile } from "@/lib/activity";
 import { useLiveCameras, useNow } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
-import { CROWD, placeViews, type PlaceView } from "@/lib/public-places";
+import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
+import { CROWD, placeViews, type PlaceView, type SpotView } from "@/lib/public-places";
 import { isOnline } from "@/lib/status";
 import { formatDateTimeWib } from "@/lib/time";
 import type { CameraOverview } from "@/lib/types";
 
-const EVIDENCE_COUNT = 2;
+// Leaflet membutuhkan `window`, jadi peta hanya dimuat di browser.
+const PlacesMap = dynamic(() => import("./PlacesMap"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 const DEFAULT_HOUR = 12; // hanya dipakai sebelum jam browser diketahui
 
 type Props = {
@@ -23,21 +32,32 @@ type Props = {
   profile: ActivityProfile | null;
 };
 
-/** Keramaian ruang publik: satu kartu per tempat, menjawab "seberapa ramai sekarang dibanding biasanya". */
+/** Keramaian ruang publik: peta kecil dan satu kartu per tempat, menjawab "seberapa ramai sekarang dibanding biasanya". */
 export function PublicSpacesView({ initialCameras, profile }: Props) {
   const cameras = useLiveCameras(initialCameras);
   const now = useNow(60_000);
+  const mapTheme = useMapTheme();
   const hour = now === null ? DEFAULT_HOUR : hourWib(now);
   const places = useMemo(() => placeViews(cameras, profile, hour), [cameras, profile, hour]);
+  const total = places.reduce((sum, place) => sum + place.now, 0);
+  const showPlace = (placeId: string) => document.getElementById(`tempat-${placeId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <div className="page space-y-5">
-      <div>
-        <h1 className="text-2xl font-semibold">Keramaian ruang publik</h1>
-        <p className="mt-1 max-w-3xl text-sm text-muted">
-          Seberapa ramai tempat-tempat ini sekarang, dibanding biasanya pada jam yang sama. Dihitung dari pejalan kaki yang
-          terlihat pada gambar kamera terakhir. Ini bukan jumlah pengunjung, dan tidak ada pengenalan wajah.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Keramaian ruang publik</h1>
+          <p className="mt-1 max-w-3xl text-sm text-muted">
+            Seberapa ramai tempat-tempat ini sekarang, dibanding biasanya pada jam yang sama. Dihitung dari pejalan kaki yang
+            terlihat pada gambar kamera terakhir. Ini bukan jumlah pengunjung, dan tidak ada pengenalan wajah.
+          </p>
+        </div>
+        {places.length > 0 ? (
+          <p className="text-sm text-muted">
+            <span className="font-display text-2xl font-bold text-text tabular-nums">{total}</span> pejalan kaki terlihat di{" "}
+            {places.length} tempat
+          </p>
+        ) : null}
       </div>
 
       {places.length === 0 ? (
@@ -46,11 +66,24 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
           <p className="mt-1 text-sm text-muted">Kamera ruang publik tidak ditemukan di daftar kamera aktif.</p>
         </div>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} hour={hour} days={profile?.days ?? 0} />
-          ))}
-        </div>
+        <>
+          <section aria-label="Peta tempat yang dipantau" className={`relative h-72 overflow-hidden rounded-token border border-border ${mapThemeClass(mapTheme)}`}>
+            <PlacesMap places={places} onSelect={showPlace} />
+            <div className="map-panel absolute top-3 left-3 p-1">
+              <MapThemeToggle />
+            </div>
+            <p className="map-panel absolute right-3 bottom-3 px-2.5 py-1 text-[11px] text-muted">
+              Besar lingkaran: pejalan kaki terlihat sekarang. Ketuk untuk melihat rinciannya.
+            </p>
+          </section>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            {places.map((place, index) => (
+              // Tempat teramai mendapat lebar penuh, supaya titik-titiknya muat berdampingan.
+              <PlaceCard key={place.id} place={place} hour={hour} days={profile?.days ?? 0} wide={index === 0} />
+            ))}
+          </div>
+        </>
       )}
 
       <div className="space-y-1 rounded-token border border-dashed border-border p-4 text-xs text-muted">
@@ -64,8 +97,8 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
           sudut. Karena pembandingnya dihitung dengan cara yang sama, perbandingan dengan biasanya tetap berlaku.
         </p>
         <p>
-          Yang dipantau hanya tempat yang kameranya menghadap ruang pejalan kaki. Kamera wisata yang ternyata menghadap jalan raya
-          tidak dipakai di sini.
+          Yang dipantau hanya tempat yang kameranya menghadap ruang pejalan kaki. Kamera jalan tidak dipakai di sini, karena di
+          sana pengendara motor sering terhitung sebagai pejalan kaki.
         </p>
         {profile?.since ? (
           <p>
@@ -80,15 +113,18 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
   );
 }
 
-function PlaceCard({ place, hour, days }: { place: PlaceView; hour: number; days: number }) {
+function PlaceCard({ place, hour, days, wide }: { place: PlaceView; hour: number; days: number; wide: boolean }) {
   const status = CROWD[place.level];
   const peak = peakHour(place.hourly);
   const max = Math.max(...place.hourly.map((value) => value ?? 0), 1);
   const hasPattern = place.hourly.some((value) => value !== null);
-  const evidence = place.cameras.filter(isOnline).slice(0, EVIDENCE_COUNT);
 
   return (
-    <section aria-label={place.name} className="rounded-token border border-border bg-surface shadow-card">
+    <section
+      id={`tempat-${place.id}`}
+      aria-label={place.name}
+      className={`scroll-mt-24 rounded-token border border-border bg-surface shadow-card ${wide ? "lg:col-span-2" : ""}`}
+    >
       <div className={`tint tone-${status.tone} rounded-t-token p-4`}>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
@@ -115,7 +151,7 @@ function PlaceCard({ place, hour, days }: { place: PlaceView; hour: number; days
       </div>
 
       <div className="space-y-4 p-4 text-sm">
-        <div>
+        <div className={wide ? "lg:max-w-xl" : ""}>
           <p className="text-xs font-semibold text-muted">
             Pola 24 jam{peak !== null ? `: biasanya paling ramai pukul ${hourRange(peak)}` : ""}
           </p>
@@ -129,43 +165,45 @@ function PlaceCard({ place, hour, days }: { place: PlaceView; hour: number; days
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-semibold text-muted">Bukti: gambar terakhir dari sudut yang paling ramai</p>
-          {evidence.length === 0 ? (
-            <p className="rounded-control bg-surface-muted p-3 text-xs text-muted">Tidak ada kamera yang sedang hidup.</p>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {evidence.map((camera) => (
-                <div key={camera.id}>
-                  <SnapshotView camera={camera} />
-                  <p className="mt-1 text-xs">
-                    <Link href={`/kamera/${camera.id}`} className="font-semibold underline-offset-2 hover:text-primary hover:underline">
-                      {camera.name}
-                    </Link>{" "}
-                    <span className="text-muted">· {camera.person_count ?? 0} pejalan kaki</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <p className="mb-1 text-xs font-semibold text-muted">Semua sudut pandang</p>
-          <ul className="divide-y divide-border">
-            {place.cameras.map((camera) => (
-              <li key={camera.id} className="flex items-center justify-between gap-3 py-1.5 text-xs">
-                <Link href={`/kamera/${camera.id}`} className="truncate underline-offset-2 hover:text-primary hover:underline">
-                  {camera.name}
-                </Link>
-                <span className="shrink-0 text-muted tabular-nums">
-                  {isOnline(camera) ? `${camera.person_count ?? 0} pejalan kaki` : "kamera mati"}
-                </span>
-              </li>
+          <p className="mb-1.5 text-xs font-semibold text-muted">
+            {place.spots.length > 1 ? `Per titik (${place.spots.length})` : "Bukti: gambar terakhir kamera"}
+          </p>
+          <div className={`grid gap-3 sm:grid-cols-2 ${wide ? "lg:grid-cols-3" : ""}`}>
+            {place.spots.map((spot) => (
+              <SpotTile key={spot.name} spot={spot} single={place.spots.length === 1} />
             ))}
-          </ul>
+          </div>
         </div>
         <FreshnessTag at={place.latest} prefix="Gambar terakhir" />
       </div>
     </section>
+  );
+}
+
+/** Satu titik di dalam tempat: gambar dari sudut teramai sebagai bukti, tingkatnya sendiri, dan jumlah yang terlihat. */
+function SpotTile({ spot, single }: { spot: SpotView; single: boolean }) {
+  const evidence = spot.cameras.find(isOnline) ?? spot.cameras[0];
+  return (
+    <div>
+      <SnapshotView camera={evidence} />
+      <div className="mt-1.5 flex items-start justify-between gap-2">
+        <div className="min-w-0 text-xs">
+          <p className="font-semibold">{single ? evidence.name : spot.name}</p>
+          <p className="text-muted">
+            {spot.online === 0
+              ? "kamera mati"
+              : `${spot.now} pejalan kaki${spot.usual !== null ? `, biasanya ±${formatNumber(spot.usual, 0)}` : ""} · ${spot.cameras.length} sudut kamera`}
+          </p>
+          <p className="mt-0.5 flex flex-wrap gap-x-2 text-muted">
+            {spot.cameras.map((camera) => (
+              <Link key={camera.id} href={`/kamera/${camera.id}`} className="underline-offset-2 hover:text-primary hover:underline">
+                {camera.name} ({isOnline(camera) ? (camera.person_count ?? 0) : "mati"})
+              </Link>
+            ))}
+          </p>
+        </div>
+        {single ? null : <Badge status={CROWD[spot.level]} />}
+      </div>
+    </div>
   );
 }
