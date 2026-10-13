@@ -105,7 +105,7 @@ Arah tampilannya adalah "insight dulu, kamera sebagai bukti": yang ditonjolkan a
 5. **Jujur terhadap batas.** Wilayah tanpa kamera ditandai "tidak terpantau", tidak diwarnai hijau. Pembanding yang datanya belum cukup diberi label "sementara". Estimasi emisi ditampilkan sebagai perbandingan antar-ruas, tidak sebagai kg per jam.
 6. **Insight lintas modul.** Kondisi air dihubungkan dengan hujan, kondisi hulu, dan lalu lintas di sekitarnya.
 
-**Karya terdahulu dan pembeda.** EcoTraffic GIS (Yogyakarta) menghitung kendaraan dari CCTV dan mengestimasi emisi lalu lintas untuk perencana. Karya itu menjadi rujukan kami untuk tampilan peta lalu lintas (ruas jalan berwarna dan heksagon aktivitas). Pembeda SemarSight: fokus utamanya air dan peringatan dini hulu–hilir; keputusan memakai aturan terbuka di atas penilaian AI terkalibrasi; lalu lintas dinyatakan sebagai indeks relatif terhadap kebiasaan tiap ruas, bukan volume; dan emisi hanya ditampilkan sebagai estimasi relatif karena datanya belum mendukung angka mutlak. `[ISI: lengkapi rujukan EcoTraffic GIS dengan tautan resminya]`
+**Pembeda dari dasbor CCTV pada umumnya.** Dasbor pemantauan kota biasanya menampilkan tayangan kamera atau angka hitungan mentah. SemarSight berbeda dalam empat hal: fokus utamanya air dan peringatan dini hulu–hilir; keputusan memakai aturan terbuka di atas penilaian AI yang dikalibrasi manusia; lalu lintas dinyatakan sebagai indeks relatif terhadap kebiasaan tiap ruas, bukan volume; dan emisi hanya ditampilkan sebagai estimasi relatif karena datanya belum mendukung angka mutlak.
 
 ---
 
