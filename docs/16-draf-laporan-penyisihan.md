@@ -178,7 +178,7 @@ Keadaan sistem per 13 Oktober 2026 pukul 16.40 WIB `[PERBARUI]`:
 | Penilaian air oleh AI | 1.860 |
 | Ringkasan AI yang ditulis | 68 |
 | Siklus 24 jam terakhir | 291 selesai, tanpa jeda |
-| Unit test worker | 192, semuanya lulus |
+| Unit test worker | 203, semuanya lulus |
 
 ## 4.2 Fitur dan Fungsionalitas
 
@@ -196,13 +196,15 @@ Keadaan sistem per 13 Oktober 2026 pukul 16.40 WIB `[PERBARUI]`:
 | Halaman kalibrasi (admin) | Berjalan |
 | Penanganan kamera mati, data tertunda, data kosong | Berjalan di halaman utama |
 | Deploy publik | `[PERBARUI]` |
-| Asisten tanya-jawab, halaman ruang publik, evaluasi berlabel manusia | Rencana menuju final |
+| Tingkat sampah di perairan (tiga tingkat, status dihaluskan) dan peringatan "sampah menumpuk + hujan diprakirakan" untuk Dinas PU | Berjalan; peringatannya belum pernah menyala dengan data langsung karena belum ada prakiraan hujan lebat |
+| Keramaian ruang publik: pejalan kaki terlihat di Kota Lama, Balai Kota, dan Goa Kreo dibanding biasanya | Berjalan; tingkat keramaian masih menunggu pembanding `[PERBARUI]` |
+| Asisten tanya-jawab, evaluasi berlabel manusia | Rencana menuju final |
 
 Selama sistem berjalan belum ada kejadian air naik yang nyata. Karena itu alur kejadian diperlihatkan lewat halaman Simulasi: masukannya buatan dan diberi label jelas, tetapi status, peringatan, dan ringkasannya dihasilkan aturan dan model yang sama dengan sistem.
 
 ## 4.3 Pengujian
 
-**Unit test.** 192 pengujian otomatis untuk aturan penghalusan, skor risiko, peringatan, pencatatan kejadian, pemeriksaan ringkasan AI, pembanding lalu lintas, dan geometri ruas jalan.
+**Unit test.** 203 pengujian otomatis untuk aturan penghalusan, skor risiko, peringatan, pencatatan kejadian, pemeriksaan ringkasan AI, pembanding lalu lintas, dan geometri ruas jalan.
 
 **Salah baca AI dan perbaikannya.** Ke-22 penilaian air yang bukan normal sampai 12 Oktober ditinjau, dari gambar buktinya atau dengan menilai ulang gambar yang tersimpan, dan tidak ada yang menunjukkan kenaikan air nyata. Penyebabnya antara lain busa pompa, sinar matahari dari belakang, dan foto referensi yang tidak mewakili keadaan normal. Pada 13 Oktober sistem mengeluarkan satu peringatan palsu: dua penilaian berturut-turut menyatakan waspada di satu rumah pompa saat air terkena sinar siang. Penelusurannya menemukan akar masalah yang lebih mendasar: petunjuk untuk AI menyebut "melewati garis normal berarti waspada", padahal garis normal digambar tepat pada muka air. Setelah petunjuk diselaraskan (waspada berarti mencapai garis waspada), 104 gambar bukti dari 20 lokasi dinilai ulang: penilaian naik yang dihitung aturan turun dari 14 menjadi 0 sampai 2 pada dua putaran. Kejadian palsu itu dihapus dari riwayat publik dan dicatat dalam dokumentasi.
 
@@ -218,9 +220,13 @@ Selama sistem berjalan belum ada kejadian air naik yang nyata. Karena itu alur k
 
 Sistem menghitung sekitar 82% kendaraan, tetapi hanya sekitar sepertiga sepeda motor. Karena tiap kamera dibandingkan dengan dirinya sendiri, kekurangan yang ajek ini tidak merusak indeks kepadatan relatif; namun porsi jenis kendaraan tidak layak dikutip. Menindaklanjuti temuan itu, model deteksi diganti ke ukuran yang lebih besar pada hari yang sama; siklus pertamanya mencatat sekitar 1,4 kali lebih banyak kendaraan dan 1,5 kali lebih banyak sepeda motor. Model baru belum dievaluasi dengan hitungan pembanding. `[PERBARUI]`
 
+**Penilaian sampah.** Satu gambar siang terbaru dari tiap lokasi air (16 lokasi) dinilai AI lalu dibandingkan dengan penilaian mata `[ISI: bila sempat, ulangi oleh anggota tim; pembanding saat ini dikerjakan dengan bantuan asisten AI]`: 13 dari 16 sepakat, 3 berbeda satu tingkat antara "tidak terlihat" dan "sedikit", dan tidak ada "banyak" yang keliru. Busa pompa dan tanaman air tidak terbaca sebagai sampah. Karena penilaian per gambar tidak ajek, status "banyak" baru berlaku bila empat dari enam penilaian terakhir sepakat. Yang dinilai adalah tingkat, bukan berat atau volume sampah.
+
+**Hitungan pejalan kaki.** Orang yang terdeteksi sedang menaiki sepeda motor tidak dihitung. Seluruh 141 kamera yang punya arsip diperiksa untuk mencari kawasan pejalan kaki: di kamera jalan, "orang" yang terhitung hampir semuanya pengendara yang motornya tidak terdeteksi, jadi hitungan orang hanya ditampilkan untuk tempat yang kameranya menghadap ruang pejalan kaki.
+
 **Keandalan.** `[PERBARUI: jumlah siklus selesai dan jeda sejak 12 Okt dari status.py]`
 
-**Yang belum diuji.** Penilaian air pada kejadian naik yang nyata; akurasi malam hari terhadap penilaian manusia; hitungan kendaraan malam hari; tampilan di layar ponsel.
+**Yang belum diuji.** Penilaian air pada kejadian naik yang nyata; peringatan sampah dengan hujan sungguhan; akurasi malam hari terhadap penilaian manusia; hitungan kendaraan malam hari; tampilan di layar ponsel.
 
 ---
 

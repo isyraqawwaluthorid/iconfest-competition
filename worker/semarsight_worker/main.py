@@ -15,7 +15,10 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-from typing import Any
+from collections.abc import Callable
+from typing import Any, TypeVar
+
+import httpx
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -33,6 +36,9 @@ log = logging.getLogger("semarsight_worker")
 
 FRAME_STATE_FILE = "_state/frame_states.json"
 COUNTING_MODULES = {"traffic", "crowd"}
+READ_ATTEMPTS = 4
+READ_RETRY_SECONDS = 3.0  # jeda dikalikan nomor percobaan: 3, 6, lalu 9 detik
+T = TypeVar("T")
 ACTIVITY_PROFILE_KEY = "activity_profile"  # baris `system_status` yang dibaca lapisan "Aktivitas per jam" di web
 POOR_QUALITY = "poor"  # hitungan dari gambar buruk tidak ikut profil aktivitas
 OUTAGE_MIN_CAMERAS = 10
@@ -118,9 +124,10 @@ def run_cycle(
     started_at = datetime.now(timezone.utc)
     started = time.monotonic()
 
-    all_cameras = database.active_cameras()
+    # Dua bacaan pembuka ini menentukan jadi-tidaknya seluruh siklus, jadi sambungan yang putus sesaat dicoba lagi.
+    all_cameras = _read_with_retry(database.active_cameras, "daftar kamera")
     cameras = _select_cameras(all_cameras, only, limit)
-    before = database.status_snapshot()
+    before = _read_with_retry(database.status_snapshot, "status kamera")
 
     with ThreadPoolExecutor(max_workers=settings.max_concurrency) as pool:
         results = list(
@@ -254,6 +261,22 @@ def record_events(
             lag_minutes, count = learned
             database.update_river_link_lag(link.upstream_id, link.downstream_id, lag_minutes, count)
             log.info("jeda hulu-hilir %s dipelajari: %d menit dari %d kejadian", link.river_system, lag_minutes, count)
+
+
+def _read_with_retry(read: Callable[[], T], what: str, attempts: int = READ_ATTEMPTS, pause: float = READ_RETRY_SECONDS) -> T:
+    """Jalankan satu bacaan database; bila sambungan gagal, coba lagi beberapa kali sebelum menyerah.
+
+    Pada 13 Okt 2026 satu siklus hilang karena sambungan ke database diputus tepat saat daftar kamera dibaca.
+    """
+    for attempt in range(1, attempts + 1):
+        try:
+            return read()
+        except httpx.TransportError as exc:
+            if attempt == attempts:
+                raise
+            log.warning("membaca %s gagal (%s); mencoba lagi (%d dari %d)", what, type(exc).__name__, attempt + 1, attempts)
+            time.sleep(pause * attempt)
+    raise AssertionError("tidak terjangkau")
 
 
 def split_unreachable(results: list[CameraResult]) -> tuple[list[CameraResult], list[CameraResult]]:

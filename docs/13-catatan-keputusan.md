@@ -182,6 +182,8 @@ Daftar lengkap dan statusnya ada di `10-tasklist.md`.
 
 ## 9. Kejadian operasional yang perlu diingat
 
+- **13 Okt 20.07 WIB: satu siklus hilang.** Sambungan ke Supabase diputus (`WinError 10054`) tepat saat daftar kamera dibaca di awal siklus, jadi seluruh siklus batal; siklus berikutnya normal. Sejak itu dua bacaan pembuka siklus dicoba lagi sampai empat kali (`_read_with_retry` di `main.py`). Ini jeda pertama sejak worker pindah ke PC.
+
 | Waktu | Kejadian | Tindak lanjut |
 |---|---|---|
 | 11 Okt dini hari | Data hilang ±11 jam karena laptop tertidur | Semua profil daya diatur tidak pernah tidur saat tercolok; worker meminta mesin tetap terjaga |

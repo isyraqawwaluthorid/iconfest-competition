@@ -150,3 +150,33 @@ def test_an_open_event_keeps_its_densest_traffic_moment():
     database.statuses = statuses
     record_events(database, [result], {"out": {"water_status": "waspada"}}, {"out": {"water_status": "waspada"}}, [], cameras)
     assert not any("traffic_impact" in fields for _, fields in database.updated)
+
+
+def test_an_opening_read_is_retried_after_a_dropped_connection():
+    import httpx
+
+    from semarsight_worker.main import _read_with_retry
+
+    calls = []
+
+    def flaky() -> str:
+        calls.append(1)
+        if len(calls) < 3:
+            raise httpx.ConnectError("sambungan diputus")
+        return "ok"
+
+    assert _read_with_retry(flaky, "daftar kamera", pause=0) == "ok"
+    assert len(calls) == 3
+
+
+def test_an_opening_read_gives_up_after_the_last_attempt():
+    import httpx
+    import pytest
+
+    from semarsight_worker.main import _read_with_retry
+
+    def dead() -> str:
+        raise httpx.ConnectError("sambungan diputus")
+
+    with pytest.raises(httpx.ConnectError):
+        _read_with_retry(dead, "daftar kamera", attempts=2, pause=0)
