@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { MapThemeToggle } from "@/components/map/MapThemeToggle";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -132,6 +133,13 @@ export function TrafficView({ initialCameras, profile }: Props) {
             ))}
           </div>
           <span aria-hidden className="h-5 w-px bg-border" />
+          <Link
+            href="/lalu-lintas/3d"
+            title="Percobaan: ruas jalan di atas peta 3D dengan bangunan timbul"
+            className="rounded-control px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-muted transition-colors hover:bg-surface-muted hover:text-text"
+          >
+            3D
+          </Link>
           <MapThemeToggle />
         </div>
       </section>

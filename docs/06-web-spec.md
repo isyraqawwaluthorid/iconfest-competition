@@ -178,6 +178,8 @@ Dibuat dari video referensi pemilik proyek (dasbor lalu lintas dengan ruas berwa
 
 Semua peta (Beranda, Simulasi, Lalu Lintas, Kamera) memakai peta dasar yang sama (`lib/map-tiles.ts`) dan punya tombol **Peta gelap** (`components/map/MapThemeToggle.tsx`, `lib/map-theme.ts`): peta dasar digelapkan lewat CSS supaya warna ruas dan batas wilayah lebih menonjol; pilihannya diingat di browser.
 
+Percobaan peta 3D: `/lalu-lintas/3d` (`components/traffic/Map3D.tsx`, `Traffic3DView.tsx`) menampilkan lapisan Ruas jalan di atas peta vektor OpenFreeMap dengan MapLibre GL, sudut pandang miring, dan bangunan timbul. Dibuka lewat tautan "3D" di bilah atas halaman Lalu lintas.
+
 Komponen: `components/traffic/TrafficView.tsx` (lapisan dan keadaan), `TrafficMap.tsx` (peta), `RoadPanels.tsx`, `ActivityPanels.tsx`, `EmissionPanels.tsx`, `SegmentPanel.tsx`. Logika murni: `lib/traffic.ts`, `lib/activity.ts`, `lib/emission.ts`, `lib/geo/roads.ts`.
 - Status kamera berubah di browser tanpa refresh saat worker memperbarui `camera_status`.
 - Mematikan worker → banner muncul dalam 15 menit; halaman tetap menampilkan data terakhir.
