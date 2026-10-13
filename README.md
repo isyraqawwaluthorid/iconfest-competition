@@ -148,6 +148,7 @@ python scripts/probe_camera.py "JRAKAH"            # uji penilaian AI satu kamer
 python scripts/probe_insight.py naik               # uji ringkasan AI pada keadaan buatan
 python scripts/build_demo_scenario.py --no-llm     # jalankan skenario simulasi melalui aturan asli
 python scripts/build_road_segments.py              # bangun ulang ruas jalan halaman Lalu Lintas dari OpenStreetMap
+python scripts/annotate_counts.py keluaran 10      # gambar kotak deteksi di snapshot 10 kamera, untuk memeriksa hitungan dengan mata
 ```
 
 Semua skrip di atas tidak menulis ke database. `replay_readings.py` dipakai setiap kali kalibrasi atau prompt diubah, untuk memastikan salah baca yang pernah terjadi tidak terulang dan lokasi lain tidak ikut berubah.

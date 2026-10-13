@@ -299,10 +299,13 @@ def refresh_weather(database: Database, weather: dict[str, openmeteo.GridWeather
         log.exception("pembaruan cuaca gagal")
 
 
-def seed_history(history: baseline.History, profile: activity.Profile, database: Database) -> None:
-    """Isi riwayat pembanding dan profil aktivitas dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart."""
+def seed_history(history: baseline.History, profile: activity.Profile, database: Database, model_name: str) -> None:
+    """Isi riwayat pembanding dan profil aktivitas dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart.
+
+    Hanya pembacaan dari model deteksi yang sedang dipakai; setelah model diganti, pembanding mulai dari nol.
+    """
     metric_by_camera = {cam.id: _density_metric(cam) for cam in database.active_cameras()}
-    rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.HISTORY)
+    rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.HISTORY, model_name)
     for row in rows:
         if row["camera_id"] in metric_by_camera and row["quality"] != POOR_QUALITY:
             profile.add(row["camera_id"], datetime.fromisoformat(row["captured_at"]), row["vehicle_total"], row["persons"])
@@ -310,7 +313,7 @@ def seed_history(history: baseline.History, profile: activity.Profile, database:
         if metric is None or not _usable_for_baseline(row["quality"], row["is_night"]):
             continue
         history.add(row["camera_id"], datetime.fromisoformat(row["captured_at"]), row[metric])
-    log.info("riwayat pembanding lalu lintas diisi dari %d pembacaan %d hari terakhir", len(rows), baseline.HISTORY.days)
+    log.info("riwayat pembanding lalu lintas diisi dari %d pembacaan %s, %d hari terakhir", len(rows), model_name, baseline.HISTORY.days)
 
 
 def _evaluate_traffic(result: CameraResult, history: baseline.History) -> TrafficReading:
@@ -470,7 +473,7 @@ def main(argv: list[str] | None = None) -> int:
     frame_states = acquisition.load_frame_states(state_path)
     history = baseline.History()
     profile = activity.Profile()
-    seed_history(history, profile, database)
+    seed_history(history, profile, database, settings.yolo_model)
     weather: dict[str, openmeteo.GridWeather] = {}
     refresh_weather(database, weather)
     water_pipeline = WaterPipeline(settings, database, weather)

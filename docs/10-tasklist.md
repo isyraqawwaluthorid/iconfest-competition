@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Selasa, 13 Oktober 2026, 15.40 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Selasa, 13 Oktober 2026, 16.05 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -16,14 +16,14 @@ Cara membaca:
 |---|---|---|---|---|
 | Fase 0 — Prasyarat | 5 dari 7 | – | 2 (manual) | sebelum 10 Okt |
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
-| Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
+| Fase 2 — Lalu lintas, web dasar, deploy | 13 dari 14 | – | 1 | Min 11 Okt |
 | Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 8 dari 9 | 1 | 0 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 4 dari 8 | 2 | 2 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | – | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **64 dari 89 (72%)** | **5** | **20** | |
+| **Jumlah inti** | **65 dari 89 (73%)** | **5** | **19** | |
 | Fitur tambahan (TX) | 2 dari 9 | – | 7 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -52,7 +52,6 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 | **T2.10** Deploy ke Vercel | Min 11 Okt | Belum; ditunda pemilik proyek 12 Okt | Juri membuka tautan, bukan `localhost`. Paling berisiko bila dikerjakan mendekati tenggat |
 | **T3.10** Uji klasifikasi malam | Sen 12 Okt | Sebagian | Akurasi malam belum pernah diperiksa terhadap penilaian manusia |
 | **T3.11** Foto referensi malam | Sen 12 Okt | Tinggal satu: Banger-IN (bukan unggulan). Dua lainnya disimpan 12 Okt pukul 18.27 | Tidak ada dampak selama Banger-IN tidak dinilai AI |
-| **T2.12** Evaluasi hitungan YOLO siang | Min 11 Okt | Belum | Angka kendaraan belum pernah dibandingkan dengan hitungan manual |
 | **T0.6** Email izin ke Diskominfo | sebelum 10 Okt | Belum [M] | Dasar pemanfaatan data untuk laporan |
 | **T0.7** Jam tenggat dan template laporan | sebelum 10 Okt | Belum [M] | Laporan tidak bisa disusun tanpa template |
 
@@ -139,7 +138,7 @@ Hasil uji siklus penuh pertama (10 Okt, 18.52 WIB): 146 kamera dalam 58 detik, 1
 - [x] **T2.11 [M]** Pilih 15–20 kamera air unggulan dan beberapa kamera lalu lintas unggulan; tandai `is_featured`. *Bukti:* 20 kamera unggulan.
 - [x] **T2.13 [K]** Halaman `/mosaik`: grid snapshot terbaru semua kamera, saringan modul, hanya aktif, cari nama.
 - [ ] **T2.10 [M+K]** Deploy pertama ke Vercel; isi env di dashboard Vercel. *Bukti:* link publik menampilkan peta dengan data nyata; tidak ada secret di bundle client. **Tertinggal** (jadwal 11 Okt).
-- [ ] **T2.12 [K]** Evaluasi hitungan YOLO pada siang hari (malam: sepeda motor kecil banyak terlewat); pertimbangkan model lebih besar atau ambang berbeda jika perlu. **Tertinggal.**
+- [x] **T2.12 [K]** Evaluasi hitungan YOLO pada siang hari. Selesai 13 Okt dengan sampel kecil: 10 kamera, satu gambar tiap kamera, dibandingkan dengan hitungan mata oleh asisten (bukan manusia). Sistem mencatat 176 kendaraan, pembanding ±214 (82%); **sepeda motor hanya 27 dari ±78**, truk terhitung berlebih (29 berbanding ±15). Indeks kepadatan relatif tetap layak; porsi jenis kendaraan tidak. Model yolo11s menemukan ±2,5 kali lebih banyak sepeda motor pada gambar yang sama. Rincian di `09-demo-evaluation-report.md`; alatnya `worker/scripts/annotate_counts.py`. **Keputusan mengganti model menunggu pemilik proyek** (pembanding harus dikumpulkan ulang). Malam hari belum dievaluasi.
 - [x] **T2.14 [K]** Pembanding lalu lintas per jam. Selesai 12 Okt: tiap titik dibandingkan dengan dirinya pada jam yang sama (±1 jam) di hari-hari sebelumnya, mengutamakan jenis hari yang sama; beranda, panel kecamatan, dan halaman kamera menyebut bila pembanding masih sementara. *Bukti:* pada data 12 Okt pukul 11.00–14.00, titik yang terbaca "padat" turun dari 68–70% menjadi ±16%. **Yang menyusul sendiri:** pembanding tidak lagi sementara, dan deteksi anomali menyala, setelah tiga hari data sejenis (hari kerja: sekitar Kamis 15 Okt).
 
 ## Fase 3 — Modul air (Senin 12 Okt)
@@ -298,4 +297,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
 | 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser; README lengkap (T6.5 selesai) |
 | 12 Okt malam | Halaman Lalu Lintas dari video referensi pemilik proyek (T5.1 selesai): ruas jalan berwarna kepadatan, heksagon aktivitas per jam (TX.7), beban emisi relatif (TX.8); aturan "sedikit kendaraan tidak disebut padat"; referensi malam DPU-Mberok2-OUT dan Semarang Indah_IN (T3.11 tinggal Banger-IN); atas masukan pemilik proyek: semua jalan berwarna (tanpa abu-abu), peta dasar berwarna di semua halaman, tombol "Peta gelap", pin kamera yang membesar saat didekati (kamera setempat digabung berangka), kisi heksagon yang memenuhi kota, dan kecamatan tidak terpantau di Beranda tanpa arsiran (garis batas saja) |
-| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2. Insight lintas modul genangan → lalu lintas (T4.6 selesai). Halaman Air (T4.8 selesai). Garis W Banger-SD-IN ditambahkan pemilik proyek |
+| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2. Insight lintas modul genangan → lalu lintas (T4.6 selesai). Halaman Air (T4.8 selesai, tanpa menu sendiri). Garis W Banger-SD-IN ditambahkan pemilik proyek. Evaluasi hitungan kendaraan (T2.12 selesai): sepeda motor hanya sepertiga yang terhitung |

@@ -14,6 +14,35 @@
 5. **Biaya:** rata-rata panggilan AI vision per kamera per hari dan berapa persen dihemat oleh deteksi perubahan lokal (dibanding memanggil AI setiap siklus).
 6. **Keandalan:** ketersediaan worker dan kamera selama periode uji.
 
+### Hasil evaluasi hitungan kendaraan (13 Okt 2026, siang)
+
+Sampel: 10 kamera lalu lintas, satu gambar tiap kamera, siklus 15.30 WIB (cerah). Pembandingnya adalah hitungan dengan mata atas gambar yang sama, **dilakukan asisten AI yang mengerjakan proyek, bukan manusia**, dari gambar berlebar 960 px dengan kotak deteksi tergambar (`worker/scripts/annotate_counts.py`). Angka pembanding bersifat kira-kira, terutama pada kerumunan sepeda motor.
+
+| Jenis | Dicatat sistem (yolo11n) | Hitungan pembanding | Catatan |
+|---|---|---|---|
+| Mobil | 115 | ±119 | Jumlahnya dekat, tetapi sebagian karena galat yang saling menutup: mobil jauh terlewat, sebagian mobil terbaca truk |
+| Sepeda motor | 27 | ±78 | **Hanya sekitar sepertiga yang terhitung.** Pengendaranya sering terdeteksi sebagai orang, motornya tidak |
+| Bus | 5 | 2 | Papan toko dan mobil gelap terbaca bus |
+| Truk | 29 | ±15 | Mobil van, MPV besar, dan pikap terbaca truk; pikap kadang terhitung dua kali (mobil dan truk) |
+| Semua kendaraan | 176 | ±214 | Sistem menghitung sekitar 82% |
+
+Artinya:
+- **Indeks kepadatan relatif masih layak dipakai**: tiap kamera dibandingkan dengan dirinya sendiri, jadi kekurangan hitung yang ajek ikut tercoret. Yang tidak boleh dilakukan adalah menyebut angka itu sebagai jumlah kendaraan sebenarnya.
+- **Porsi jenis kendaraan tidak layak dikutip**: sepeda motor 15% menurut sistem, ±36% menurut pembanding; truk 16% berbanding ±7%. Lapisan Beban emisi bergantung pada porsi ini, jadi hanya peringkat antar-ruasnya yang berguna.
+- Kamera bersudut sangat lebar (Tugumuda 2 Wide) kehilangan banyak kendaraan kecil di kejauhan.
+
+Perbandingan model pada 10 gambar kamera yang sama (diambil 15.35 WIB, lebar 960 px, tanpa hitungan pembanding):
+
+| Model | Mobil | Sepeda motor | Bus | Truk | Waktu 10 gambar |
+|---|---|---|---|---|---|
+| yolo11n (dipakai sekarang) | 90 | 29 | 7 | 11 | 1,7 detik (termasuk pemanasan) |
+| yolo11s | 103 | 72 | 1 | 15 | 1,0 detik |
+| yolo11m | 99 | 66 | 2 | 18 | 2,5 detik |
+
+yolo11s menemukan ±2,5 kali lebih banyak sepeda motor dan jauh lebih sedikit bus palsu; dua gambar hasilnya diperiksa dengan mata dan kotak tambahannya memang sepeda motor. Kerumunan motor yang rapat tetap banyak terlewat. **Mengganti model belum dilakukan**: hitungan akan naik di semua kamera, sehingga pembanding ("kebiasaan") dari hitungan lama tidak berlaku lagi dan harus dikumpulkan ulang. Worker sudah disiapkan untuk itu (riwayat pembanding hanya memakai hitungan dari model yang sama).
+
+Yang belum dievaluasi: malam hari, hujan, hitungan orang, dan pembanding oleh manusia.
+
 ## Skenario video demo penyisihan (±3 menit)
 
 1. **Masalah (20 detik):** ratusan CCTV kota Semarang, hanya ditonton; banjir dan genangan kronis.

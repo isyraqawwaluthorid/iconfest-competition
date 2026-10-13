@@ -107,14 +107,19 @@ class Database:
     def download_object(self, path: str) -> bytes:
         return self._client.storage.from_(self._bucket).download(path)
 
-    def recent_traffic(self, since: datetime) -> list[dict[str, Any]]:
-        """Pembacaan lalu lintas `live` sejak `since`, urut waktu, untuk mengisi ulang baseline bergulir."""
+    def recent_traffic(self, since: datetime, model: str) -> list[dict[str, Any]]:
+        """Pembacaan lalu lintas `live` sejak `since` yang dihitung dengan `model`, urut waktu, untuk mengisi ulang baseline bergulir.
+
+        Hitungan dari model lain tidak ikut: model yang berbeda menemukan jumlah kendaraan yang berbeda pada gambar
+        yang sama, jadi mencampurnya membuat "kebiasaan" tidak bisa dibandingkan dengan hitungan sekarang.
+        """
         rows: list[dict[str, Any]] = []
         while True:
             page = (
                 self._client.table("traffic_readings")
                 .select("camera_id, captured_at, vehicle_total, persons, quality, is_night")
                 .eq("source", "live")
+                .eq("model", model)
                 .gte("captured_at", since.isoformat())
                 .order("captured_at")
                 .order("id")
