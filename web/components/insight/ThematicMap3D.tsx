@@ -39,8 +39,8 @@ export default function ThematicMap3D({ summaries, theme, sources, pending, sele
         name: summary.district.name,
         color: toneColor(display.tone),
         // Wilayah tanpa sumber data hanya digambar garis batasnya, tidak pernah diberi warna status.
-        // Di atas peta gelap warna yang sama tampak lebih redup, jadi dibuat lebih pekat.
-        opacity: untracked ? (isSelected ? 0.18 : 0) : isSelected ? (dark ? 0.8 : 0.62) : dark ? 0.58 : 0.4,
+        // Cukup tembus pandang supaya jalan dan nama tempat di bawahnya tetap terbaca, di peta terang maupun gelap.
+        opacity: untracked ? (isSelected ? 0.18 : 0) : isSelected ? (dark ? 0.7 : 0.62) : dark ? 0.45 : 0.4,
         line: isSelected ? tokenColor("--primary-strong", "#1d4ed8") : outline,
         width: isSelected ? 3.5 : 1.8,
         tip: `${summary.district.name} · ${display.label}`,

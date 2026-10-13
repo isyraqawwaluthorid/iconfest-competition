@@ -59,6 +59,36 @@ const toBounds = ([[south, west], [north, east]]: [LatLng, LatLng]): [[number, n
   [east, north],
 ];
 
+// Gaya gelap OpenFreeMap nyaris hitam: laut, daratan, dan jalan sulit dibedakan. Warnanya diangkat sedikit
+// (laut kebiruan, jalan abu-abu terang) supaya kota tetap terbaca di bawah warna status.
+const DARK_PAINT: [layer: string, property: string, color: string][] = [
+  ["background", "background-color", "#1b1f27"],
+  ["water", "fill-color", "#10293d"],
+  ["waterway", "line-color", "#10293d"],
+  ["landuse_residential", "fill-color", "#21262f"],
+  ["landcover_wood", "fill-color", "#1d2b26"],
+  ["landuse_park", "fill-color", "#1d2b26"],
+  ["building", "fill-color", "#272c36"],
+  ["highway_path", "line-color", "#2d323c"],
+  ["highway_minor", "line-color", "#363c48"],
+  ["highway_major_casing", "line-color", "#2a2f39"],
+  ["highway_major_inner", "line-color", "#4c5464"],
+  ["highway_major_subtle", "line-color", "#4c5464"],
+  ["highway_motorway_casing", "line-color", "#2a2f39"],
+  ["highway_motorway_inner", "line-color", "#5c6577"],
+  ["highway_motorway_subtle", "line-color", "#5c6577"],
+];
+
+function softenDark(map: MapLibreMap) {
+  for (const [layer, property, color] of DARK_PAINT) if (map.getLayer(layer)) map.setPaintProperty(layer, property, color);
+  // Nama tempat dan jalan ikut diterangkan; aslinya abu-abu gelap di atas hitam.
+  for (const layer of map.getStyle().layers) {
+    if (layer.type !== "symbol") continue;
+    if (layer.id.startsWith("place_")) map.setPaintProperty(layer.id, "text-color", "#aeb5c2");
+    else if (layer.id.startsWith("highway_name")) map.setPaintProperty(layer.id, "text-color", "#8b93a3");
+  }
+}
+
 /** Pastikan ada bangunan 3D dan kembalikan id lapisannya. Gaya terang sudah punya; gaya gelap belum. */
 function ensureBuildings(map: MapLibreMap, theme: MapTheme): string {
   const layers = map.getStyle().layers;
@@ -75,7 +105,7 @@ function ensureBuildings(map: MapLibreMap, theme: MapTheme): string {
       "source-layer": "building",
       minzoom: 14,
       paint: {
-        "fill-extrusion-color": theme === "dark" ? "#3a4050" : "#d9d4cc",
+        "fill-extrusion-color": theme === "dark" ? "#454c5c" : "#d9d4cc",
         "fill-extrusion-height": ["coalesce", ["get", "render_height"], 4],
         "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0],
         "fill-extrusion-opacity": 0.85,
@@ -144,6 +174,7 @@ export default function GlMap({
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), navigation);
     const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "gl-tip", offset: 12 });
     map.on("load", () => {
+      if (theme === "dark") softenDark(map);
       ready.current = true;
       sync(map, true);
     });
