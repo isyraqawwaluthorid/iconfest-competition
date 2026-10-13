@@ -66,8 +66,8 @@ REASONS = {
 
 # Langkah yang ditampilkan: (menit, keterangan untuk penonton, status terkonfirmasi yang diharapkan).
 STEPS = [
-    (0, "Keadaan awal: semua lokasi air normal dan hujan belum diprakirakan.", {UPSTREAM_SITE: "normal"}),
-    (15, "Prakiraan hujan 3 jam ke depan naik menjadi 12,5 mm. Aturan membuka peringatan hujan lebat; di kamera belum ada yang berubah.", {UPSTREAM_SITE: "normal"}),
+    (0, "Keadaan awal: semua lokasi air normal dan hujan belum diprakirakan. Sampah banyak terpantau di Progo-IN, tetapi tanpa hujan itu baru catatan.", {UPSTREAM_SITE: "normal"}),
+    (15, "Prakiraan hujan 3 jam ke depan naik menjadi 12,5 mm. Aturan membuka peringatan hujan lebat, dan karena sampah banyak sudah terpantau di Progo-IN, juga peringatan untuk Dinas PU: bersihkan saringan sebelum hujan. Di kamera belum ada yang berubah.", {UPSTREAM_SITE: "normal"}),
     (30, "AI kamera menilai Progo-IN \"waspada\" untuk pertama kali. Ini baru indikasi awal: status resminya tetap Normal sampai penilaian kedua sepakat.", {UPSTREAM_SITE: "normal"}),
     (40, "Penilaian kedua sepakat, jadi status resmi Progo-IN naik menjadi Waspada. Peringatan dini otomatis dibuat untuk Progo-OUT di hilirnya, dan ringkasan AI ditulis ulang.", {UPSTREAM_SITE: "waspada", DOWNSTREAM_SITE: "normal"}),
     (50, "AI kamera menilai Progo-IN \"siaga\" dan jalan JRAKAH tergenang ringan, masing-masing baru sekali. Keduanya masih indikasi awal: status resmi belum berubah.", {UPSTREAM_SITE: "waspada", ROAD_SITE: "normal"}),
@@ -99,7 +99,8 @@ def main() -> None:
         statuses[cam.id] |= {
             "health": "live", "consecutive_failures": 0, "water_status": "normal", "water_trend": "stabil",
             "water_status_since": (start - timedelta(days=1)).isoformat(), "road_flood": road,
-            "trash": "tidak_relevan" if cam.water_kind == "jalan" else "tidak_terlihat",
+            # Status sampah resmi (sudah dihaluskan). Satu lokasi dibuat bersampah banyak untuk memperlihatkan peringatan sampah + hujan.
+            "trash": "tidak_relevan" if cam.water_kind == "jalan" else "banyak" if cam.name == UPSTREAM_SITE else "tidak_terlihat",
             "water_confidence": 0.84, "needs_verification": False,
         }  # fmt: skip
         calm = smoothing.Reading("normal", road, 0.84, "good", "sama")
@@ -172,6 +173,7 @@ def main() -> None:
         desired = [
             *alerts.water_alerts(sites, statuses, weather),
             *alerts.upstream_alerts(sites, statuses, links),
+            *alerts.trash_alerts(sites, statuses, weather, frozenset(camera_id for kind, camera_id in active if kind == "trash_blockage")),
             alerts.rain_alert(weather, already_active=("heavy_rain", None) in active),
         ]
         current = {}

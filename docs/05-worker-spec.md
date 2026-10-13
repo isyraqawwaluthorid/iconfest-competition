@@ -208,6 +208,11 @@ Urutan level: normal(0) < waspada(1) < siaga(2) < awas(3).
 - **Hasil aturan disimpan di tiap pembacaan** (12 Okt), di `water_readings.raw.smoothing`: `level` (level yang dihitung dari pembacaan itu, atau `null` jika diabaikan), `previous` dan `confirmed` (status resmi sebelum dan sesudahnya), `needed` (jumlah penilaian sepakat untuk naik), dan `recheck_minutes` (jeda pemeriksaan berkala saat itu: 10 menit bila hujan, selain itu 30). Web menggambar linimasa dan penanda "menunggu konfirmasi" dari catatan ini, sehingga aturannya hanya ada di satu tempat.
 - Kamera `water_kind = jalan` memakai `road_flood` dengan aturan sama (tidak_tergenang < ringan < sedang < tinggi). Pemetaan ke status umum: ringan → waspada, sedang → siaga, tinggi → awas.
 
+### Status sampah resmi (`fusion/smoothing.py`, sejak 13 Okt)
+- Penilaian sampah per gambar tidak ajek, jadi `camera_status.trash` berisi status yang sudah dihaluskan; penilaian mentahnya tetap di `water_readings.trash`, dan status resmi setelah tiap penilaian dicatat di `raw.smoothing.trash`.
+- "Banyak" bila 4 dari 6 penilaian terakhir yang layak (keyakinan ≥ 0,5, gambar tidak buruk, sampah bisa dinilai) menyatakan banyak; setelah resmi, bertahan selama masih ada 2 dari 6. Untuk tingkat di bawahnya dipakai yang terbanyak di antara enam penilaian itu.
+- Peringatan `trash_blockage` (waspada, untuk Dinas PU): status sampah resmi "banyak" di pompa, sungai, atau kolam **dan** prakiraan hujan 3 jam ≥ 10 mm di wilayahnya; ditutup saat prakiraan turun di bawah 7 mm atau sampahnya tidak lagi banyak.
+
 ### Tren (`fusion/trend.py`)
 Bandingkan level terkonfirmasi sekarang dengan 30 dan 60 menit lalu: naik ≥ 2 level dalam 60 menit atau ≥ 1 level dalam 30 menit → `naik_cepat`; naik ≥ 1 level dalam 60 menit → `naik`; turun → `turun`; selain itu `stabil`.
 

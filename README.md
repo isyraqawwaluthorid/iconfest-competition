@@ -140,7 +140,7 @@ Cara menyiapkan mesin baru, memindahkan worker, dan masalah yang pernah terjadi 
 
 ```bash
 cd worker
-pytest                                             # 192 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
+pytest                                             # 197 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
 python scripts/status.py                           # detak worker, 20 lokasi air, peringatan, jeda data
 python scripts/calibration_check.py                # kalibrasi tiap kamera air; yang perlu dilihat ditulis lebih dulu
 python scripts/replay_readings.py --all 3          # nilai ulang gambar bukti tersimpan dengan kalibrasi dan prompt saat ini

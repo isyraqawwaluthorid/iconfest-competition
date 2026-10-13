@@ -17,6 +17,16 @@ MIN_CONFIDENCE = 0.5
 MIN_CONFIDENCE_ELEVATED = 0.65
 READINGS_TO_RISE = 2
 READINGS_TO_FALL = 3
+# Sampah: penilaian AI atas sampah yang sama sering berganti antara "sedikit" dan "banyak" dari satu gambar ke
+# gambar berikutnya (Manggis-IN: 12 kali dalam 46 penilaian, 13 Okt 2026). "Banyak" baru resmi bila 4 dari 6
+# penilaian terakhir yang layak sepakat (sekitar 2-3 jam), dan baru lepas bila tinggal 1 dari 6. Diuji pada
+# penilaian 72 jam: dengan 3 dari 4, status "banyak" menyala 11 kali di empat lokasi; dengan 4 dari 6, 7 kali.
+TRASH_HEAVY = "banyak"
+TRASH_LEVELS = ("tidak_terlihat", "sedikit", TRASH_HEAVY)
+TRASH_NOT_APPLICABLE = "tidak_relevan"
+TRASH_WINDOW = 6
+TRASH_TO_CONFIRM = 4
+TRASH_TO_KEEP = 2
 
 
 @dataclass(frozen=True)
@@ -28,6 +38,7 @@ class Reading:
     confidence: float
     quality: str | None
     change_vs_reference: str | None = None
+    trash: str | None = None
 
 
 def level_of(reading: Reading, water_kind: str | None) -> int | None:
@@ -74,3 +85,25 @@ def confirm_water_status(current: str | None, readings: list[Reading], water_kin
     if len(falling) == READINGS_TO_FALL and max(falling) < now:
         return LEVELS[max(falling)], needs_verification
     return current, needs_verification
+
+
+def confirm_trash(current: str | None, readings: list[Reading]) -> str | None:
+    """Status sampah resmi dari penilaian terbaru (`readings` terurut dari yang terbaru).
+
+    Penilaian berkeyakinan rendah, dari gambar buruk, atau yang tidak bisa menilai sampah tidak ikut dihitung.
+    Tanpa penilaian yang layak, status sebelumnya dipertahankan.
+    """
+    if readings and readings[0].trash == TRASH_NOT_APPLICABLE:
+        return TRASH_NOT_APPLICABLE
+    usable = [r.trash for r in readings if r.trash in TRASH_LEVELS and r.confidence >= MIN_CONFIDENCE and r.quality != "poor"]
+    window = usable[:TRASH_WINDOW]
+    if not window:
+        return current
+    heavy = window.count(TRASH_HEAVY)
+    if heavy >= TRASH_TO_CONFIRM or (current == TRASH_HEAVY and heavy >= TRASH_TO_KEEP):
+        return TRASH_HEAVY
+    lighter = [level for level in window if level != TRASH_HEAVY]
+    if not lighter:
+        # Baru beberapa penilaian, semuanya "banyak": sampah terlihat, tetapi belum cukup untuk disebut banyak.
+        return current if current in TRASH_LEVELS[:2] else "sedikit"
+    return max(lighter, key=lambda level: (lighter.count(level), -lighter.index(level)))

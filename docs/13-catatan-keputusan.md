@@ -76,6 +76,12 @@ Sejak 11 Okt ada 22 penilaian yang bukan normal. Yang terjadi 12 Okt di Kartini-
 - **Belum diputuskan (menunggu pemilik proyek):** aturan tambahan "tanpa hujan, kenaikan butuh tiga penilaian sepakat, bukan dua".
 - **Sisi baiknya.** Ini pertama kalinya alur status resmi → peringatan → kejadian → turun sendiri berjalan dengan data langsung, dan semuanya bekerja seperti di simulasi.
 
+### Sampah: istilah harus didefinisikan, dan status harus dihaluskan (13 Okt)
+- Sebelum membangun peringatan sampah + hujan, gambar buktinya dilihat dulu. Di KP.Kali-OUT "banyak" benar; di Manggis-IN sampahnya tersebar dan AI berganti-ganti antara "sedikit" dan "banyak". Sebabnya sama dengan salah baca garis N siang itu: prompt memakai istilah tanpa mendefinisikannya.
+- Dua lapis perbaikan: definisi tiap tingkat di prompt, dan penghalusan (4 dari 6) sebelum menjadi status resmi. Ambang dipilih dengan menjalankan beberapa pilihan pada penilaian 72 jam yang tersimpan (`3 dari 4` menyala 11 kali, `4 dari 6` 7 kali), bukan dengan menebak.
+- Tingkat peringatannya waspada, bukan siaga seperti rancangan awal: ini ajakan bersiap untuk Dinas PU, bukan tanda air naik (disetujui pemilik proyek).
+- Pegangan dari pemilik proyek hari itu: periksa kalibrasi dan keluaran AI secara rutin, "jangan sampai ada yang halu"; status yang tampil harus nyata dan bisa dipertanggungjawabkan.
+
 ### Risiko dan peringatan
 - **Skor risiko 0–1, terbuka:** status air 40%, tren 20%, kondisi hulu 20%, prakiraan hujan 3 jam 20%. Dihitung ulang tiap siklus tanpa menambah panggilan AI.
 - **Hubungan hulu–hilir diisi untuk empat rumah pompa** (12 Okt): sisi masuk → sisi keluar Bulu Drain, Kartini, Progo, dan Trimulyo, dengan jeda awal 15 menit yang selalu disebut "perkiraan awal". Hanya pasangan yang jelas dari nama dan jarak (0–140 m) yang diisi; tiga pasangan lain yang berdekatan (IPdome → Mberok, Mberok → Jembatan Mberok, Bulu Drain-OUT → KS-OUT-2) ditinggalkan sampai ada yang memastikan alirannya. Lokasi tanpa hulu tetap berkomponen hulu 0, dan halaman kamera mengatakannya terus terang.

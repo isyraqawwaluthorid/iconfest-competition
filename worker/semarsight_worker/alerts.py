@@ -115,22 +115,36 @@ def rain_alert(weather: dict[str, GridWeather], *, already_active: bool) -> Aler
     )
 
 
-def trash_alerts(cameras: list[CameraRow], statuses: dict[str, dict[str, Any]], weather: dict[str, GridWeather]) -> list[Alert]:
-    """Sampah banyak di pompa atau sungai, sementara hujan lebat diprakirakan: risiko aliran tersumbat."""
+def trash_alerts(
+    cameras: list[CameraRow],
+    statuses: dict[str, dict[str, Any]],
+    weather: dict[str, GridWeather],
+    already_active: frozenset[str] = frozenset(),
+) -> list[Alert]:
+    """Sampah banyak di pompa, sungai, atau kolam, sementara hujan lebat diprakirakan: bersihkan sebelum hujan.
+
+    `statuses[...]["trash"]` adalah status sampah resmi (sudah dihaluskan), bukan satu penilaian AI.
+    Tingkatnya waspada: ini ajakan bersiap untuk Dinas PU, bukan tanda air sudah naik. Peringatan yang sudah
+    aktif (`already_active`, id kamera) baru ditutup di bawah `HEAVY_RAIN_CLEAR_MM`, agar tidak kedap-kedip.
+    """
     alerts = []
     for cam in cameras:
         local = weather.get(cam.weather_grid_id or "")
-        if cam.water_kind == "jalan" or local is None or local.precip_next_3h_mm < HEAVY_RAIN_MM:
+        threshold = HEAVY_RAIN_CLEAR_MM if cam.id in already_active else HEAVY_RAIN_MM
+        if cam.water_kind == "jalan" or local is None or local.precip_next_3h_mm < threshold:
             continue
         if statuses.get(cam.id, {}).get("trash") != "banyak":
             continue
         alerts.append(
             Alert(
                 type="trash_blockage",
-                level="siaga",
+                level="waspada",
                 camera_id=cam.id,
                 title=f"Sampah menumpuk di {cam.name}",
-                message=f"Sampah terlihat banyak dan hujan {local.precip_next_3h_mm:.0f} mm diprakirakan dalam 3 jam ke depan; aliran berisiko tersumbat.",
+                message=(
+                    f"Sampah terlihat banyak dan hujan {local.precip_next_3h_mm:.0f} mm diprakirakan dalam 3 jam ke depan. "
+                    "Bersihkan saringan dan pintu air sebelum hujan agar aliran tidak tersumbat."
+                ),
                 audience=("pu",),
                 data={"trash": "banyak", "rain_next_3h_mm": local.precip_next_3h_mm},
             )
@@ -220,7 +234,9 @@ def sync(database: Database, cameras: list[CameraRow], weather: dict[str, GridWe
     water_cameras = [cam for cam in cameras if "water" in cam.modules and cam.is_calibrated]
     desired = [
         *water_alerts(water_cameras, statuses, weather),
-        *trash_alerts(water_cameras, statuses, weather),
+        *trash_alerts(
+            water_cameras, statuses, weather, frozenset(row["camera_id"] for row in active if row["type"] == "trash_blockage")
+        ),
         *upstream_alerts(water_cameras, statuses, links or []),
         *offline_alerts(cameras, statuses),
     ]

@@ -57,7 +57,7 @@ class Database:
         """Keadaan `camera_status` sebelum siklus ini: kegagalan berturut-turut dan status air terkonfirmasi."""
         response = (
             self._client.table("camera_status")
-            .select("camera_id, consecutive_failures, water_status, water_status_since")
+            .select("camera_id, consecutive_failures, water_status, water_status_since, trash")
             .execute()
         )
         return {row["camera_id"]: row for row in response.data}
@@ -90,7 +90,7 @@ class Database:
         """Pembacaan AI terbaru satu kamera, terurut dari yang paling baru."""
         response = (
             self._client.table("water_readings")
-            .select("status, road_flood, confidence, quality, raw, captured_at")
+            .select("status, road_flood, trash, confidence, quality, raw, captured_at")
             .eq("camera_id", camera_id)
             .eq("source", "live")
             .order("captured_at", desc=True)

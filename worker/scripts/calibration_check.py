@@ -6,7 +6,7 @@ Dijalankan di awal tiap sesi kerja dan setiap kali ada penilaian yang bukan norm
     python scripts/calibration_check.py 48     # 48 jam terakhir
 
 Yang diperiksa per kamera: urutan dan jarak garis acuan, foto referensi siang dan malam, keyakinan AI
-siang dan malam, serta penilaian yang bukan normal. Penilaian bukan normal harus dilihat gambarnya
+siang dan malam, penilaian yang bukan normal, dan penilaian sampah yang tidak ajek. Penilaian bukan normal harus dilihat gambarnya
 (`python scripts/replay_readings.py "<nama>" --odd`) sebelum dianggap kejadian.
 Dijalankan dari folder `worker/` dengan virtualenv aktif.
 """
@@ -27,6 +27,7 @@ from semarsight_worker.fusion import smoothing  # noqa: E402
 LEVELS = ["normal", "waspada", "siaga", "awas"]
 MIN_LINE_GAP = 0.012  # jarak tegak antar garis, dalam porsi tinggi gambar; di bawah ini garis sulit dibedakan AI
 LOW_NIGHT_CONFIDENCE = 0.6
+TRASH_FLIPS_TO_FLAG = 6
 
 
 def main() -> None:
@@ -38,7 +39,7 @@ def main() -> None:
     offset = 0
     while True:
         page = (
-            database._client.table("water_readings").select("camera_id, status, confidence, is_night")
+            database._client.table("water_readings").select("camera_id, status, confidence, is_night, trash")
             .gte("captured_at", since).order("captured_at").range(offset, offset + PAGE_SIZE - 1).execute().data
         )
         for row in page:
@@ -76,6 +77,13 @@ def main() -> None:
         if odd:
             counted = sum(r["status"] in LEVELS and (r["confidence"] or 0) >= smoothing.MIN_CONFIDENCE_ELEVATED for r in rows if r["status"] != "normal")
             issues.append("penilaian bukan normal: " + ", ".join(f"{n}x {s}" for s, n in odd.items()) + f" ({counted} cukup yakin untuk dihitung)")
+
+        # Penilaian sampah yang sering berganti antara "banyak" dan tingkat lain: AI tidak ajek di lokasi ini.
+        # Status resminya sudah dihaluskan, tetapi gambarnya perlu dilihat sebelum sampahnya dijadikan temuan.
+        trash = [r["trash"] for r in rows if r.get("trash") in smoothing.TRASH_LEVELS]
+        heavy_flips = sum((a == smoothing.TRASH_HEAVY) != (b == smoothing.TRASH_HEAVY) for a, b in zip(trash, trash[1:]))
+        if heavy_flips >= TRASH_FLIPS_TO_FLAG:
+            issues.append(f"penilaian sampah tidak ajek: 'banyak' berganti {heavy_flips}x dalam {len(trash)} penilaian")
 
         confidence = f"yakin siang {day:.2f}" if day is not None else "yakin siang -"
         confidence += f", malam {night:.2f}" if night is not None else ", malam -"

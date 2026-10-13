@@ -136,17 +136,20 @@ class WaterPipeline:
             # level yang dihitung dari pembacaan ini (None jika diabaikan) dan status resmi sebelum dan sesudahnya.
             # Web menggambar linimasa dari catatan ini, tanpa mengulang aturannya.
             image_quality = result.quality.quality if result.quality else None
-            latest = smoothing.Reading(vision.status, vision.road_flood, vision.confidence, image_quality, vision.change_vs_reference)
+            latest = smoothing.Reading(vision.status, vision.road_flood, vision.confidence, image_quality, vision.change_vs_reference, vision.trash)
             readings = [latest, *self._load_readings(cam)]
             level = smoothing.level_of(latest, cam.water_kind)
             if level is not None:
                 self._levels[cam.id].insert(0, (result.checked_at, level))
             before = previous_status.get(cam.id, {})
             confirmed, needs_verification = smoothing.confirm_water_status(before.get("water_status"), readings, cam.water_kind)
+            # Status sampah juga dihaluskan: satu penilaian "banyak" belum mengubahnya (lihat smoothing.confirm_trash).
+            trash = smoothing.confirm_trash(before.get("trash"), readings)
             outcome = {
                 "level": smoothing.LEVELS[level] if level is not None else None,
                 "previous": before.get("water_status"),
                 "confirmed": confirmed,
+                "trash": trash,  # status sampah resmi setelah penilaian ini; penilaian mentahnya ada di kolom `trash`
                 "needed": smoothing.READINGS_TO_RISE,  # penilaian sepakat yang dibutuhkan untuk naik
                 "recheck_minutes": self._recheck_minutes(cam),  # penilaian berikutnya paling lambat sekian menit lagi
             }
@@ -173,7 +176,7 @@ class WaterPipeline:
             update: dict[str, Any] = {
                 "water_status": confirmed,
                 "road_flood": vision.road_flood,
-                "trash": vision.trash,
+                "trash": trash,
                 "water_confidence": vision.confidence,
                 "needs_verification": needs_verification,
             }
@@ -211,6 +214,7 @@ class WaterPipeline:
                 confidence=row["confidence"] or 0.0,
                 quality=row["quality"],
                 change_vs_reference=((row.get("raw") or {}).get("output") or {}).get("change_vs_reference"),
+                trash=row.get("trash"),
             )
             for row in rows
         ]

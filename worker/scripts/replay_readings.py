@@ -35,7 +35,7 @@ from semarsight_worker.db import Database  # noqa: E402
 from semarsight_worker.fusion import smoothing  # noqa: E402
 
 WIB = ZoneInfo("Asia/Jakarta")
-COLUMNS = "captured_at, status, road_flood, confidence, snapshot_path"
+COLUMNS = "captured_at, status, road_flood, confidence, snapshot_path, trash"
 
 
 def main() -> None:
@@ -91,21 +91,27 @@ def main() -> None:
         return "-" if value is None else smoothing.LEVELS[value]
 
     before, after = Counter(), Counter()
+    trash_before, trash_after = Counter(), Counter()
     with ThreadPoolExecutor(max_workers=6) as pool:
         for cam, row, assessed, result in pool.map(assess, jobs):
             old = level(cam, row["status"], row["road_flood"], row["confidence"] or 0.0)
             new = level(cam, result.status, result.road_flood, result.confidence, result.change_vs_reference)
             before[old] += 1
             after[new] += 1
+            trash_before[row.get("trash")] += 1
+            trash_after[result.trash] += 1
             at = datetime.fromisoformat(row["captured_at"]).astimezone(WIB)
             print(
                 f"{cam.name[:22]:22} {at:%d/%m %H.%M} {'malam' if assessed.is_night else 'siang'} "
                 f"dulu {row['status']:19} {row['confidence'] or 0:.2f} -> kini {result.status:19} {result.confidence:.2f} "
-                f"dipakai={new:8} vs_ref={result.change_vs_reference:22} | {result.reason[:90]}"
+                f"dipakai={new:8} vs_ref={result.change_vs_reference:22} sampah {str(row.get('trash'))[:7]:7}->{result.trash[:7]:7} | {result.reason[:90]}"
             )
     print(f"\n{len(jobs)} gambar. Level yang dipakai penghalusan ('-' = diabaikan, menandai perlu diperiksa):")
     print("  dulu:", dict(before))
     print("  kini:", dict(after))
+    print("Penilaian sampah (mentah, sebelum dihaluskan):")
+    print("  dulu:", dict(trash_before))
+    print("  kini:", dict(trash_after))
 
 
 if __name__ == "__main__":

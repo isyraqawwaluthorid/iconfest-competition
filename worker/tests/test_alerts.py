@@ -78,7 +78,12 @@ def test_trash_alert_needs_both_heavy_trash_and_heavy_rain():
     assert alerts.trash_alerts(cameras, trashy, _weather(G2=4.0)) == []
     assert alerts.trash_alerts(cameras, {"cam-1": {"trash": "sedikit"}}, _weather(G2=15.0)) == []
     [alert] = alerts.trash_alerts(cameras, trashy, _weather(G2=15.0))
-    assert (alert.type, alert.level, alert.audience) == ("trash_blockage", "siaga", ("pu",))
+    assert (alert.type, alert.level, alert.audience) == ("trash_blockage", "waspada", ("pu",))
+    assert "sebelum hujan" in alert.message
+    # Yang sudah aktif baru ditutup di bawah ambang penutup, agar tidak kedap-kedip saat prakiraan naik-turun.
+    assert alerts.trash_alerts(cameras, trashy, _weather(G2=8.0)) == []
+    assert len(alerts.trash_alerts(cameras, trashy, _weather(G2=8.0), frozenset({"cam-1"}))) == 1
+    assert alerts.trash_alerts(cameras, trashy, _weather(G2=6.0), frozenset({"cam-1"})) == []
 
 
 def test_only_featured_cameras_dead_for_half_an_hour_raise_an_offline_alert():

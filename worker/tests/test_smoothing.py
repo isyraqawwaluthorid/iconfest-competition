@@ -1,3 +1,4 @@
+from semarsight_worker.fusion import smoothing
 from semarsight_worker.fusion.smoothing import Reading, confirm_water_status
 
 
@@ -81,3 +82,44 @@ def test_flooded_road_that_looks_like_the_normal_reference_is_not_trusted():
     assert confirm_water_status("normal", [shiny, shiny], "jalan") == ("normal", True)
     flooded = Reading("normal", "genangan_ringan", 0.8, "good", change_vs_reference="sedikit_lebih_tinggi")
     assert confirm_water_status("normal", [flooded, flooded], "jalan") == ("waspada", False)
+
+
+def _trash(*levels: str, confidence: float = 0.8, quality: str = "good") -> list[Reading]:
+    """Penilaian sampah, yang terbaru lebih dulu."""
+    return [Reading("normal", "tidak_relevan", confidence, quality, "sama", level) for level in levels]
+
+
+def test_a_few_heavy_trash_readings_do_not_make_it_official():
+    assert smoothing.confirm_trash("sedikit", _trash("banyak", "sedikit", "sedikit", "sedikit")) == "sedikit"
+    assert smoothing.confirm_trash("sedikit", _trash("banyak", "banyak", "banyak", "sedikit", "sedikit", "sedikit")) == "sedikit"
+    assert smoothing.confirm_trash(None, _trash("banyak")) == "sedikit"
+
+
+def test_four_of_the_last_six_make_heavy_trash_official():
+    assert smoothing.confirm_trash("sedikit", _trash("banyak", "sedikit", "banyak", "banyak", "sedikit", "banyak")) == "banyak"
+    assert smoothing.confirm_trash("sedikit", _trash("banyak", "banyak", "banyak", "banyak")) == "banyak"
+    # Yang lebih lama dari enam penilaian terakhir tidak ikut dihitung.
+    assert smoothing.confirm_trash("sedikit", _trash(*["sedikit"] * 6, *["banyak"] * 6)) == "sedikit"
+
+
+def test_heavy_trash_stays_until_only_one_of_six_says_so():
+    assert smoothing.confirm_trash("banyak", _trash("sedikit", "banyak", "sedikit", "sedikit", "sedikit", "banyak")) == "banyak"
+    assert smoothing.confirm_trash("banyak", _trash("sedikit", "sedikit", "sedikit", "sedikit", "sedikit", "banyak")) == "sedikit"
+    # Tanpa status "banyak" sebelumnya, dua dari enam belum cukup.
+    assert smoothing.confirm_trash("sedikit", _trash("sedikit", "banyak", "sedikit", "sedikit", "sedikit", "banyak")) == "sedikit"
+
+
+def test_unsure_or_unusable_readings_are_not_counted_for_trash():
+    unsure = _trash("banyak", "banyak", "banyak", "banyak", confidence=0.4)
+    assert smoothing.confirm_trash("sedikit", unsure) == "sedikit"
+    blurry = _trash("banyak", "banyak", "banyak", "banyak", quality="poor")
+    assert smoothing.confirm_trash("tidak_terlihat", blurry) == "tidak_terlihat"
+    mixed = [*_trash("tidak_dapat_dinilai"), *_trash("banyak", "banyak", "banyak", "banyak")]
+    assert smoothing.confirm_trash("sedikit", mixed) == "banyak"
+    assert smoothing.confirm_trash("sedikit", []) == "sedikit"
+
+
+def test_lighter_levels_follow_the_majority_and_roads_stay_not_applicable():
+    assert smoothing.confirm_trash("sedikit", _trash("tidak_terlihat", "sedikit", "tidak_terlihat", "tidak_terlihat")) == "tidak_terlihat"
+    assert smoothing.confirm_trash("tidak_terlihat", _trash("sedikit", "tidak_terlihat")) == "sedikit"  # seri: yang terbaru
+    assert smoothing.confirm_trash(None, _trash("tidak_relevan")) == "tidak_relevan"

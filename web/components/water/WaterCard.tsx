@@ -71,7 +71,7 @@ export function WaterCard({ camera, readings }: { camera: CameraOverview; readin
           <dd>{WATER[latest.status].label}</dd>
           <dt className="text-muted">Keyakinan AI</dt>
           <dd>{confidenceLabel(latest.confidence)}</dd>
-          <dt className="text-muted">Sampah di air</dt>
+          <dt className="text-muted">Sampah pada gambar ini</dt>
           <dd>{TRASH_LABEL[latest.trash]}</dd>
           <dt className="text-muted">Dipicu oleh</dt>
           <dd>{latest.trigger ? TRIGGER_LABEL[latest.trigger] : "–"}</dd>

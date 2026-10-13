@@ -84,6 +84,13 @@ export function SitePanel({ row, progress, links, cameras, onSelect, onClose }: 
           <PendingReading status={camera.water_status} level={pending} reading={progress.latest} simulated={false} />
         ) : null}
         {around ? <p className="mt-2 text-xs">{nearbySentence(around.cameras, around.busy, around.busiest.name, around.provisional)}</p> : null}
+        {/* Status sampah resmi: baru "banyak" setelah beberapa penilaian berturut-turut sepakat, bukan dari satu gambar. */}
+        {camera.trash === "banyak" ? (
+          <p className="mt-2 text-xs">
+            <span className="font-semibold">Sampah banyak terlihat</span> pada sebagian besar penilaian terakhir. Bila hujan lebat
+            diprakirakan, sistem membuat peringatan untuk membersihkan saringan sebelum hujan.
+          </p>
+        ) : null}
       </div>
 
       <div>

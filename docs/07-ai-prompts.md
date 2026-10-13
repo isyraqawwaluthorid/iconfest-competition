@@ -39,7 +39,13 @@ Tugasmu:
    Kamera jalan biasanya tidak punya garis acuan. Tanpa garis, status mengikuti genangan di jalan:
    tidak_tergenang → "normal", ringan → "waspada", sedang → "siaga", tinggi → "awas".
    Tidak adanya garis bukan alasan menurunkan confidence.
-3. Nilai sampah yang terlihat di permukaan air atau di pintu air.
+3. Nilai sampah (plastik, botol, styrofoam, kayu, tumpukan daun) di permukaan air atau di saringan dan pintu air:
+   - tidak_terlihat = tidak ada sampah yang jelas terlihat;
+   - sedikit = beberapa benda tersebar, sebagian besar permukaan air tetap terbuka;
+   - banyak = sampah menutupi sebagian besar permukaan pada suatu bagian, atau menumpuk rapat di saringan,
+     pintu air, atau tepi.
+   Tanaman yang tumbuh (eceng gondok, rumput di tepi), busa, dan pantulan cahaya bukan sampah.
+   Jika ragu antara dua tingkat, pilih yang lebih rendah.
 4. Bandingkan dengan Gambar 2.
 
 Aturan:
