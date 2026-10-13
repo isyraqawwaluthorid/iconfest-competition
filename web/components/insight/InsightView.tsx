@@ -97,6 +97,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
   const stats = useMemo(() => cityStats(cameras, weather, summaries), [cameras, weather, summaries]);
   const sources = useMemo(() => themeSources(cameras, theme), [cameras, theme]);
   const cameraNames = useMemo(() => new Map(cameras.map((camera) => [camera.id, camera.name])), [cameras]);
+  const waterSiteCount = cameras.filter((camera) => camera.modules.includes("water") && camera.is_calibrated).length;
   const selectedSummary = summaries.find((s) => s.district.name === selected) ?? null;
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0];
   const latest = cameras.reduce<string | null>(
@@ -216,6 +217,25 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                   </div>
                 ))}
               </dl>
+              {/* Pintu ke rincian per lokasi air, dibuat menonjol supaya terlihat begitu beranda dibuka. Halaman itu memakai
+                  data langsung, jadi tidak ditawarkan di simulasi. */}
+              {clock === undefined ? (
+                <Link
+                  href="/air"
+                  className="mt-3 flex items-center gap-2.5 rounded-control bg-primary px-3 py-2.5 text-on-primary shadow-card transition-colors hover:bg-primary-strong"
+                >
+                  <Icon name="droplet" size={20} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm leading-tight font-semibold">Lihat lokasi air satu per satu</span>
+                    <span className="block text-xs opacity-90">
+                      {waterSiteCount} lokasi di peta, dengan gambar kamera dan garis acuannya
+                    </span>
+                  </span>
+                  <span aria-hidden className="text-lg leading-none">
+                    →
+                  </span>
+                </Link>
+              ) : null}
               <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border pt-3 text-xs text-muted">
                 <FreshnessTag at={latest} />
                 <span>
@@ -282,7 +302,11 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                 ) : null}
                 {/* Halaman rincian per lokasi memakai data langsung, jadi tautannya tidak ditawarkan di simulasi. */}
                 {tab === "water" && clock === undefined ? (
-                  <Link href="/air" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                  <Link
+                    href="/air"
+                    className="mt-3 flex items-center justify-center gap-2 rounded-control border border-primary px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary-soft"
+                  >
+                    <Icon name="droplet" size={16} />
                     Lihat semua lokasi air di peta
                   </Link>
                 ) : null}
