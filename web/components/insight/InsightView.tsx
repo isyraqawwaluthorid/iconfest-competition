@@ -280,6 +280,12 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                     onShow={showOnMap}
                   />
                 ) : null}
+                {/* Halaman rincian per lokasi memakai data langsung, jadi tautannya tidak ditawarkan di simulasi. */}
+                {tab === "water" && clock === undefined ? (
+                  <Link href="/air" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                    Lihat semua lokasi air di peta
+                  </Link>
+                ) : null}
                 {tab === "traffic" ? (
                   <Ranking
                     empty="Belum ada titik lalu lintas yang punya pembanding."

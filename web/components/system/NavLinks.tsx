@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const NAV = [
   { href: "/", label: "Beranda" },
-  { href: "/air", label: "Air" },
   { href: "/lalu-lintas", label: "Lalu lintas" },
   { href: "/riwayat", label: "Riwayat" },
   { href: "/simulasi", label: "Simulasi" },
@@ -17,8 +16,12 @@ const SOURCES = [
   { href: "/mosaik", label: "Mosaik" },
 ];
 
+// Halaman rincian yang dibuka dari Beranda dan tidak punya menu sendiri; saat dibuka, menu Beranda tetap menyala.
+const UNDER_HOME = ["/air"];
+
 function isCurrent(pathname: string, href: string): boolean {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  if (href === "/") return pathname === "/" || UNDER_HOME.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function NavLinks() {

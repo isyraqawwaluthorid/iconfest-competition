@@ -69,7 +69,14 @@ export function WaterView({ initialCameras, initialReadings, weather, links, ope
     <div className="relative flex flex-1 flex-col lg:min-h-[40rem]">
       <section aria-label="Peta lokasi air" className={`relative h-[60dvh] min-h-96 lg:absolute lg:inset-0 lg:h-auto ${mapThemeClass(mapTheme)}`}>
         <WaterMap rows={rows} selected={selected} onSelect={setSelected} />
-        <div className="map-panel absolute top-3 left-1/2 flex -translate-x-1/2 p-1">
+        <div className="map-panel absolute top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 p-1">
+          <Link
+            href="/"
+            className="rounded-control px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-muted transition-colors hover:bg-surface-muted hover:text-text"
+          >
+            ← Beranda
+          </Link>
+          <span aria-hidden className="h-5 w-px bg-border" />
           <MapThemeToggle />
         </div>
       </section>

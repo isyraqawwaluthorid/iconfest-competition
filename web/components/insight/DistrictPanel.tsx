@@ -81,9 +81,16 @@ export function DistrictPanel({ summary, allCameras, insight, cameraNames, progr
       ) : null}
 
       <section className="space-y-2">
-        <h3 className="label-caps flex items-center gap-1.5 text-muted">
-          <Icon name="droplet" size={14} /> Air
-        </h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="label-caps flex items-center gap-1.5 text-muted">
+            <Icon name="droplet" size={14} /> Air
+          </h3>
+          {clock === undefined ? (
+            <Link href="/air" className="text-xs font-semibold text-primary hover:underline">
+              Semua lokasi air
+            </Link>
+          ) : null}
+        </div>
         {sites.length === 0 ? (
           <p className="rounded-control bg-surface-muted p-3 text-muted">
             Belum ada lokasi air yang dipantau di sini, jadi kondisi airnya tidak diketahui.
