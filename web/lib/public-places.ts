@@ -22,6 +22,13 @@ const PLACES: PlaceDefinition[] = [
     radiusM: 150,
   },
   {
+    id: "goa-kreo",
+    name: "Goa Kreo",
+    about: "Kawasan wisata di tepi Waduk Jatibarang, Gunungpati.",
+    center: [-7.03865, 110.35114],
+    radiusM: 150,
+  },
+  {
     id: "balai-kota",
     name: "Balai Kota",
     about: "Halaman dan pintu masuk-keluar kantor Pemerintah Kota Semarang.",

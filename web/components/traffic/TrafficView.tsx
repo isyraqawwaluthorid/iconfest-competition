@@ -57,7 +57,10 @@ export function TrafficView({ initialCameras, profile }: Props) {
     null,
   );
 
-  const [metric, setMetric] = useState<ActivityMetric>("vehicles");
+  // Lapisan aktivitas hanya memakai kendaraan. Hitungan orang di kamera jalan tidak dipakai: dalam antrean rapat
+  // sepeda motornya sering tidak terdeteksi, sehingga pengendaranya terhitung sebagai pejalan kaki (diperiksa 13 Okt).
+  // Keramaian orang ditampilkan di halaman Ruang publik, dari kamera yang menghadap ruang pejalan kaki.
+  const metric: ActivityMetric = "vehicles";
   const [pickedHour, setPickedHour] = useState<number | null>(null);
   const [selectedHex, setSelectedHex] = useState<string | null>(null);
   const currentHour = now === null ? null : hourWib(now);
@@ -155,7 +158,6 @@ export function TrafficView({ initialCameras, profile }: Props) {
           selected={selectedHex}
           onHour={setPickedHour}
           onAdvance={advanceHour}
-          onMetric={setMetric}
           onSelect={setSelectedHex}
         />
       )}

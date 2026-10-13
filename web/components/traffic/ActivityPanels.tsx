@@ -36,7 +36,6 @@ type Props = {
   onHour: (hour: number) => void;
   /** Maju satu jam; dipanggil berkala selama tombol Putar aktif. */
   onAdvance: () => void;
-  onMetric: (metric: ActivityMetric) => void;
   onSelect: (hexId: string | null) => void;
 };
 
@@ -44,7 +43,7 @@ type Props = {
  * Panel lapisan "Aktivitas per jam". Kiri: bentuk satu hari untuk semua kawasan terpantau. Bawah: penggeser
  * jam. Kanan: kawasan teramai pada jam itu, atau rincian heksagon yang dipilih.
  */
-export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metric, selected, onHour, onAdvance, onMetric, onSelect }: Props) {
+export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metric, selected, onHour, onAdvance, onSelect }: Props) {
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     if (!playing) return;
@@ -152,28 +151,6 @@ export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metr
           </p>
 
           <HourBars values={city} max={cityMax} hour={hour} onHour={onHour} label="Aktivitas kawasan terpantau per jam" />
-
-          <div role="group" aria-label="Yang dihitung" className="mt-3 flex gap-1 rounded-control bg-surface-muted p-1">
-            {ACTIVITY_METRICS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={item.id === metric}
-                onClick={() => onMetric(item.id)}
-                className={`flex-1 rounded-control px-2 py-1 text-xs transition-colors ${
-                  item.id === metric ? "bg-surface font-semibold text-text shadow-card" : "font-medium text-muted hover:text-text"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-          {metric === "persons" ? (
-            <p className="mt-2 text-xs text-muted">
-              Yang dihitung pejalan kaki; orang yang terdeteksi sedang menaiki sepeda motor tidak ikut. Pengendara yang motornya
-              tidak terdeteksi masih bisa terhitung.
-            </p>
-          ) : null}
 
           <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs text-muted">
             <p>
