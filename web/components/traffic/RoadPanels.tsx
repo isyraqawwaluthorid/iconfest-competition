@@ -162,12 +162,19 @@ function RoadList({ rows, total, showAll, uncompared, onToggle, onSelect }: Road
                   <span className="block truncate text-xs text-muted tabular-nums">
                     {measured
                       ? `${formatNumber(camera.density_index ?? 0, 1)}× kebiasaan · ${camera.vehicle_count ?? 0} kendaraan · kamera ${camera.name}`
-                      : camera.vehicle_count != null && isOnline(camera)
-                        ? `${camera.vehicle_count} kendaraan terlihat · kamera ${camera.name}`
-                        : `kamera ${camera.name}`}
+                      : `kamera ${camera.name}`}
                   </span>
                 </span>
-                <Badge status={status} />
+                {/* Tanpa pembanding, lencana "belum ada pembanding" di tiap baris hanya mengulang judul panel kiri;
+                    yang ditampilkan adalah jumlah kendaraan yang terlihat. */}
+                {uncompared && !showAll && isOnline(camera) ? (
+                  <span className="shrink-0 text-right">
+                    <span className="block font-display text-lg leading-none font-bold tabular-nums">{camera.vehicle_count ?? 0}</span>
+                    <span className="block text-[11px] text-muted">kendaraan</span>
+                  </span>
+                ) : (
+                  <Badge status={status} />
+                )}
               </button>
             </li>
           ))}

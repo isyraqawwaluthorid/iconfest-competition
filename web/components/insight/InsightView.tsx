@@ -179,7 +179,8 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
       </div>
 
       {/* Kolom kiri bisa digulir bila isinya melebihi tinggi layar; bagian kosongnya tidak menghalangi klik ke peta. */}
-      <div className="p-3 lg:pointer-events-none lg:absolute lg:top-3 lg:bottom-3 lg:left-3 lg:w-[22rem] lg:overflow-y-auto lg:p-0 lg:[&>*]:pointer-events-auto">
+      {/* Di layar sempit ringkasan ini tampil sebelum peta ("insight dulu"). */}
+      <div className="order-first p-3 lg:order-none lg:pointer-events-none lg:absolute lg:top-3 lg:bottom-3 lg:left-3 lg:w-[22rem] lg:overflow-y-auto lg:p-0 lg:[&>*]:pointer-events-auto">
         <section aria-label="Kondisi kota sekarang" className="map-panel relative overflow-hidden">
           <div className={`tint tone-${outdated ? "unknown" : situation.tone} p-4`}>
             <div className="flex items-center justify-between gap-2">
@@ -251,7 +252,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
         {now !== null ? <ProgressTimeline rows={progress} now={now} simulated={clock !== undefined} /> : null}
       </div>
 
-      <div className="p-3 pt-0 lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[23rem] lg:p-0">
+      <div className="p-3 lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[23rem] lg:p-0">
         <aside className="map-panel relative flex flex-col overflow-hidden lg:max-h-full">
           {selectedSummary ? (
             <div className="overflow-y-auto p-4">

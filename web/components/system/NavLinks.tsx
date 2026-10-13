@@ -33,7 +33,7 @@ export function NavLinks() {
         key={item.href}
         href={item.href}
         aria-current={current ? "page" : undefined}
-        className={`rounded-control px-3 py-1.5 text-sm transition-colors ${
+        className={`shrink-0 rounded-control px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
           current ? "bg-primary font-semibold text-on-primary" : "font-medium text-muted hover:bg-surface-muted hover:text-text"
         }`}
       >
@@ -42,9 +42,10 @@ export function NavLinks() {
     );
   };
   return (
-    <nav aria-label="Navigasi utama" className="flex flex-wrap items-center gap-1">
+    // Di layar sempit menu menjadi satu baris yang bisa digeser, supaya tidak memakan tiga baris di atas peta.
+    <nav aria-label="Navigasi utama" className="flex max-w-full items-center gap-1 overflow-x-auto lg:flex-wrap">
       {NAV.map(link)}
-      <span className="label-caps mx-2 text-muted">Sumber data</span>
+      <span className="label-caps mx-2 shrink-0 whitespace-nowrap text-muted">Sumber data</span>
       {SOURCES.map(link)}
     </nav>
   );
