@@ -5,7 +5,7 @@ import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { Badge } from "@/components/ui/Badge";
 import { useNow } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
-import { DENSITY, HEALTH, TONE_BG } from "@/lib/status";
+import { DENSITY, HEALTH, isOnline, TONE_BG } from "@/lib/status";
 import { formatDateTimeWib, minutesSince } from "@/lib/time";
 import type { RoadRow, TrafficSituation } from "@/lib/traffic";
 import { SegmentPanel } from "./SegmentPanel";
@@ -39,7 +39,12 @@ export function RoadPanels({ rows, situation, latest, selected, onSelect }: Prop
   // tetapi tidak lagi disebut sebagai keadaan "sekarang".
   const outdated = now !== null && latest !== null && minutesSince(latest, now) > STALE_AFTER_MINUTES;
   const selectedRow = rows.find((row) => row.camera.id === selected) ?? null;
-  const listed = showAll ? rows : rows.filter((row) => row.measured).slice(0, TOP_COUNT);
+  const measured = rows.filter((row) => row.measured);
+  // Selagi pembanding belum ada (sistem baru mulai, atau model penghitung baru diganti), daftar tetap berguna:
+  // ruas diurutkan menurut jumlah kendaraan yang terlihat, tanpa menyebutnya lancar atau padat.
+  const uncompared = measured.length === 0;
+  const byCount = [...rows].filter((row) => isOnline(row.camera)).sort((a, b) => (b.camera.vehicle_count ?? 0) - (a.camera.vehicle_count ?? 0));
+  const listed = showAll ? rows : (uncompared ? byCount : measured).slice(0, TOP_COUNT);
 
   return (
     <>
@@ -111,7 +116,14 @@ export function RoadPanels({ rows, situation, latest, selected, onSelect }: Prop
             {selectedRow ? (
               <SegmentPanel key={selectedRow.camera.id} row={selectedRow} onClose={() => onSelect(null)} />
             ) : (
-              <RoadList rows={listed} total={rows.length} showAll={showAll} onToggle={() => setShowAll((all) => !all)} onSelect={onSelect} />
+              <RoadList
+                rows={listed}
+                total={rows.length}
+                showAll={showAll}
+                uncompared={uncompared}
+                onToggle={() => setShowAll((all) => !all)}
+                onSelect={onSelect}
+              />
             )}
           </div>
         </aside>
@@ -124,17 +136,19 @@ type RoadListProps = {
   rows: RoadRow[];
   total: number;
   showAll: boolean;
+  /** Belum ada ruas yang punya pembanding: daftar diurutkan menurut jumlah kendaraan terlihat. */
+  uncompared: boolean;
   onToggle: () => void;
   onSelect: (cameraId: string) => void;
 };
 
 /** Daftar ruas, yang paling padat lebih dulu. Memilih satu ruas mendekatkan peta ke ruas itu. */
-function RoadList({ rows, total, showAll, onToggle, onSelect }: RoadListProps) {
+function RoadList({ rows, total, showAll, uncompared, onToggle, onSelect }: RoadListProps) {
   return (
     <div className="text-sm">
-      <p className="label-caps text-muted">{showAll ? "Semua ruas" : "Ruas terpadat sekarang"}</p>
+      <p className="label-caps text-muted">{showAll ? "Semua ruas" : uncompared ? "Kendaraan terbanyak terlihat sekarang" : "Ruas terpadat sekarang"}</p>
       {rows.length === 0 ? (
-        <p className="mt-3 text-muted">Belum ada ruas yang bisa dinilai. Kamera lalu lintas sedang tidak mengirim gambar.</p>
+        <p className="mt-3 text-muted">Kamera lalu lintas sedang tidak mengirim gambar.</p>
       ) : (
         <ol className="mt-1 divide-y divide-border">
           {rows.map(({ camera, title, status, measured }, index) => (
@@ -148,7 +162,9 @@ function RoadList({ rows, total, showAll, onToggle, onSelect }: RoadListProps) {
                   <span className="block truncate text-xs text-muted tabular-nums">
                     {measured
                       ? `${formatNumber(camera.density_index ?? 0, 1)}× kebiasaan · ${camera.vehicle_count ?? 0} kendaraan · kamera ${camera.name}`
-                      : `kamera ${camera.name}`}
+                      : camera.vehicle_count != null && isOnline(camera)
+                        ? `${camera.vehicle_count} kendaraan terlihat · kamera ${camera.name}`
+                        : `kamera ${camera.name}`}
                   </span>
                 </span>
                 <Badge status={status} />

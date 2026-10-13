@@ -70,7 +70,7 @@ def get_settings() -> Settings:
         frames_retention_days=int(_get("FRAMES_RETENTION_DAYS", "14")),
         http_user_agent=_get("HTTP_USER_AGENT", "Mozilla/5.0 (compatible; SemarSight/0.1)"),
         timezone=_get("TIMEZONE", "Asia/Jakarta"),
-        yolo_model=_get("YOLO_MODEL", "yolo11n.pt"),
+        yolo_model=_get("YOLO_MODEL", "yolo11s.pt"),
         yolo_conf=float(_get("YOLO_CONF", "0.25")),
         openai_api_key=_get("OPENAI_API_KEY", ""),
         ai_vision_enabled=_get_bool("AI_VISION_ENABLED", True),

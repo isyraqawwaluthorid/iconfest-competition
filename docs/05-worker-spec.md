@@ -29,7 +29,7 @@ Dua paket dari rancangan awal tidak dipakai: SSIM dihitung langsung dengan OpenC
 | `FRAME_TIMEOUT_SECONDS` | 20 | Timeout ffmpeg per kamera |
 | `FRAMES_DIR` | `./frames` | Penyimpanan frame lokal |
 | `FRAMES_RETENTION_DAYS` | 14 | |
-| `YOLO_MODEL` | `yolo11n.pt` | |
+| `YOLO_MODEL` | `yolo11s.pt` | Sejak 13 Okt (sebelumnya `yolo11n.pt`). Mengganti model membuat pembanding lalu lintas mulai dari nol |
 | `YOLO_CONF` | 0.25 | Ambang keyakinan deteksi |
 | `WATER_CHANGE_THRESHOLD` | 0.12 | `1 - SSIM` di ROI untuk memicu AI vision (kalibrasi dari data) |
 | `WATER_HEARTBEAT_MINUTES` | 30 | Panggilan AI minimum per kamera air |

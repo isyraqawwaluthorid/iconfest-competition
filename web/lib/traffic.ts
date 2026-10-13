@@ -98,11 +98,15 @@ export function trafficSituation(rows: RoadRow[]): TrafficSituation {
     provisional: measured.some((row) => row.camera.baseline_is_provisional),
   };
   if (measured.length === 0) {
+    // Kamera hidup tetapi tanpa pembanding: sistem baru mulai, atau model penghitungnya baru diganti.
+    const collecting = rows.some((row) => isOnline(row.camera));
     return {
       ...base,
       tone: "unknown",
-      headline: "Belum ada ruas yang bisa dinilai",
-      detail: "Kamera lalu lintas sedang tidak mengirim gambar, atau belum punya pembanding.",
+      headline: collecting ? "Pembanding sedang dikumpulkan" : "Belum ada ruas yang bisa dinilai",
+      detail: collecting
+        ? "Kepadatan dinilai terhadap kebiasaan tiap ruas pada jam yang sama di hari sebelumnya. Pembanding itu baru tersedia setelah sehari data, jadi untuk sementara ruas belum diberi tingkat. Kendaraan tetap dihitung."
+        : "Kamera lalu lintas sedang tidak mengirim gambar.",
     };
   }
   if (dense + busy === 0) {
