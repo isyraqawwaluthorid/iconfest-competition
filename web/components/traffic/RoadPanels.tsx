@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { FreshnessTag } from "@/components/system/FreshnessTag";
 import { Badge } from "@/components/ui/Badge";
+import { useNow } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
 import { DENSITY, HEALTH, TONE_BG } from "@/lib/status";
+import { formatDateTimeWib, minutesSince } from "@/lib/time";
 import type { RoadRow, TrafficSituation } from "@/lib/traffic";
 import { SegmentPanel } from "./SegmentPanel";
 import { PANEL_BOTTOM, PANEL_LEFT, PANEL_RIGHT } from "./layout";
 
 const TOP_COUNT = 8;
+const STALE_AFTER_MINUTES = 15; // tiga siklus worker; sama dengan beranda dan banner sistem
 const LEGEND = [
   DENSITY.lancar,
   DENSITY.normal,
@@ -31,6 +34,10 @@ type Props = {
 /** Panel lapisan "Ruas jalan". Kiri: kondisi sekarang. Kanan: ruas terpadat, atau rincian ruas yang dipilih. */
 export function RoadPanels({ rows, situation, latest, selected, onSelect }: Props) {
   const [showAll, setShowAll] = useState(false);
+  const now = useNow();
+  // Data yang tidak diperbarui lebih dari tiga siklus dianggap tertunda: warna terakhir tetap tampil di peta,
+  // tetapi tidak lagi disebut sebagai keadaan "sekarang".
+  const outdated = now !== null && latest !== null && minutesSince(latest, now) > STALE_AFTER_MINUTES;
   const selectedRow = rows.find((row) => row.camera.id === selected) ?? null;
   const listed = showAll ? rows : rows.filter((row) => row.measured).slice(0, TOP_COUNT);
 
@@ -55,10 +62,16 @@ export function RoadPanels({ rows, situation, latest, selected, onSelect }: Prop
 
       <div className={PANEL_LEFT}>
         <section aria-label="Lalu lintas sekarang" className="map-panel relative overflow-hidden">
-          <div className={`tint tone-${situation.tone} p-4`}>
-            <p className="label-caps">Lalu lintas sekarang</p>
-            <h1 className="mt-1 text-xl leading-tight font-extrabold">{situation.headline}</h1>
-            <p className="mt-1.5 text-sm">{situation.detail}</p>
+          <div className={`tint tone-${outdated ? "unknown" : situation.tone} p-4`}>
+            <p className="label-caps">{outdated ? "Data tertunda" : "Lalu lintas sekarang"}</p>
+            <h1 className="mt-1 text-xl leading-tight font-extrabold">
+              {outdated && latest ? `Belum ada pembaruan sejak ${formatDateTimeWib(latest)}` : situation.headline}
+            </h1>
+            <p className="mt-1.5 text-sm">
+              {outdated
+                ? `Sistem sedang tidak mengirim data, jadi keadaan sekarang tidak diketahui. Warna di peta adalah keadaan terakhir yang tercatat: ${situation.headline.toLowerCase()}.`
+                : situation.detail}
+            </p>
           </div>
           <div className="p-4">
             {situation.measured > 0 ? (
