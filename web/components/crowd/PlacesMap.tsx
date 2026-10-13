@@ -11,8 +11,10 @@ type Props = {
   onSelect: (placeId: string) => void;
 };
 
-const MIN_RADIUS = 9;
-const MAX_RADIUS = 30;
+// Selisih ukuran sengaja dibuat kecil: tempat dengan satu-dua kamera tidak boleh tampak "kalah" hanya karena
+// kameranya lebih sedikit. Perbandingan yang adil ada di daftar per titik di sebelah peta.
+const MIN_RADIUS = 11;
+const MAX_RADIUS = 18;
 
 /** Peta kecil halaman Ruang publik: satu pin per tempat, besarnya mengikuti jumlah pejalan kaki yang terlihat. Hanya dirender di browser. */
 export default function PlacesMap({ places, onSelect }: Props) {

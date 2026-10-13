@@ -14,7 +14,7 @@ import { useLiveCameras, useNow } from "@/lib/hooks";
 import { formatNumber } from "@/lib/insight";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { CROWD, placeViews, type PlaceView, type SpotView } from "@/lib/public-places";
-import { isOnline } from "@/lib/status";
+import { isOnline, TONE_BG } from "@/lib/status";
 import { formatDateTimeWib } from "@/lib/time";
 import type { CameraOverview } from "@/lib/types";
 
@@ -40,6 +40,16 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
   const hour = now === null ? DEFAULT_HOUR : hourWib(now);
   const places = useMemo(() => placeViews(cameras, profile, hour), [cameras, profile, hour]);
   const total = places.reduce((sum, place) => sum + place.now, 0);
+  // Satuan yang dibandingkan adalah titik, bukan tempat: tujuh titik yang setara lebih adil dibaca daripada tiga
+  // tempat yang jumlah kameranya berbeda jauh.
+  const spots = useMemo(
+    () =>
+      places
+        .flatMap((place) => place.spots.map((spot) => ({ ...spot, placeId: place.id, label: place.spots.length === 1 ? place.name : `${place.name} · ${spot.name}` })))
+        .sort((a, b) => b.now - a.now),
+    [places],
+  );
+  const busiest = Math.max(...spots.map((spot) => spot.now), 1);
   const showPlace = (placeId: string) => document.getElementById(`tempat-${placeId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
@@ -67,15 +77,33 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
         </div>
       ) : (
         <>
-          <section aria-label="Peta tempat yang dipantau" className={`relative h-72 overflow-hidden rounded-token border border-border ${mapThemeClass(mapTheme)}`}>
-            <PlacesMap places={places} onSelect={showPlace} />
-            <div className="map-panel absolute top-3 left-3 p-1">
-              <MapThemeToggle />
-            </div>
-            <p className="map-panel absolute right-3 bottom-3 px-2.5 py-1 text-[11px] text-muted">
-              Besar lingkaran: pejalan kaki terlihat sekarang. Ketuk untuk melihat rinciannya.
-            </p>
-          </section>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
+            <section aria-label="Peta tempat yang dipantau" className={`relative h-80 overflow-hidden rounded-token border border-border ${mapThemeClass(mapTheme)}`}>
+              <PlacesMap places={places} onSelect={showPlace} />
+              <div className="map-panel absolute top-3 left-3 p-1">
+                <MapThemeToggle />
+              </div>
+            </section>
+            <section aria-label="Titik teramai sekarang" className="rounded-token border border-border bg-surface p-4 shadow-card">
+              <p className="label-caps text-muted">Titik teramai sekarang</p>
+              <ol className="mt-2 space-y-2">
+                {spots.map((spot) => (
+                  <li key={spot.label}>
+                    <button type="button" onClick={() => showPlace(spot.placeId)} className="block w-full text-left hover:text-primary">
+                      <span className="flex items-baseline justify-between gap-2 text-xs">
+                        <span className="truncate font-semibold">{spot.label}</span>
+                        <span className="shrink-0 text-muted tabular-nums">{spot.online === 0 ? "kamera mati" : `${spot.now} pejalan kaki`}</span>
+                      </span>
+                      <span className="mt-1 block h-2 overflow-hidden rounded-full bg-surface-muted">
+                        <span className={`block h-full rounded-full ${TONE_BG[CROWD[spot.level].tone]}`} style={{ width: `${Math.round((spot.now / busiest) * 100)}%` }} />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-3 text-[11px] text-muted">Warna batang mengikuti tingkat keramaian dibanding biasanya; abu-abu berarti pembandingnya belum ada.</p>
+            </section>
+          </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
             {places.map((place, index) => (
