@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Selasa, 13 Oktober 2026, 18.00 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Selasa, 13 Oktober 2026, 17.50 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -174,7 +174,7 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 
 | Kamera | Jenis | Garis | Ref. siang | Ref. malam | Keyakinan | Catatan dan tindak lanjut |
 |---|---|---|---|---|---|---|
-| Banger-SD-IN | pompa masuk | N W S A (**W ditambah, S digeser pemilik proyek 13 Okt**) | ada | ada | 0,77 / 0,75 | Dikalibrasi ulang 11 Okt. **Sore hari (sekitar 15.30–17.30) kamera melawan cahaya** dan penilaiannya tidak stabil: 12 Okt 17.00 sempat dinilai "awas" padahal airnya setinggi referensi. Ditahan oleh penilaian ganda; pantau tiap sore Kalibrasi 13 Okt diperiksa: urutan benar, jarak antar garis 0,025 / 0,020 / 0,019 (batas bawah 0,012) |
+| Banger-SD-IN | pompa masuk | N W S A (**W ditambah, S digeser pemilik proyek 13 Okt**) | ada | ada | 0,77 / 0,75 | Dikalibrasi ulang 11 Okt. **Sore hari (sekitar 15.30–17.30) kamera melawan cahaya** dan penilaiannya tidak stabil: 12 Okt 17.00 sempat dinilai "awas" padahal airnya setinggi referensi. Ditahan oleh penilaian ganda; pantau tiap sore Kalibrasi 13 Okt diperiksa: urutan benar, jarak antar garis 0,025 / 0,020 / 0,019 (batas bawah 0,012). **Sore 13 Okt (aturan garis baru, garis W baru):** 6 penilaian pukul 14.45–17.20 semuanya normal, keyakinan 0,58–0,76; tidak ada indikasi palsu seperti 12 Okt |
 | Bulu Drain-IN | pompa masuk | N W S A | ada | ada | 0,81 / 0,75 | Baik |
 | Kartini-IN | pompa masuk | N W S A | ada | ada | 0,78 / 0,73 | Satu "waspada" lemah 12 Okt; garis N berimpit dengan muka air. Pantau |
 | Manggis-IN | pompa masuk | N W S A | ada | ada | 0,84 / 0,79 | Baik. Sampah terbaca banyak 12 Okt |
@@ -188,7 +188,7 @@ Garis: N = normal, W = waspada, S = siaga, A = awas. Kamera jalan memang tidak m
 | KS-OUT-2 | pompa keluar | N W S A | ada | ada | 0,73 / 0,65 | Busa saat pompa menyala sempat terbaca "awas"; kini tertahan aturan keyakinan. Pantau |
 | Kartini-OUT | pompa keluar | N W S A | **diganti 12 Okt** | ada | 0,78 / 0,76 | Referensi siang lama kolam kosong; kini kolam terisi pukul 13.13. Garis N digeser ke dasar dinding beton 12 Okt sore, setelah dua "waspada" lagi (15.20, 15.55); delapan gambar yang sama kini normal. **Perlu disetujui (T3.13)** |
 | Progo-OUT | pompa keluar | N W S A | ada | ada | 0,81 / 0,75 | Baik |
-| Semarang Indah_OUT | pompa keluar | N W S A (**N digeser 13 Okt**) | ada | ada | 0,69 / 0,71 | **Peringatan palsu pertama sistem, 13 Okt 12.47 WIB:** dua penilaian berturut-turut "waspada" (12.12 dan 12.47) saat air kolam terkena sinar siang, padahal batas air di dinding tidak berubah. Sebabnya garis N tergambar di atas air, di bawah kaki dinding, sehingga air selalu tampak "melewati N". Garis N digeser ke kaki dinding (garis lama dicadangkan); nilai ulang 10 gambar: yang 12.47 menjadi normal, yang 12.12 masih "waspada". **Pantau tiap siang 11.00–13.30; perlu dilihat pemilik proyek** |
+| Semarang Indah_OUT | pompa keluar | N W S A (**N digeser 13 Okt**) | ada | ada | 0,69 / 0,71 | **Peringatan palsu pertama sistem, 13 Okt 12.47 WIB:** dua penilaian berturut-turut "waspada" (12.12 dan 12.47) saat air kolam terkena sinar siang, padahal batas air di dinding tidak berubah. Sebabnya garis N tergambar di atas air, di bawah kaki dinding, sehingga air selalu tampak "melewati N". Garis N digeser ke kaki dinding (garis lama dicadangkan); nilai ulang 10 gambar: yang 12.47 menjadi normal, yang 12.12 masih "waspada". **Pantau tiap siang 11.00–13.30; perlu dilihat pemilik proyek**. Sore 13 Okt: 8 penilaian normal; tiga berkeyakinan rendah saat busa pompa (15.31–15.41), dan pukul 16.16 jawaban pertama AI "waspada" tetapi penilaian ulang gambar yang sama "normal", jadi tidak dihitung |
 | Trimulyo_OUT | pompa keluar | N W S A | ada | ada | 0,75 / 0,75 | Baik |
 | IPdome-Polder Tawang | kolam | N W S A | ada | ada | 0,81 / 0,77 | Dua "waspada" 12 Okt karena garis N berimpit dengan muka air. Garis N digeser ke anak tangga pertama 12 Okt; delapan gambar yang sama kini normal semua |
 | Jinunjung_Halaman | kolam | N W S A | ada | ada | 0,81 / 0,75 | Baik |
