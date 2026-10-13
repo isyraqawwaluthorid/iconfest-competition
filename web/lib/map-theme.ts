@@ -3,51 +3,36 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Pilihan tampilan peta: terang (warna asli peta dasar) atau gelap (peta dasar digelapkan lewat CSS, supaya
- * warna ruas, wilayah, dan batasnya lebih menonjol). Satu pilihan untuk semua peta, diingat di browser.
+ * Pilihan tampilan peta: terang (bawaan) atau gelap (supaya warna ruas, wilayah, dan batasnya lebih menonjol).
+ * Satu pilihan untuk semua peta. Pilihan hanya berlaku selama situs terbuka dan ikut saat berpindah halaman;
+ * setiap kali situs dibuka atau dimuat ulang, peta kembali terang.
  */
 export type MapTheme = "light" | "dark";
 
-const KEY = "semarsight:map-theme";
 const CHANGED = "semarsight:map-theme-changed";
 
-// Dipakai bila penyimpanan browser tidak bisa diakses (mode privat): pilihan tetap berlaku selama halaman terbuka.
-let remembered: MapTheme | null = null;
-
-function read(): MapTheme {
-  if (remembered) return remembered;
-  try {
-    return window.localStorage.getItem(KEY) === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
-}
+let current: MapTheme = "light";
 
 function subscribe(onChange: () => void): () => void {
   window.addEventListener(CHANGED, onChange);
-  window.addEventListener("storage", onChange); // tab lain mengganti pilihan
-  return () => {
-    window.removeEventListener(CHANGED, onChange);
-    window.removeEventListener("storage", onChange);
-  };
+  return () => window.removeEventListener(CHANGED, onChange);
 }
 
 export function setMapTheme(theme: MapTheme): void {
-  remembered = theme;
-  try {
-    window.localStorage.setItem(KEY, theme);
-  } catch {
-    // Tanpa penyimpanan, pilihan hanya diingat selama halaman terbuka.
-  }
+  current = theme;
   window.dispatchEvent(new Event(CHANGED));
 }
 
-/** Pilihan peta saat ini. HTML dari server selalu terang; pilihan tersimpan berlaku begitu halaman terpasang. */
+/** Pilihan peta saat ini. */
 export function useMapTheme(): MapTheme {
-  return useSyncExternalStore(subscribe, read, () => "light");
+  return useSyncExternalStore(
+    subscribe,
+    () => current,
+    () => "light",
+  );
 }
 
-/** Kelas untuk elemen yang membungkus peta; aturan warnanya ada di globals.css (`.map-dark`). */
+/** Kelas untuk elemen yang membungkus peta datar cadangan; aturan warnanya ada di globals.css (`.map-dark`). */
 export function mapThemeClass(theme: MapTheme): string {
   return theme === "dark" ? "map-dark" : "";
 }
