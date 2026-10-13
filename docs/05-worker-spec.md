@@ -164,7 +164,8 @@ Kamera air baru diproses jika `roi` terisi. Kalibrasi dilakukan di halaman admin
 
 Tiga pelajaran dari salah baca sore 11 Okt (keduanya dikonfirmasi normal dari gambarnya):
 - **Area pengamatan cukup di sekitar benda acuan, bukan seluruh permukaan air.** Gambar yang dikirim ke AI selalu selebar 512 px, jadi area yang lebar membuat dinding acuan tampak kecil dan garis hanya berjarak beberapa piksel. Di Banger-SD-IN, garis lama memberi awas, awas, siaga pada tiga frame berturut-turut; setelah area dipersempit ke dinding turap dan garis dijadikan tiga (Normal sedikit di atas muka air biasa, Siaga dekat puncak dinding, Awas di daratan), lima dari lima frame dinilai normal.
-- **Garis Waspada boleh dihilangkan** bila ruangnya sempit: air yang melewati Normal tetapi belum mencapai Siaga sudah dinilai waspada.
+- **Arti garis (ditegaskan 13 Okt):** garis Normal menandai tinggi muka air pada kondisi normal (digambar rata dengan air saat kalibrasi); status baru "waspada" saat air **mencapai garis Waspada**, "siaga" saat mencapai garis Siaga, "awas" saat mencapai garis Awas. Sampai 13 Okt prompt menyebut "melewati N → waspada", tidak sesuai dengan cara garis digambar; itu sumber salah baca berulang (lihat `13-catatan-keputusan.md`).
+- **Garis Waspada boleh dihilangkan** bila ruangnya sempit: tanpa garis itu, air dinilai waspada bila jelas di atas Normal, kira-kira setengah jalan menuju Siaga atau lebih.
 - **Busa pompa bukan kenaikan air.** Di Semarang Indah_OUT busa saat pompa menyala menutupi tepi dan terbaca awas lalu waspada. Prompt kini menyebut busa secara khusus; pada enam frame yang sama hasilnya normal, lima di antaranya dengan keyakinan di bawah 0,5 sehingga tidak mengubah status dan ditandai perlu verifikasi.
 
 Tiga pelajaran lagi dari 12 Okt, setelah gambar bukti penilaian yang bukan normal hari itu diperiksa (semuanya salah baca):

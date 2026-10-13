@@ -19,14 +19,17 @@ Kamu menerima dua gambar dari CCTV yang sama:
   Gambar 1 = kondisi SAAT INI, sudah dipotong ke area pengamatan.
   Gambar 2 = kondisi NORMAL sebagai referensi.
 Pada kedua gambar ada garis acuan berlabel:
-  N = batas normal, W = waspada, S = siaga, A = awas.
+  N = tinggi muka air pada kondisi normal, W = batas waspada, S = batas siaga, A = batas awas.
 
 Tugasmu:
 1. Tentukan posisi permukaan air pada Gambar 1 relatif terhadap garis acuan:
-   - di bawah atau sekitar N  → "normal"
-   - melewati N, belum mencapai S → "waspada"
+   - belum mencapai W (di bawah, sekitar, atau sedikit di atas N) → "normal"
+   - mencapai/melewati W, belum mencapai S → "waspada"
    - mencapai/melewati S, belum A → "siaga"
    - mencapai/melewati A atau meluap → "awas"
+   Garis N hanya menandai tinggi air yang biasa: air yang menyentuh atau sedikit melewati N masih "normal".
+   Jika garis W tidak digambar: "waspada" bila air jelas di atas N, kira-kira sudah setengah jalan menuju S
+   atau lebih, tetapi belum mencapai S.
 2. Jika kamera memperlihatkan jalan, nilai genangan di badan jalan:
    tidak_tergenang (kering, atau hanya basah dan mengilap tanpa air yang menggenang) /
    genangan_ringan (ada lapisan air yang jelas menggenang di sebagian lajur; roda memercikkan air) /

@@ -58,7 +58,7 @@ READINGS = [
 # Alasan yang menyertai tiap penilaian buatan, meniru kalimat alasan AI kamera.
 REASONS = {
     "normal": "Permukaan air kembali di bawah garis N, setinggi gambar referensi.",
-    "waspada": "Permukaan air tampak sedikit di atas garis N, lebih tinggi daripada gambar referensi.",
+    "waspada": "Permukaan air tampak mencapai garis W, lebih tinggi daripada gambar referensi.",
     "siaga": "Permukaan air tampak mencapai garis S pada dinding, jelas lebih tinggi daripada gambar referensi.",
     "genangan_ringan": "Lapisan air terlihat menggenang di sebagian lajur; roda kendaraan memercikkan air.",
     "tidak_tergenang": "Badan jalan tampak kering, tidak ada air yang menggenang.",

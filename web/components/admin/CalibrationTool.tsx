@@ -12,6 +12,13 @@ type Lines = Partial<Record<ReferenceLevel, Point[]>>;
 type Mode = "roi" | ReferenceLevel;
 
 const LEVEL_LABEL: Record<ReferenceLevel, string> = { normal: "Normal", waspada: "Waspada", siaga: "Siaga", awas: "Awas" };
+// Arti tiap garis bagi penilaian AI (lihat worker/semarsight_worker/prompts/water_vision.md).
+const LEVEL_HINT: Record<ReferenceLevel, string> = {
+  normal: "Klik dua titik pada benda tetap, rata dengan muka air saat kondisi normal. Garis ini hanya patokan; air di sekitarnya masih normal.",
+  waspada: "Klik dua titik pada benda tetap, di ketinggian yang bila tercapai air berarti waspada. Beri jarak yang jelas dari garis Normal.",
+  siaga: "Klik dua titik pada benda tetap, di ketinggian yang bila tercapai air berarti siaga.",
+  awas: "Klik dua titik pada benda tetap, di ketinggian yang bila tercapai air berarti awas (hampir atau sudah meluap).",
+};
 const WATER_KIND_LABEL: Record<string, string> = {
   sungai: "Sungai",
   pompa_in: "Pompa (sisi masuk)",
@@ -134,7 +141,7 @@ export function CalibrationTool({ camera }: { camera: AdminCameraDetail }) {
           <p className="text-muted">
             {mode === "roi"
               ? "Klik mengelilingi permukaan air (atau badan jalan untuk kamera genangan)."
-              : `Klik dua titik pada benda tetap yang menandai batas ${LEVEL_LABEL[mode].toLowerCase()}.`}
+              : LEVEL_HINT[mode]}
           </p>
         </div>
 
