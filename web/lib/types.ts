@@ -1,3 +1,5 @@
+import type { TrafficImpact } from "./cross-module";
+
 export type Health = "live" | "frozen" | "dead" | "unknown";
 export type ImageQuality = "good" | "fair" | "poor";
 export type WaterStatus = "normal" | "waspada" | "siaga" | "awas" | "tidak_dapat_dinilai";
@@ -130,6 +132,8 @@ export type WaterEvent = {
   /** Kosong selama kejadian masih berlangsung. */
   ended_at: string | null;
   duration_minutes: number | null;
+  /** Keadaan lalu lintas terpadat di sekitar lokasi selama kejadian; kosong bila titik lalu lintas di sekitarnya kurang dari dua. */
+  traffic_impact: TrafficImpact | null;
 };
 
 /** Hujan terbaru untuk satu titik grid cuaca (Open-Meteo). */

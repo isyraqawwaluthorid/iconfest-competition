@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Selasa, 13 Oktober 2026, 15.05 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Selasa, 13 Oktober 2026, 15.20 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -18,12 +18,12 @@ Cara membaca:
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
 | Fase 2 — Lalu lintas, web dasar, deploy | 12 dari 14 | – | 2 | Min 11 Okt |
 | Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
-| Fase 4 — Fusi dan insight | 6 dari 9 | 1 | 2 | Sel 13 Okt |
+| Fase 4 — Fusi dan insight | 7 dari 9 | 1 | 1 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 4 dari 8 | 2 | 2 | Rab 14 Okt |
 | Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | – | 7 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **62 dari 89 (70%)** | **5** | **22** | |
+| **Jumlah inti** | **63 dari 89 (71%)** | **5** | **21** | |
 | Fitur tambahan (TX) | 2 dari 9 | – | 7 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -37,7 +37,7 @@ Keadaan sistem saat dokumen ini diperbarui: worker berjalan di PC (13 siklus tan
 | Worker berjalan terus, merekam semua kamera aktif tiap 5 menit | Sebagian | Berjalan di PC yang menetap, bukan VPS; belum terbukti semalaman di PC |
 | Modul air: kalibrasi 15–20 kamera, klasifikasi AI, status terkonfirmasi, tren, peringatan hulu–hilir | **Selesai** | Peringatan hulu–hilir berjalan untuk empat rumah pompa; belum pernah teruji oleh kejadian nyata |
 | Modul lalu lintas: hitungan YOLO, baseline, indeks kepadatan, anomali | Sebagian | Pembanding per jam sudah berjalan (T2.14), tetapi masih sementara sampai ada tiga hari data sejenis; anomali menyala sendiri setelah itu. Sejak 12 Okt ruas dengan kurang dari 8 kendaraan tidak lagi disebut ramai atau padat |
-| Hujan Open-Meteo dan minimal satu insight lintas modul | Sebagian | Hujan sudah; insight lintas modul genangan → lalu lintas belum (T4.6) |
+| Hujan Open-Meteo dan minimal satu insight lintas modul | **Selesai** | Lintas modul genangan → lalu lintas berjalan sejak 13 Okt (T4.6). Kalimat dari AI baru memakainya setelah pembanding lalu lintas tidak lagi sementara; belum teruji oleh kejadian nyata |
 | Website ter-deploy: beranda, peta, panel kamera, Air, Lalu Lintas, peringatan, riwayat | Sebagian | Deploy (T2.10); halaman Air (T4.8). Lalu Lintas dan Riwayat sudah ada |
 | Ringkasan atau insight AI otomatis | **Selesai** | – |
 | Penanganan kamera mati, worker offline, data kosong | Sebagian | Audit menyeluruh belum dilakukan (T5.6) |
@@ -66,7 +66,7 @@ Usulan urutan, mengikuti `15-pengantar-lanjutan.md` dan temuan 12 Okt. Target pe
 |---|---|---|
 | Sen 12 Okt (sisa hari) | ~~T2.14 pembanding lalu lintas per jam~~, ~~T4.4 dan inti T4.3 hulu–hilir~~, ~~TV.4 tren 24 jam~~, ~~T5.1 halaman Lalu Lintas~~, ~~TX.7 heksagon aktivitas~~, ~~TX.8 beban emisi relatif~~, ~~referensi malam dua kamera (T3.11)~~ (selesai) | Melihat halaman Lalu lintas dan memberi masukan |
 | Sel 13 Okt | T2.10 deploy; ~~T5.4 cara mendemokan kejadian~~, ~~T4.5 kejadian~~, ~~T5.2 riwayat~~ (selesai 12 Okt) | Akun Vercel |
-| Rab 14 Okt | T4.6 insight lintas modul; T5.6 audit keadaan kosong dan error; ~~T5.3 halaman Tentang~~ (selesai 12 Okt); T6.5 README | Template laporan dari panitia (T0.7) |
+| Rab 14 Okt | ~~T4.6 insight lintas modul~~ (selesai 13 Okt); T5.6 audit keadaan kosong dan error; ~~T5.3 halaman Tentang~~ (selesai 12 Okt); T6.5 README | Template laporan dari panitia (T0.7) |
 | Kam 15 Okt | Perbaikan bug saja (T6.4); T6.6 laporan; T6.7 video; T7.3 repo publik; T7.4 ganti kunci | Laporan, video, surat bermaterai (T6.8), pengumpulan |
 | Jum 16 Okt | Cadangan; T7.1 cek tautan dari perangkat lain; T7.2 pengumpulan bila belum | Pengumpulan |
 
@@ -212,7 +212,7 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 
   Tidak diusulkan karena tidak ada dasar dari nama atau jarak: Banger-SD-IN, Manggis-IN, KP.Kali-OUT, Semarang Indah_OUT (pasangannya, Semarang Indah_IN, bukan kamera unggulan), Jinunjung_Halaman, dan kamera jalan lainnya. Yang juga perlu diputuskan: di rumah pompa, sisi mana yang memengaruhi risiko sisi lainnya (air masuk yang tinggi membebani pompa; air keluar yang tinggi menghambat pembuangan).
 - [x] **T4.5 [K]** `fusion/events.py`: buka, perbarui puncak, tutup kejadian. Selesai 12 Okt: kejadian dibuka saat status resmi naik dari normal, puncak dan gambar buktinya diperbarui, ditutup dengan durasi saat status resmi kembali normal; jeda hulu–hilir dipelajari sebagai median dari kejadian yang tercatat. *Bukti:* 12 unit test, dan jalur buka → puncak → tutup diuji ke database sungguhan dengan baris bertanda `synthetic` yang lalu dihapus. Tabel masih kosong karena belum ada kejadian nyata; `rain_total_mm` dibiarkan kosong karena total hujan belum benar-benar diukur.
-- [ ] **T4.6 [K]** `fusion/cross_module.py`: genangan → lalu lintas (kamera ganda + radius 1 km), simpan `events.traffic_impact`, dan insight lintas modul. Bergantung pada T2.14 dan T4.5.
+- [x] **T4.6 [K]** `fusion/cross_module.py`: genangan → lalu lintas. Selesai 13 Okt: untuk tiap lokasi air yang status resminya naik (atau jalan yang tergenang), dihitung keadaan titik lalu lintas dalam radius 1 km (jumlah titik, berapa yang lebih padat dari kebiasaannya, titik terpadat); lokasi yang juga kamera lalu lintas ikut dihitung. Hasilnya dipakai di tiga tempat: fakta `traffic_nearby` untuk insight AI (dengan aturan menulis "bersamaan dengan", bukan "karena", dan tidak menyimpulkan selagi pembanding masih sementara), kolom `events.traffic_impact` yang menyimpan saat terpadat selama kejadian, dan kalimat di panel kecamatan serta halaman Riwayat (juga di CSV). *Bukti:* 7 unit test lintas modul, 2 unit test kejadian, 1 unit test fakta insight; fakta dari data langsung untuk keadaan buatan "JRAKAH tergenang" berisi 4 titik dalam 1 km; kalimatnya terlihat di simulasi langkah 6. **Belum teruji oleh kejadian nyata, dan pembanding lalu lintas masih sementara, jadi AI belum menuliskannya sebagai temuan.** Skenario simulasi perlu disusun ulang setelah pembanding tidak lagi sementara supaya ringkasan AI di simulasi ikut memuatnya.
 - [ ] **T4.8 [K]** `/air`: daftar kamera urut risiko, diagram hulu → hilir, hujan per grid, kejadian aktif. Kandidat digeser.
 
 ## Fase 5 — Kelengkapan dan keandalan (Rabu 14 Okt)
@@ -298,4 +298,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
 | 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser; README lengkap (T6.5 selesai) |
 | 12 Okt malam | Halaman Lalu Lintas dari video referensi pemilik proyek (T5.1 selesai): ruas jalan berwarna kepadatan, heksagon aktivitas per jam (TX.7), beban emisi relatif (TX.8); aturan "sedikit kendaraan tidak disebut padat"; referensi malam DPU-Mberok2-OUT dan Semarang Indah_IN (T3.11 tinggal Banger-IN); atas masukan pemilik proyek: semua jalan berwarna (tanpa abu-abu), peta dasar berwarna di semua halaman, tombol "Peta gelap", pin kamera yang membesar saat didekati (kamera setempat digabung berangka), kisi heksagon yang memenuhi kota, dan kecamatan tidak terpantau di Beranda tanpa arsiran (garis batas saja) |
-| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2 |
+| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2. Insight lintas modul genangan → lalu lintas (T4.6 selesai) |

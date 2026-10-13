@@ -29,6 +29,8 @@ class CameraRow(BaseModel):
     modules: list[str] = []
     stream_url: str
     is_featured: bool = False
+    lat: float | None = None
+    lng: float | None = None
     traffic_roi: dict | None = None
     weather_grid_id: str | None = None
     # kalibrasi modul air (diisi lewat halaman admin)

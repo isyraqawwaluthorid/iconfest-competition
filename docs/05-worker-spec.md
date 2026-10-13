@@ -236,7 +236,10 @@ Lihat rumus di `02-architecture.md`. Simpan komponen dan bobot di `camera_status
 
 ## Lintas modul (`fusion/cross_module.py`)
 
-1. **Genangan → lalu lintas**
+1. **Genangan → lalu lintas** (berjalan sejak 13 Okt; rancangan awalnya di bawah)
+   - `nearby_traffic(site, cameras, statuses)`: titik lalu lintas hidup yang punya indeks dalam radius 1 km dari lokasi air (lokasi itu sendiri ikut bila ia juga kamera lalu lintas); minimal dua titik. Hasil: jumlah titik, berapa yang ramai atau padat, median indeks, titik terpadat, dan tanda `sementara` bila ada pembanding yang belum tiga hari.
+   - Dihitung hanya untuk lokasi yang status resminya naik atau jalannya tergenang. Masuk ke fakta insight (`water.attention[].traffic_nearby`), dan ke `events.traffic_impact` (yang disimpan adalah saat terpadat selama kejadian).
+   - Ini catatan hal yang terjadi bersamaan, bukan perbandingan sebelum-sesudah; perbandingan dengan baseline jam yang sama selama kejadian (butir di bawah) belum dikerjakan.
    - Kamera dengan modul `water` **dan** `traffic` sekaligus (13 kamera di seed; 12 di antaranya berkategori genangan): bandingkan `density_index` saat `road_flood ≥ ringan` dengan baseline jam yang sama.
    - Kamera lalu lintas dalam radius 1 km dari kamera genangan (haversine): rata-rata `density_index` selama kejadian vs baseline.
    - Simpan di `events.traffic_impact` dan kirim sebagai fakta ke insight.

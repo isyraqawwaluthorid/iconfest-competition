@@ -193,7 +193,7 @@ class Database:
         """Kejadian `live` yang belum ditutup, per kamera."""
         response = (
             self._client.table("events")
-            .select("id, camera_id, started_at, peak_status, snapshot_paths")
+            .select("id, camera_id, started_at, peak_status, snapshot_paths, traffic_impact")
             .eq("source", "live")
             .is_("ended_at", "null")
             .execute()

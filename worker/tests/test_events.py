@@ -59,10 +59,14 @@ class FakeDatabase:
         self.updated: list[tuple] = []
         self.lags: list[tuple] = []
         self.reads = 0
+        self.statuses: dict = {}  # keadaan kamera lalu lintas, untuk dampak di sekitar kejadian
 
     def open_events(self) -> dict:
         self.reads += 1
         return self.opened
+
+    def insight_inputs(self) -> dict:
+        return self.statuses
 
     def insert_event(self, row: dict) -> None:
         self.inserted.append(row)
@@ -89,18 +93,60 @@ LINK = Link(upstream_id="in", downstream_id="out", river_system="Pompa Uji", lag
 
 def test_a_calm_cycle_does_not_even_read_the_events_table():
     database = FakeDatabase()
-    record_events(database, [_result("out")], {"out": {"water_status": "normal"}}, {"out": {"water_status": "normal"}}, [LINK])
+    record_events(database, [_result("out")], {"out": {"water_status": "normal"}}, {"out": {"water_status": "normal"}}, [LINK], [])
     assert (database.reads, database.inserted, database.updated) == (0, [], [])
 
 
 def test_a_downstream_rise_opens_an_event_and_learns_the_lag():
     database = FakeDatabase()
-    record_events(database, [_result("out")], {"out": {"water_status": "normal"}}, {"out": {"water_status": "waspada"}}, [LINK])
+    record_events(database, [_result("out")], {"out": {"water_status": "normal"}}, {"out": {"water_status": "waspada"}}, [LINK], [])
     assert [(row["camera_id"], row["peak_status"]) for row in database.inserted] == [("out", "waspada")]
     assert database.lags == [("in", "out", 20, 1)]
 
 
 def test_sites_without_an_ai_reading_this_cycle_are_left_alone():
     database = FakeDatabase({"out": _open(camera_id="out")})
-    record_events(database, [_result("out")], {"out": {"water_status": "waspada"}}, {"out": {"risk_score": 0.4}}, [LINK])
+    record_events(database, [_result("out")], {"out": {"water_status": "waspada"}}, {"out": {"risk_score": 0.4}}, [LINK], [])
     assert (database.reads, database.updated) == (0, [])
+
+
+def _traffic_camera(camera_id: str, lng: float) -> CameraRow:
+    return CameraRow.model_validate(
+        {"id": camera_id, "source_link_id": 2, "name": f"Simpang {camera_id}", "modules": ["traffic"], "stream_url": "http://example.invalid/x.m3u8", "lat": -6.99, "lng": lng}
+    )
+
+
+def _site_with_neighbours() -> tuple[CameraResult, list[CameraRow], dict]:
+    result = _result("out")
+    result.camera.lat, result.camera.lng = -6.99, 110.42
+    cameras = [result.camera, _traffic_camera("t1", 110.421), _traffic_camera("t2", 110.423)]
+    statuses = {
+        "t1": {"health": "live", "density_index": 2.0, "density_level": "padat", "baseline_is_provisional": False},
+        "t2": {"health": "live", "density_index": 1.0, "density_level": "normal", "baseline_is_provisional": False},
+    }
+    return result, cameras, statuses
+
+
+def test_a_new_event_records_the_traffic_around_it():
+    result, cameras, statuses = _site_with_neighbours()
+    database = FakeDatabase()
+    database.statuses = statuses
+    record_events(database, [result], {"out": {"water_status": "normal"}}, {"out": {"water_status": "waspada"}}, [], cameras)
+    impact = database.inserted[0]["traffic_impact"]
+    assert (impact["cameras"], impact["busier_than_usual"], impact["median_index"]) == (2, 1, 1.5)
+    assert impact["busiest"]["name"] == "Simpang t1"
+
+
+def test_an_open_event_keeps_its_densest_traffic_moment():
+    result, cameras, statuses = _site_with_neighbours()
+    calmer = {"median_index": 1.1, "cameras": 2}
+    database = FakeDatabase({"out": _open(camera_id="out") | {"traffic_impact": calmer}})
+    database.statuses = statuses
+    record_events(database, [result], {"out": {"water_status": "waspada"}}, {"out": {"water_status": "waspada"}}, [], cameras)
+    assert [fields["traffic_impact"]["median_index"] for _, fields in database.updated if "traffic_impact" in fields] == [1.5]
+
+    busier = {"median_index": 2.4, "cameras": 2}
+    database = FakeDatabase({"out": _open(camera_id="out") | {"traffic_impact": busier}})
+    database.statuses = statuses
+    record_events(database, [result], {"out": {"water_status": "waspada"}}, {"out": {"water_status": "waspada"}}, [], cameras)
+    assert not any("traffic_impact" in fields for _, fields in database.updated)

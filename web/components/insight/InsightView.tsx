@@ -237,6 +237,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
             <div className="overflow-y-auto p-4">
               <DistrictPanel
                 summary={selectedSummary}
+                allCameras={cameras}
                 insight={insight}
                 cameraNames={cameraNames}
                 progress={progressBySite}

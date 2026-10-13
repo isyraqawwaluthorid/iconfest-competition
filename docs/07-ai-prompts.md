@@ -129,6 +129,8 @@ Jika tidak ada jawaban yang lolos, insight lama tetap tampil dan web menandainya
 }
 ```
 
+`water.attention[].traffic_nearby` (sejak 13 Okt) ada pada lokasi air yang status resminya naik: keadaan titik lalu lintas dalam radius 1 km (`cameras`, `busier_than_usual`, `median_index`, `busiest`, `baseline`). LLM boleh menyebutnya sebagai dampak yang terjadi "bersamaan dengan" kenaikan air hanya bila `baseline` bernilai `per_jam` dan `busier_than_usual` lebih dari 0, tidak pernah dengan kata "karena".
+
 `water.pending_confirmation` (sejak 12 Okt) berisi lokasi yang baru sekali dinilai naik oleh AI kamera, sudah dihitung aturan, tetapi belum dikonfirmasi penilaian kedua: nama, status resmi, level yang dinilai, keyakinan, waktu, dan jumlah penilaian yang dibutuhkan. Adanya isi di daftar ini menjadikan tingkat keseluruhan `perlu_perhatian`, dan LLM diminta menyebutnya sebagai "menunggu penilaian kedua", bukan sebagai kenaikan.
 
 Selama pembanding lalu lintas masih sementara (median 24 jam yang mencampur siang dan malam), tingkat kepadatan **tidak dikirim** ke LLM: yang tidak layak disimpulkan tidak perlu sampai ke sana. Setelah pembanding per jam tersedia, `traffic` memuat `by_level`, `anomalies`, dan `busiest`.

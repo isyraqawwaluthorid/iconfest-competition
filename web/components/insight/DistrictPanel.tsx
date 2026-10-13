@@ -2,17 +2,21 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Icon } from "@/components/ui/Icon";
 import type { Insight } from "@/lib/ai-insight";
+import { isRaisedSite, nearbySentence, nearbyTraffic } from "@/lib/cross-module";
 import { useNow } from "@/lib/hooks";
 import { formatNumber, themeDisplay, type DistrictSummary } from "@/lib/insight";
 import { DENSITY, NOT_ASSESSED, TREND_LABEL, WATER } from "@/lib/status";
 import { formatDateTimeWib, formatTimeWib } from "@/lib/time";
 import type { SiteProgress } from "@/lib/progress";
+import type { CameraOverview } from "@/lib/types";
 import { InsightCard } from "./AiInsight";
 import { RainOutlook, TrafficTrend } from "./DistrictTrend";
 import { PendingReading, ReadingHistory } from "./PendingReading";
 
 type Props = {
   summary: DistrictSummary;
+  /** Semua kamera kota: titik lalu lintas di sekitar sebuah lokasi air bisa berada di kecamatan tetangga. */
+  allCameras: CameraOverview[];
   insight: Insight | null;
   cameraNames: Map<string, string>;
   /** Lokasi air yang sedang bergerak (indikasi awal, status naik, atau baru berubah): id kamera → perkembangannya. */
@@ -23,7 +27,7 @@ type Props = {
 };
 
 /** Rincian satu kecamatan: temuan AI, air, lalu lintas, dan hujan, dengan kamera hanya sebagai sumber data. */
-export function DistrictPanel({ summary, insight, cameraNames, progress, clock, onClose }: Props) {
+export function DistrictPanel({ summary, allCameras, insight, cameraNames, progress, clock, onClose }: Props) {
   const { district, cameras, online, waterSites, trafficSites, densityIndex, densityLevel, busy, rain } = summary;
   const sites = [...waterSites].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0));
   const risk = themeDisplay(summary, "risk");
@@ -90,6 +94,8 @@ export function DistrictPanel({ summary, insight, cameraNames, progress, clock, 
               const status = site.water_status ? WATER[site.water_status] : NOT_ASSESSED;
               const moving = progress.get(site.id);
               const waiting = moving?.pending && moving.latest ? { level: moving.pending, reading: moving.latest } : null;
+              // Lintas modul: hanya untuk lokasi yang status resminya naik, supaya hari yang tenang tetap ringkas.
+              const around = isRaisedSite(site) ? nearbyTraffic(site, allCameras) : null;
               return (
                 <li key={site.id} className={`tint tone-${status.tone} accent-left rounded-control p-3`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -107,6 +113,19 @@ export function DistrictPanel({ summary, insight, cameraNames, progress, clock, 
                   </p>
                   {waiting ? (
                     <PendingReading status={site.water_status} level={waiting.level} reading={waiting.reading} simulated={clock !== undefined} />
+                  ) : null}
+                  {around ? (
+                    <p className="mt-2 flex items-start gap-1.5 text-xs">
+                      <span className="mt-0.5 shrink-0">
+                        <Icon name="car" size={14} />
+                      </span>
+                      <span>
+                        {nearbySentence(around.cameras, around.busy, around.busiest.name, around.provisional)}{" "}
+                        <Link href="/lalu-lintas" className="font-semibold underline underline-offset-2">
+                          Lihat ruas jalan
+                        </Link>
+                      </span>
+                    </p>
                   ) : null}
                   {/* Lokasi yang sedang bergerak memperlihatkan tiap penilaiannya, supaya perubahan statusnya bisa ditelusuri. */}
                   {moving ? <ReadingHistory readings={moving.readings} /> : null}

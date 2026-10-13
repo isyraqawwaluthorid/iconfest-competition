@@ -120,7 +120,7 @@ export async function getActiveAlerts(): Promise<Alert[]> {
 export async function getEvents(limit = 200): Promise<WaterEvent[]> {
   const { data, error } = await getSupabase()
     .from("events")
-    .select("id, camera_id, kind, started_at, peak_at, peak_status, ended_at, duration_minutes, cameras(name)")
+    .select("id, camera_id, kind, started_at, peak_at, peak_status, ended_at, duration_minutes, traffic_impact, cameras(name)")
     .eq("source", "live")
     .order("started_at", { ascending: false })
     .limit(limit);

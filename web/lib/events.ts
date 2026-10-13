@@ -15,7 +15,19 @@ export function formatDuration(minutes: number): string {
   return rest ? `${hours} jam ${rest} menit` : `${hours} jam`;
 }
 
-const CSV_HEADER = ["mulai_wib", "selesai_wib", "lokasi", "jenis", "status_puncak", "waktu_puncak_wib", "durasi_menit"];
+const CSV_HEADER = [
+  "mulai_wib",
+  "selesai_wib",
+  "lokasi",
+  "jenis",
+  "status_puncak",
+  "waktu_puncak_wib",
+  "durasi_menit",
+  // Lalu lintas dalam 1 km pada saat terpadat selama kejadian (terjadi bersamaan, bukan bukti sebab-akibat).
+  "titik_lalu_lintas_sekitar",
+  "titik_lebih_padat_dari_biasanya",
+  "titik_terpadat",
+];
 
 function cell(value: string | number | null): string {
   const text = value == null ? "" : String(value);
@@ -32,6 +44,9 @@ export function eventsToCsv(events: WaterEvent[]): string {
     event.peak_status ? WATER[event.peak_status].label : "",
     event.peak_at ? formatDateTimeWib(event.peak_at) : "",
     event.duration_minutes,
+    event.traffic_impact?.cameras ?? null,
+    event.traffic_impact?.busier_than_usual ?? null,
+    event.traffic_impact?.busiest.name ?? null,
   ]);
   return [CSV_HEADER, ...rows].map((row) => row.map(cell).join(",")).join("\n") + "\n";
 }

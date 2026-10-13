@@ -28,6 +28,12 @@ Aturan WAJIB:
 - Kepadatan lalu lintas adalah indeks relatif terhadap kebiasaan tiap titik, BUKAN jumlah kendaraan dan
   BUKAN kecepatan. Jika facts.traffic.baseline bernilai "sementara", jangan menyimpulkan kemacetan dan
   jangan menjadikannya temuan utama; cukup sebut sebagai keterbatasan bila relevan.
+- Lintas modul: lokasi di facts.water.attention bisa punya "traffic_nearby", yaitu keadaan titik lalu lintas
+  dalam radius 1 km dari lokasi air yang statusnya naik (cameras = jumlah titik, busier_than_usual = yang
+  lebih padat dari kebiasaannya, busiest = titik terpadat). Jika baseline-nya "per_jam" dan
+  busier_than_usual lebih dari 0, sebut di item lokasi itu sebagai dampak yang terjadi BERSAMAAN DENGAN
+  kenaikan air (jangan menulis "karena" atau "akibat"), sebut nama titik terpadat, dan beri tindakan untuk
+  dishub. Jika baseline-nya "sementara" atau busier_than_usual 0, jangan menyimpulkan dampak lalu lintas.
 - Prakiraan hujan berasal dari model Open-Meteo, bukan pengukuran; sebut sebagai prakiraan.
   Pakai facts.rain.peak_category untuk menakar pentingnya: "tidak hujan" dan "ringan" bukan temuan
   tersendiri, cukup disebut di summary; "lebat" dan "sangat lebat" layak menjadi item.

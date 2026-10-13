@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { nearbySentence } from "@/lib/cross-module";
 import { EVENT_KIND_LABEL, formatDuration } from "@/lib/events";
 import { getEvents } from "@/lib/queries";
 import { NOT_ASSESSED, WATER } from "@/lib/status";
@@ -18,8 +19,8 @@ export default function HistoryPage() {
           <h1 className="text-2xl font-semibold">Riwayat kejadian</h1>
           <p className="mt-1 max-w-3xl text-sm text-muted">
             Satu baris untuk tiap periode sebuah lokasi air berstatus resmi di atas normal: kapan mulai, seberapa tinggi
-            puncaknya, dan berapa lama sampai kembali normal. Dicatat otomatis dari status resmi, bukan dari penilaian AI
-            tunggal.
+            puncaknya, berapa lama sampai kembali normal, dan keadaan lalu lintas di sekitarnya pada saat terpadat (terjadi
+            bersamaan, bukan bukti sebab-akibat). Dicatat otomatis dari status resmi, bukan dari penilaian AI tunggal.
           </p>
         </div>
         <a
@@ -66,6 +67,7 @@ async function History() {
             <th className="px-4 py-2.5 font-semibold">Puncak</th>
             <th className="px-4 py-2.5 font-semibold">Lama</th>
             <th className="px-4 py-2.5 font-semibold">Selesai</th>
+            <th className="px-4 py-2.5 font-semibold">Lalu lintas di sekitarnya</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -86,6 +88,16 @@ async function History() {
               </td>
               <td className="px-4 py-2.5 whitespace-nowrap tabular-nums">
                 {event.ended_at ? formatDateTimeWib(event.ended_at) : <span className="font-semibold">masih berlangsung</span>}
+              </td>
+              <td className="max-w-xs px-4 py-2.5 text-xs text-muted">
+                {event.traffic_impact
+                  ? nearbySentence(
+                      event.traffic_impact.cameras,
+                      event.traffic_impact.busier_than_usual,
+                      event.traffic_impact.busiest.name,
+                      event.traffic_impact.baseline === "sementara",
+                    ).replace("Lalu lintas di sekitarnya (1 km): ", "Saat terpadat: ")
+                  : "Kurang dari dua titik lalu lintas dalam 1 km"}
               </td>
             </tr>
           ))}

@@ -23,7 +23,7 @@ from . import acquisition, alerts, housekeeping, quality, storage
 from .analyzers import traffic
 from .config import Settings, get_settings
 from .db import Database
-from .fusion import activity, baseline, events, upstream
+from .fusion import activity, baseline, cross_module, events, upstream
 from .insights import InsightWriter
 from .models import CameraResult, CameraRow, CycleStats, FrameState, QualityResult, TrafficReading
 from .sources import openmeteo
@@ -160,7 +160,7 @@ def run_cycle(
         ]
     )
     try:
-        record_events(database, recordable, before, water_updates, water_pipeline.links)
+        record_events(database, recordable, before, water_updates, water_pipeline.links, all_cameras)
     except Exception:  # noqa: BLE001 - kejadian dicatat ulang pada penilaian berikutnya; status dan peringatan tidak ikut tertahan
         log.exception("pencatatan kejadian gagal")
     try:
@@ -206,22 +206,36 @@ def record_events(
     before: dict[str, dict[str, Any]],
     water_updates: dict[str, dict[str, Any]],
     links: list[upstream.Link],
+    cameras: list[CameraRow],
 ) -> None:
-    """Buka, perbarui, atau tutup kejadian untuk lokasi yang dinilai AI pada siklus ini, lalu pelajari jeda hulu → hilir."""
+    """Buka, perbarui, atau tutup kejadian untuk lokasi yang dinilai AI pada siklus ini, lalu pelajari jeda hulu → hilir.
+
+    Selama kejadian berlangsung, keadaan lalu lintas di sekitarnya ikut dicatat (`traffic_impact`): yang disimpan
+    adalah saat terpadat, sebagai catatan "bersamaan dengan", bukan sebab-akibat.
+    """
     assessed = [r for r in results if "water_status" in water_updates.get(r.camera.id, {})]
     pairs = {r.camera.id: (before.get(r.camera.id, {}).get("water_status"), water_updates[r.camera.id]["water_status"]) for r in assessed}
     if not any(status in events.LEVELS[1:] for pair in pairs.values() for status in pair):
         return  # tidak ada yang di atas normal, sebelum maupun sesudah: tidak ada kejadian yang perlu disentuh
 
     open_events = database.open_events()
+    traffic_statuses = database.insight_inputs()  # hanya dibaca saat ada kejadian, jadi tidak membebani siklus biasa
     opened = set()
     for result in assessed:
         cam = result.camera
         previous, current = pairs[cam.id]
-        change = events.step(cam.id, cam.water_kind, previous, current, open_events.get(cam.id), result.checked_at, result.evidence_path)
+        open_event = open_events.get(cam.id)
+        change = events.step(cam.id, cam.water_kind, previous, current, open_event, result.checked_at, result.evidence_path)
+        near = cross_module.nearby_traffic(cam, cameras, traffic_statuses) if current in events.LEVELS[1:] else None
+        if near and open_event:
+            worst = cross_module.worse_impact(open_event.get("traffic_impact"), near.as_fact())
+            if worst is not open_event.get("traffic_impact"):
+                database.update_event(open_event["id"], {"traffic_impact": worst})
         if change is None:
             continue
         if change.insert:
+            if near:
+                change.insert["traffic_impact"] = near.as_fact()
             database.insert_event(change.insert)
             opened.add(cam.id)
             log.info("kejadian dibuka: %s berstatus %s", cam.name, current)

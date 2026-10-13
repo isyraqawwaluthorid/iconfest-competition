@@ -23,6 +23,7 @@ from pydantic import ValidationError
 from . import alerts
 from .config import REPO_ROOT, Settings
 from .db import Database
+from .fusion import cross_module
 from .fusion.upstream import Link
 from .models import CameraRow, InsightResult
 from .openai_api import RESPONSES_URL, json_schema_format, output_text
@@ -102,12 +103,21 @@ def build_facts(
             ],
         }
 
+    def traffic_around(cam: CameraRow, status: dict[str, Any]) -> dict[str, Any]:
+        """Lintas modul: keadaan titik lalu lintas di sekitar lokasi yang status airnya naik atau jalannya tergenang."""
+        near = cross_module.nearby_traffic(cam, cameras, statuses) if cross_module.is_raised(status) else None
+        return {"traffic_nearby": near.as_fact()} if near else {}
+
     sites = [
         (cam, statuses[cam.id])
         for cam in cameras
         if "water" in cam.modules and statuses.get(cam.id, {}).get("water_status")
     ]
-    attention = [_water_fact(cam, status, area(cam), weather) | relations(cam) for cam, status in sites if _needs_attention(status)]
+    attention = [
+        _water_fact(cam, status, area(cam), weather) | relations(cam) | traffic_around(cam, status)
+        for cam, status in sites
+        if _needs_attention(status)
+    ]
     # Menunggu konfirmasi: penilaian terakhir dihitung aturan di atas status resmi, tetapi baru sekali.
     pending = []
     for cam, status in sites:

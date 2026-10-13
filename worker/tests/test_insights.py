@@ -304,3 +304,20 @@ def test_a_reading_at_the_confirmed_level_is_not_pending():
     statuses = {"a": _status(water_status="waspada"), "b": _status()}
     facts = insights.build_facts([_camera("a", "Pompa A"), _camera("b", "Pompa B")], statuses, _weather(), [], NOW, None, latest)
     assert facts["water"]["pending_confirmation"] == []
+
+
+def test_a_raised_site_carries_the_traffic_around_it_and_a_calm_site_does_not():
+    cameras = [
+        _camera("a", "Pompa A", lat=-6.99, lng=110.42),
+        _camera("b", "Pompa B", lat=-6.99, lng=110.42),
+        _camera("t1", "Simpang Satu", modules=["traffic"], lat=-6.99, lng=110.421),
+        _camera("t2", "Simpang Dua", modules=["traffic"], lat=-6.99, lng=110.424),
+    ]
+    busy = {"health": "live", "density_index": 1.9, "density_level": "padat", "baseline_is_provisional": False}
+    calm = {"health": "live", "density_index": 0.9, "density_level": "normal", "baseline_is_provisional": False}
+    statuses = {"a": _status(water_status="siaga", water_trend="naik"), "b": _status(needs_verification=True), "t1": busy, "t2": calm}
+    by_name = {site["name"]: site for site in _facts(statuses, cameras=cameras)["water"]["attention"]}
+    near = by_name["Pompa A"]["traffic_nearby"]
+    assert (near["cameras"], near["busier_than_usual"], near["baseline"]) == (2, 1, "per_jam")
+    assert near["busiest"]["name"] == "Simpang Satu"
+    assert "traffic_nearby" not in by_name["Pompa B"]  # perlu verifikasi, tetapi statusnya tidak naik
