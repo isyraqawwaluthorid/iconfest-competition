@@ -2,7 +2,7 @@
 
 Dipakai lapisan "Aktivitas per jam" di web: seberapa ramai tiap kawasan biasanya pada jam tertentu.
 Ini rata-rata dari hitungan yang benar-benar dikumpulkan, bukan perkiraan untuk kawasan tanpa kamera.
-Hitungan orang ikut memuat pengendara sepeda motor, karena detektor tidak membedakannya dari pejalan kaki.
+Hitungan orang berarti pejalan kaki: orang yang terdeteksi sedang menaiki sepeda motor sudah dibuang (lihat analyzers/traffic.py).
 """
 
 from __future__ import annotations

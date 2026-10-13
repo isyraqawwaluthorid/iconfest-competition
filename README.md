@@ -61,6 +61,7 @@ Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web 
 | `/simulasi` | **Simulasi kejadian.** Skenario air naik delapan langkah di layar yang sama dengan beranda, berlabel "SIMULASI · Bukan data langsung". Hanya masukannya yang buatan; status, peringatan, dan ringkasan AI dihasilkan aturan dan model yang sama dengan sistem. |
 | `/air` | **Kondisi air per lokasi** (dibuka dari Beranda, tanpa menu sendiri). Satu pin per lokasi air berwarna status resminya; rincian tiap lokasi memuat gambar kamera dengan garis acuan, asal skor risikonya, dan hubungan hulu → hilir. |
 | `/lalu-lintas` | **Lalu lintas dari dekat**, tiga lapisan di satu peta. *Ruas jalan*: potongan jalan di sekitar tiap kamera, berwarna tingkat kepadatan dibanding kebiasaannya. *Aktivitas per jam*: heksagon dengan penggeser jam, dari rata-rata hitungan yang sudah terkumpul. *Beban emisi*: estimasi relatif per ruas dari kendaraan terlihat dan faktor emisi resmi, bukan kg per jam. |
+| `/ruang-publik` | **Keramaian ruang publik.** Pejalan kaki yang terlihat di Kota Lama dan Balai Kota dibanding biasanya pada jam yang sama, dengan pola 24 jam dan gambar kamera sebagai bukti. Bukan jumlah pengunjung. |
 | `/riwayat` | Kejadian yang tercatat (mulai, puncak, lama) dengan unduhan CSV. |
 | `/tentang` | Cara kerja, batasan, privasi, dan sumber data. |
 | `/kamera/[id]` | **Bukti visual** satu lokasi: gambar terakhir dengan garis acuan, penilaian AI dan alasannya, pembanding kondisi normal, gambar yang dinilai sebelumnya, rincian skor risiko, dan grafik kepadatan. |
@@ -140,7 +141,7 @@ Cara menyiapkan mesin baru, memindahkan worker, dan masalah yang pernah terjadi 
 
 ```bash
 cd worker
-pytest                                             # 197 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
+pytest                                             # 201 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
 python scripts/status.py                           # detak worker, 20 lokasi air, peringatan, jeda data
 python scripts/calibration_check.py                # kalibrasi tiap kamera air; yang perlu dilihat ditulis lebih dulu
 python scripts/replay_readings.py --all 3          # nilai ulang gambar bukti tersimpan dengan kalibrasi dan prompt saat ini

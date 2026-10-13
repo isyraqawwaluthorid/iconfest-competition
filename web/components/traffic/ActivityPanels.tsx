@@ -169,7 +169,10 @@ export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metr
             ))}
           </div>
           {metric === "persons" ? (
-            <p className="mt-2 text-xs text-muted">Hitungan orang ikut memuat pengendara sepeda motor, bukan pejalan kaki saja.</p>
+            <p className="mt-2 text-xs text-muted">
+              Yang dihitung pejalan kaki; orang yang terdeteksi sedang menaiki sepeda motor tidak ikut. Pengendara yang motornya
+              tidak terdeteksi masih bisa terhitung.
+            </p>
           ) : null}
 
           <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs text-muted">
@@ -227,10 +230,17 @@ export function ActivityPanels({ profile, hexes, breaks, hour, currentHour, metr
   );
 }
 
-type HourBarsProps = { values: (number | null)[]; max: number; hour: number; onHour: (hour: number) => void; label: string };
+type HourBarsProps = {
+  values: (number | null)[];
+  max: number;
+  hour: number;
+  /** Dipanggil saat satu batang diketuk; tanpa ini batang hanya untuk dibaca. */
+  onHour?: (hour: number) => void;
+  label: string;
+};
 
 /** Dua puluh empat batang, satu per jam. Jam tanpa data digambar sebagai garis putus, bukan batang nol. */
-function HourBars({ values, max, hour, onHour, label }: HourBarsProps) {
+export function HourBars({ values, max, hour, onHour, label }: HourBarsProps) {
   return (
     <div className="mt-3">
       <div className="flex h-20 items-end gap-px" role="group" aria-label={label}>
@@ -240,7 +250,8 @@ function HourBars({ values, max, hour, onHour, label }: HourBarsProps) {
             <button
               key={item}
               type="button"
-              onClick={() => onHour(item)}
+              onClick={onHour ? () => onHour(item) : undefined}
+              disabled={!onHour}
               title={`Pukul ${hourRange(item)}: ${value === null ? "belum ada data" : formatNumber(value, 1)}`}
               aria-label={`Pukul ${hourRange(item)}`}
               aria-pressed={item === hour}
