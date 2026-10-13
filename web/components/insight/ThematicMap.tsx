@@ -17,7 +17,7 @@ import {
 import { CITY_BOUNDS, districtOf, DISTRICTS, shortName } from "@/lib/geo/districts";
 import { themeDisplay, type DistrictSummary, type Theme } from "@/lib/insight";
 import { BASEMAP } from "@/lib/map-tiles";
-import { DENSITY, isElevated, NOT_ASSESSED, WATER } from "@/lib/status";
+import { DENSITY, isElevated, NOT_ASSESSED, trashDisplay, WATER } from "@/lib/status";
 import type { CameraOverview, WaterStatus } from "@/lib/types";
 
 type Props = {
@@ -75,7 +75,7 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
   // Yang digambar belakangan berada di atas: lokasi biasa dulu, lalu yang statusnya naik, lalu yang menunggu konfirmasi.
   const ordered = useMemo(() => {
     const weight = (camera: CameraOverview) =>
-      theme !== "risk" ? 0 : pending.has(camera.id) ? 2 : isElevated(camera.water_status) ? 1 : 0;
+      theme === "trash" ? Number(camera.trash === "banyak") : theme !== "risk" ? 0 : pending.has(camera.id) ? 2 : isElevated(camera.water_status) ? 1 : 0;
     return [...sources].sort((a, b) => weight(a) - weight(b));
   }, [sources, pending, theme]);
 
@@ -123,10 +123,13 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
               ? camera.water_status
                 ? WATER[camera.water_status]
                 : NOT_ASSESSED
-              : DENSITY[camera.density_level ?? "tidak_diketahui"];
+              : theme === "trash"
+                ? (trashDisplay(camera.trash) ?? NOT_ASSESSED)
+                : DENSITY[camera.density_level ?? "tidak_diketahui"];
           // Pada tema risiko air, lokasi yang bergerak dibuat menonjol: menunggu konfirmasi atau sudah naik.
           const waiting = theme === "risk" ? pending.get(camera.id) : undefined;
-          const raised = theme === "risk" && isElevated(camera.water_status);
+          // Yang menonjol: status air di atas normal pada tema risiko, sampah banyak pada tema sampah.
+          const raised = theme === "risk" ? isElevated(camera.water_status) : theme === "trash" && camera.trash === "banyak";
           const tone = waiting ? WATER[waiting].tone : status.tone;
           return (
             <CircleMarker
@@ -148,11 +151,13 @@ export default function ThematicMap({ summaries, theme, sources, pending, select
                   <br />
                   {waiting
                     ? `Resmi: ${status.label.toLowerCase()} · indikasi ${WATER[waiting].label.toLowerCase()} (1 dari 2)`
-                    : status.label}
+                    : theme === "trash"
+                      ? "Sampah banyak"
+                      : status.label}
                 </Tooltip>
               ) : (
                 <Tooltip>
-                  {camera.name} · {status.label}
+                  {camera.name} · {theme === "trash" ? `sampah ${status.label.toLowerCase()}` : status.label}
                 </Tooltip>
               )}
             </CircleMarker>

@@ -19,6 +19,7 @@ import {
   hasDensity,
   hasWaterStatus,
   summarizeDistricts,
+  trashHeavySites,
   themeLegend,
   themeSources,
   THEMES,
@@ -97,6 +98,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
   const stats = useMemo(() => cityStats(cameras, weather, summaries), [cameras, weather, summaries]);
   const sources = useMemo(() => themeSources(cameras, theme), [cameras, theme]);
   const cameraNames = useMemo(() => new Map(cameras.map((camera) => [camera.id, camera.name])), [cameras]);
+  const trashHeavy = useMemo(() => trashHeavySites(cameras), [cameras]);
   const waterSiteCount = cameras.filter((camera) => camera.modules.includes("water") && camera.is_calibrated).length;
   const selectedSummary = summaries.find((s) => s.district.name === selected) ?? null;
   const activeTheme = THEMES.find((t) => t.id === theme) ?? THEMES[0];
@@ -140,7 +142,7 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
         <div
           role="group"
           aria-label="Tema peta"
-          className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1 overflow-x-auto p-1"
+          className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1 overflow-x-auto p-1 lg:max-w-[calc(100%-47rem)]"
         >
           {THEMES.map((item) => (
             <button
@@ -218,6 +220,24 @@ export function InsightScreen({ cameras, alerts, insight, readings, weather, clo
                   </div>
                 ))}
               </dl>
+              {/* Sampah perairan dinilai dari gambar yang sama dengan status air; barisnya membuka tema sampah di peta. */}
+              <button
+                type="button"
+                onClick={() => setTheme("trash")}
+                aria-pressed={theme === "trash"}
+                className={`tint tone-${trashHeavy.length > 0 ? "siaga" : "normal"} accent-left mt-3 flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-left`}
+              >
+                <span className="font-display text-2xl leading-none font-bold tabular-nums">{trashHeavy.length}</span>
+                <span className="min-w-0 flex-1 text-xs">
+                  <span className="block font-semibold">
+                    {trashHeavy.length > 0 ? "lokasi air dengan sampah banyak" : "Tidak ada lokasi air bersampah banyak"}
+                  </span>
+                  <span className="block truncate">
+                    {trashHeavy.length > 0 ? trashHeavy.map((camera) => camera.name).join(", ") : "Dinilai AI dari gambar kamera"} · lihat di
+                    peta
+                  </span>
+                </span>
+              </button>
               {/* Pintu ke rincian per lokasi air, dibuat menonjol supaya terlihat begitu beranda dibuka. Halaman itu memakai
                   data langsung, jadi tidak ditawarkan di simulasi. */}
               {clock === undefined ? (

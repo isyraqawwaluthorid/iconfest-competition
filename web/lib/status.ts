@@ -94,6 +94,17 @@ export const TRASH_LABEL: Record<TrashLevel, string> = {
   tidak_relevan: "Tidak relevan",
 };
 
+/**
+ * Tingkat sampah di perairan (status resmi yang sudah dihaluskan worker). Hanya tiga tingkat yang berwarna;
+ * `null` untuk lokasi yang sampahnya tidak dinilai (jalan) atau belum bisa dinilai.
+ */
+export function trashDisplay(trash: TrashLevel | null): StatusDisplay | null {
+  if (trash === "tidak_terlihat") return { label: "Tidak terlihat", tone: "normal" };
+  if (trash === "sedikit") return { label: "Sedikit", tone: "waspada" };
+  if (trash === "banyak") return { label: "Banyak", tone: "siaga" };
+  return null;
+}
+
 /** Keyakinan AI ditulis sebagai kata lebih dulu; angkanya hanya pelengkap. */
 export function confidenceLabel(confidence: number | null): string {
   if (confidence == null) return "tidak diketahui";

@@ -10,7 +10,7 @@ import { PANEL_BOTTOM, PANEL_LEFT, PANEL_RIGHT } from "@/components/traffic/layo
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useLiveCameras, useLiveReadings, useNow } from "@/lib/hooks";
-import { formatNumber, rainDisplay } from "@/lib/insight";
+import { formatNumber, hasTrashStatus, rainDisplay } from "@/lib/insight";
 import { mapThemeClass, useMapTheme } from "@/lib/map-theme";
 import { siteProgress } from "@/lib/progress";
 import { HEALTH, NOT_ASSESSED, TONE_BG, WATER } from "@/lib/status";
@@ -58,6 +58,14 @@ export function WaterView({ initialCameras, initialReadings, weather, links, ope
   const selectedRow = selected ? (byId.get(selected) ?? null) : null;
   const listed = showAll ? rows : rows.slice(0, TOP_COUNT);
   const rain = wettest(weather);
+  const trash = useMemo(() => {
+    const rated = rows.filter((row) => hasTrashStatus(row.camera));
+    return {
+      heavy: rated.filter((row) => row.camera.trash === "banyak"),
+      some: rated.filter((row) => row.camera.trash === "sedikit").length,
+      none: rated.filter((row) => row.camera.trash === "tidak_terlihat").length,
+    };
+  }, [rows]);
   const latest = rows.reduce<string | null>(
     (max, { camera }) => (camera.status_updated_at && (!max || camera.status_updated_at > max) ? camera.status_updated_at : max),
     null,
@@ -133,6 +141,25 @@ export function WaterView({ initialCameras, initialReadings, weather, links, ope
               ) : (
                 <p className="mt-1 text-sm text-muted">Data hujan belum tersedia.</p>
               )}
+            </div>
+
+            <div className="mt-3 border-t border-border pt-3">
+              <p className="text-xs font-semibold text-muted">Sampah di perairan</p>
+              <p className="mt-1 text-sm">
+                <span className="font-display text-xl font-bold tabular-nums">{trash.heavy.length}</span> lokasi bersampah banyak,{" "}
+                {trash.some} sedikit, {trash.none} tidak terlihat.
+              </p>
+              {trash.heavy.length > 0 ? (
+                <p className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+                  {trash.heavy.map((row) => (
+                    <SiteChip key={row.camera.id} row={row} onSelect={setSelected} />
+                  ))}
+                </p>
+              ) : null}
+              <p className="mt-1.5 text-[11px] text-muted">
+                Dinilai AI dari gambar kamera dalam tiga tingkat; &quot;banyak&quot; baru berlaku bila sebagian besar penilaian terakhir
+                sepakat. Bukan ukuran berat atau volume.
+              </p>
             </div>
 
             {links.length > 0 ? (

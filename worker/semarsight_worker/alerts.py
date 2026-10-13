@@ -52,6 +52,11 @@ class Changes:
     resolve: list[str]
 
 
+def _mm(value: float) -> str:
+    """Curah hujan untuk teks peringatan: satu desimal dengan koma, sama dengan yang ditulis web ("12,5")."""
+    return f"{value:.1f}".replace(".", ",")
+
+
 def water_alerts(cameras: list[CameraRow], statuses: dict[str, dict[str, Any]], weather: dict[str, GridWeather]) -> list[Alert]:
     """Satu peringatan per lokasi air yang status terkonfirmasinya waspada ke atas."""
     alerts = []
@@ -109,7 +114,7 @@ def rain_alert(weather: dict[str, GridWeather], *, already_active: bool) -> Aler
         type="heavy_rain",
         level="waspada" if peak >= VERY_HEAVY_RAIN_MM else "info",
         title="Prakiraan hujan lebat",
-        message=f"Prakiraan hujan hingga {peak:.0f} mm dalam 3 jam ke depan di {places}.",
+        message=f"Prakiraan hujan hingga {_mm(peak)} mm dalam 3 jam ke depan di {places}.",
         audience=("bpbd", "pu", "warga"),
         data={"peak_mm": peak, "grids": {w.grid_id: w.precip_next_3h_mm for w in wet}, "source": "Open-Meteo"},
     )
@@ -142,7 +147,7 @@ def trash_alerts(
                 camera_id=cam.id,
                 title=f"Sampah menumpuk di {cam.name}",
                 message=(
-                    f"Sampah terlihat banyak dan hujan {local.precip_next_3h_mm:.0f} mm diprakirakan dalam 3 jam ke depan. "
+                    f"Sampah terlihat banyak dan hujan {_mm(local.precip_next_3h_mm)} mm diprakirakan dalam 3 jam ke depan. "
                     "Bersihkan saringan dan pintu air sebelum hujan agar aliran tidak tersumbat."
                 ),
                 audience=("pu",),

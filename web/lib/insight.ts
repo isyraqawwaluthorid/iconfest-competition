@@ -1,13 +1,13 @@
 import { DISTRICTS, districtOf, type District } from "./geo/districts";
-import { DENSITY, isElevated, isOnline, RISK, UNTRACKED, type StatusDisplay, type Tone } from "./status";
-import type { CameraOverview, DensityLevel, GridWeather, RiskLevel } from "./types";
+import { DENSITY, isElevated, isOnline, RISK, trashDisplay, UNTRACKED, type StatusDisplay, type Tone } from "./status";
+import type { CameraOverview, DensityLevel, GridWeather, RiskLevel, TrashLevel } from "./types";
 
 /**
  * Ringkasan per kecamatan untuk peta tematik. Kamera hanya sumber data; yang ditampilkan adalah
  * kondisi wilayahnya. Wilayah tanpa sumber data ditandai "tidak terpantau", bukan dianggap aman.
  */
 
-export type Theme = "risk" | "traffic" | "rain";
+export type Theme = "risk" | "traffic" | "rain" | "trash";
 
 export const THEMES: { id: Theme; label: string; explain: string }[] = [
   {
@@ -25,7 +25,24 @@ export const THEMES: { id: Theme; label: string; explain: string }[] = [
     label: "Hujan 3 jam ke depan",
     explain: "Prakiraan Open-Meteo dari titik cuaca terdekat ke tiap kecamatan.",
   },
+  {
+    id: "trash",
+    label: "Sampah perairan",
+    explain: "Tingkat sampah tertinggi di lokasi air tiap kecamatan, dinilai AI dari gambar kamera. Bukan ukuran berat atau volume.",
+  },
 ];
+
+const TRASH_RANK: TrashLevel[] = ["tidak_terlihat", "sedikit", "banyak"];
+
+/** Lokasi air yang sampahnya dinilai (pompa, sungai, kolam; bukan jalan) dan punya status sampah resmi. */
+export function hasTrashStatus(camera: CameraOverview): boolean {
+  return hasWaterStatus(camera) && camera.trash != null && TRASH_RANK.includes(camera.trash);
+}
+
+/** Lokasi yang status sampah resminya "banyak". */
+export function trashHeavySites(cameras: CameraOverview[]): CameraOverview[] {
+  return cameras.filter((camera) => hasTrashStatus(camera) && camera.trash === "banyak");
+}
 
 export type DistrictSummary = {
   district: District;
@@ -41,6 +58,8 @@ export type DistrictSummary = {
   densityLevel: DensityLevel;
   busy: number;
   rain: GridWeather | null;
+  /** Tingkat sampah tertinggi di antara lokasi air kecamatan ini; `null` bila tidak ada lokasi yang dinilai sampahnya. */
+  worstTrash: TrashLevel | null;
 };
 
 // Batas yang sama dengan worker (fusion/baseline.py), agar wilayah dan kamera memakai skala yang sama.
@@ -133,6 +152,12 @@ export function summarizeDistricts(cameras: CameraOverview[], weather: GridWeath
       densityLevel: densityLevelOf(densityIndex),
       busy: trafficSites.filter((cam) => cam.density_level === "ramai" || cam.density_level === "padat").length,
       rain: nearestGrid(district, weather),
+      worstTrash: members
+        .filter(hasTrashStatus)
+        .reduce<TrashLevel | null>(
+          (worst, cam) => (worst === null || TRASH_RANK.indexOf(cam.trash as TrashLevel) > TRASH_RANK.indexOf(worst) ? cam.trash : worst),
+          null,
+        ),
     };
   });
 }
@@ -146,12 +171,14 @@ export function themeDisplay(summary: DistrictSummary, theme: Theme): StatusDisp
   if (theme === "traffic") {
     return summary.densityIndex == null ? UNTRACKED : DENSITY[summary.densityLevel];
   }
+  if (theme === "trash") return trashDisplay(summary.worstTrash) ?? UNTRACKED;
   return summary.rain ? rainDisplay(summary.rain.precip_next_3h_mm) : UNTRACKED;
 }
 
 export function themeLegend(theme: Theme): StatusDisplay[] {
   if (theme === "risk") return [RISK.rendah, RISK.sedang, RISK.tinggi, RISK.sangat_tinggi, UNTRACKED];
   if (theme === "traffic") return [DENSITY.lancar, DENSITY.normal, DENSITY.ramai, DENSITY.padat, UNTRACKED];
+  if (theme === "trash") return [...TRASH_RANK.map((level) => trashDisplay(level) as StatusDisplay), UNTRACKED];
   return [...RAIN_STEPS.map(({ label, tone }) => ({ label, tone })), UNTRACKED];
 }
 
@@ -159,6 +186,7 @@ export function themeLegend(theme: Theme): StatusDisplay[] {
 export function themeSources(cameras: CameraOverview[], theme: Theme): CameraOverview[] {
   if (theme === "risk") return cameras.filter(hasWaterStatus);
   if (theme === "traffic") return cameras.filter(hasDensity);
+  if (theme === "trash") return cameras.filter(hasTrashStatus);
   return [];
 }
 
@@ -251,7 +279,7 @@ export function citySituation(cameras: CameraOverview[], weather: GridWeather[])
   if (!wettest) {
     points.push("Data hujan belum tersedia.");
   } else if (wettest.precip_next_3h_mm >= 10) {
-    points.push(`Hujan lebat diprakirakan: hingga ${wettest.precip_next_3h_mm.toFixed(0)} mm dalam 3 jam ke depan di ${wettest.name}.`);
+    points.push(`Hujan lebat diprakirakan: hingga ${formatNumber(wettest.precip_next_3h_mm, 1)} mm dalam 3 jam ke depan di ${wettest.name}.`);
   } else if (wettest.precip_next_3h_mm >= 1) {
     points.push(`Hujan ringan diprakirakan dalam 3 jam ke depan, paling banyak ${formatNumber(wettest.precip_next_3h_mm, 1)} mm di ${wettest.name}.`);
   } else {

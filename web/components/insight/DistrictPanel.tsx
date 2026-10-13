@@ -117,6 +117,7 @@ export function DistrictPanel({ summary, allCameras, insight, cameraNames, progr
                   <p className="mt-1 text-xs">
                     {site.water_trend ? `Tren ${TREND_LABEL[site.water_trend]}` : "Tren belum diketahui"}
                     {site.risk_score != null ? ` · skor risiko ${formatNumber(site.risk_score, 2)}` : ""}
+                    {site.trash === "banyak" ? " · sampah banyak" : site.trash === "sedikit" ? " · sampah sedikit" : ""}
                   </p>
                   {waiting ? (
                     <PendingReading status={site.water_status} level={waiting.level} reading={waiting.reading} simulated={clock !== undefined} />

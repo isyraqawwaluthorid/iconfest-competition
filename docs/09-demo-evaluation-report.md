@@ -43,6 +43,23 @@ yolo11s menemukan ±2,5 kali lebih banyak sepeda motor dan jauh lebih sedikit bu
 
 Yang belum dievaluasi: malam hari, hujan, hitungan orang, dan pembanding oleh manusia.
 
+### Hasil evaluasi penilaian sampah (13 Okt 2026, siang)
+
+Sampel: satu gambar siang terbaru dari tiap lokasi air yang dinilai AI dan bukan jalan (16 lokasi), dinilai ulang dengan petunjuk yang sudah memuat definisi tiap tingkat. Pembandingnya penilaian mata atas gambar yang sama, **dikerjakan asisten AI yang mengerjakan proyek, bukan manusia**, dari potongan gambar berlebar ±470 px.
+
+| | Jumlah |
+|---|---|
+| Sepakat | 13 dari 16 |
+| Berbeda satu tingkat, antara "tidak terlihat" dan "sedikit" | 3 (Kartini-OUT, Semarang Indah_OUT, Trimulyo_Depan) |
+| "Banyak" yang benar | 1 dari 1 (KP.Kali-OUT) |
+| "Banyak" yang keliru | 0 |
+
+Busa pompa di Bulu Drain-OUT dan tanaman air di Kartini-OUT tidak dinilai sebagai sampah banyak. Perbedaan yang ada hanya di ujung bawah skala, yang tidak memicu apa pun.
+
+Batas evaluasi ini: sampel kecil; hanya satu lokasi yang benar-benar bersampah banyak, jadi kemampuan sistem menemukan "banyak" di lokasi lain belum teruji; malam hari belum dievaluasi; pembandingnya bukan manusia. Yang dinilai adalah tingkat (tiga kelas) dari gambar, bukan berat atau volume sampah.
+
+Penghalusan: dengan aturan "4 dari 6 penilaian", pada penilaian 72 jam yang tersimpan status "banyak" menyala 7 kali di empat lokasi (11 kali dengan "3 dari 4"; penilaian mentahnya berganti jauh lebih sering).
+
 ## Skenario video demo penyisihan (±3 menit)
 
 1. **Masalah (20 detik):** ratusan CCTV kota Semarang, hanya ditonton; banjir dan genangan kronis.

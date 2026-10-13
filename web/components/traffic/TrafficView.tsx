@@ -103,7 +103,7 @@ export function TrafficView({ initialCameras, profile }: Props) {
           emission={emissionPaint}
         />
 
-        <div className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2 overflow-x-auto p-1">
+        <div className="map-panel absolute top-3 left-1/2 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-2 overflow-x-auto p-1 lg:max-w-[calc(100%-47rem)]">
           <div role="group" aria-label="Lapisan peta" className={group}>
             {LAYERS.map((item) => (
               <button key={item.id} type="button" aria-pressed={item.id === layer} onClick={() => setLayer(item.id)} className={button(item.id === layer)}>

@@ -62,7 +62,7 @@ def test_heavy_rain_alert_names_the_wettest_areas_first():
     alert = alerts.rain_alert(_weather(G1=3.0, G2=12.4, G5=24.6), already_active=False)
     assert alert.level == "waspada"  # puncak di atas 20 mm
     assert alert.camera_id is None
-    assert alert.message == "Prakiraan hujan hingga 25 mm dalam 3 jam ke depan di Wilayah G5, Wilayah G2."
+    assert alert.message == "Prakiraan hujan hingga 24,6 mm dalam 3 jam ke depan di Wilayah G5, Wilayah G2."
     assert alert.data["grids"] == {"G5": 24.6, "G2": 12.4}
 
 

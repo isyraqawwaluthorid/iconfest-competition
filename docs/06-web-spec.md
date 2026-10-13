@@ -158,6 +158,10 @@ Yang sengaja **tidak** diambil, karena datanya tidak kita punya: tinggi air dala
 
 - Halaman `/`, `/peta`, `/air`, `/lalu-lintas`, `/kamera/[id]`, `/riwayat` berfungsi dengan data nyata.
 
+## Sampah perairan ditonjolkan (13 Okt)
+
+Penilaian sampah berasal dari panggilan AI yang sama dengan status air, jadi tidak menambah biaya. Supaya terlihat: (1) tema peta keempat di Beranda, "Sampah perairan" (kecamatan berwarna tingkat sampah tertinggi di lokasinya; lokasi bersampah banyak diberi pin besar berlabel); (2) baris di panel kiri Beranda yang menyebut jumlah dan nama lokasi bersampah banyak, dan membuka tema itu saat diklik; (3) blok "Sampah di perairan" di halaman Air; (4) keterangan di rincian lokasi dan di panel kecamatan. Semua memakai status sampah resmi (dihaluskan), dan selalu disebut sebagai tingkat hasil penilaian AI, bukan ukuran berat atau volume.
+
 ## Halaman Ruang Publik (13 Okt)
 
 `/ruang-publik`, dengan menu sendiri karena isinya tidak ada di Beranda. Satu kartu per tempat (`lib/public-places.ts`: Kota Lama dan Balai Kota, ditentukan dari titik pusat dan radius), menjawab "seberapa ramai sekarang dibanding biasanya": pejalan kaki terlihat sekarang (jumlah dari semua sudut kamera yang hidup), rata-rata pada jam yang sama dari profil aktivitas worker, tingkat sepi / biasa / ramai / sangat ramai (di bawah 10 orang tidak disebut ramai), pola 24 jam, dan dua gambar kamera sebagai bukti. Tempat baru hanya ditambahkan setelah kameranya diperiksa menghadap ruang pejalan kaki. Komponen: `components/crowd/PublicSpacesView.tsx`.
