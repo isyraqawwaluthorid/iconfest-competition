@@ -49,7 +49,7 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 
 | Tugas | Jadwal | Keadaan | Dampak bila terus tertunda |
 |---|---|---|---|
-| **T2.10** Deploy ke Vercel | Min 11 Okt | Belum; ditunda pemilik proyek 12 Okt | Juri membuka tautan, bukan `localhost`. Paling berisiko bila dikerjakan mendekati tenggat |
+| **T2.10** Deploy ke Vercel | Min 11 Okt | Belum; **dijadwalkan pemilik proyek Rabu 14 Okt siang** | Juri membuka tautan, bukan `localhost`. Paling berisiko bila dikerjakan mendekati tenggat |
 | **T3.10** Uji klasifikasi malam | Sen 12 Okt | Sebagian | Akurasi malam belum pernah diperiksa terhadap penilaian manusia |
 | **T3.11** Foto referensi malam | Sen 12 Okt | Tinggal satu: Banger-IN (bukan unggulan). Dua lainnya disimpan 12 Okt pukul 18.27 | Tidak ada dampak selama Banger-IN tidak dinilai AI |
 | **T0.6** Email izin ke Diskominfo | sebelum 10 Okt | Belum [M] | Dasar pemanfaatan data untuk laporan |
@@ -89,7 +89,7 @@ Heksagon aktivitas ikut mulai dari nol dan terisi semua jam lagi pada Rabu malam
 | **TX.6** Keputusan: emisi kg/jam untuk final? | setelah 16 Okt | Butuh rekaman klip dan hitungan manual pada 5 kamera. Yang ada sekarang estimasi relatif saja |
 | **Rutin** Menilai kalibrasi | tiap sesi | Lihat bagian "Perlu dilihat" dari `calibration_check.py`; asisten mengingatkan di awal tiap sesi |
 | **T3.13** Melihat sekilas tiga kalibrasi yang diubah asisten 12 Okt | tidak mendesak | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; sudah diuji, cadangan tersedia |
-| **T2.10** Akun Vercel dan langkah deploy | Sel 13 Okt | Dipandu langkah demi langkah |
+| **T2.10** Akun Vercel dan langkah deploy | **Rab 14 Okt siang** | Dipandu langkah demi langkah (±20 menit). Butuh login GitHub `randymuflih` (pemilik repo). Pemeriksaan pra-deploy 13 Okt: build lolos, tidak ada rahasia di bundel klien maupun di git. **Ganti `ADMIN_PASSWORD` dengan sandi yang kuat saat mengisi variabel di Vercel** (yang sekarang hanya 8 karakter) |
 | **T4.4** (opsional) Memastikan tiga pasangan hulu–hilir yang meragukan | kapan saja | Empat pasangan rumah pompa sudah berjalan; tiga lainnya butuh pengetahuan aliran setempat |
 | **T0.6** Email izin ke Diskominfo | Rab 14 Okt | |
 | **T6.6, T6.7, T6.8** Laporan, video demo, surat bermaterai | Kam 15 Okt | Kerangka di `09-demo-evaluation-report.md`; siapkan materai |
