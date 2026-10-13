@@ -13,11 +13,11 @@ const STEPS = [
   },
   {
     title: "Membaca gambar",
-    body: "Di kamera jalan, kendaraan dihitung oleh model deteksi yang berjalan di mesin sendiri. Di lokasi air, AI menilai posisi muka air terhadap garis acuan dan foto kondisi normal, hanya saat gambarnya berubah, saat hujan, atau tiap 30 menit.",
+    body: "Di kamera jalan dan ruang publik, kendaraan dan pejalan kaki dihitung oleh model deteksi yang berjalan di mesin sendiri. Di lokasi air, AI menilai posisi muka air terhadap garis acuan dan foto kondisi normal, sekaligus tingkat sampah yang terlihat, hanya saat gambarnya berubah, saat hujan, atau tiap 30 menit.",
   },
   {
     title: "Memutuskan dengan aturan",
-    body: "Penilaian AI tidak langsung menjadi status. Status resmi baru naik setelah dua penilaian sepakat, dan baru turun setelah tiga. Skor risiko, peringatan, dan tingkat keseluruhan dihitung dengan aturan yang terbuka.",
+    body: "Penilaian AI tidak langsung menjadi status. Status air resmi baru naik setelah dua penilaian sepakat, dan baru turun setelah tiga; sampah baru disebut banyak bila empat dari enam penilaian terakhir sepakat. Skor risiko, peringatan, dan tingkat keseluruhan dihitung dengan aturan yang terbuka.",
   },
   {
     title: "Menjelaskan",
@@ -28,9 +28,12 @@ const STEPS = [
 const LIMITS = [
   "Tidak mengukur tinggi air dalam sentimeter. Yang ada adalah status (normal, waspada, siaga, awas) dari penilaian visual terhadap garis acuan.",
   "Tidak menghitung kendaraan secara presisi dan tidak mengukur kecepatan. Kepadatan adalah indeks relatif: dibanding titik itu sendiri pada jam yang sama di hari-hari sebelumnya. Sepeda motor, terutama malam hari, banyak yang tidak terdeteksi.",
+  "Sampah di perairan dinilai dalam tiga tingkat (tidak terlihat, sedikit, banyak) dari gambar kamera. Itu bukan ukuran berat atau volume sampah.",
+  "Keramaian ruang publik adalah pejalan kaki yang terlihat kamera, bukan jumlah pengunjung, dan hanya untuk tempat yang kameranya menghadap ruang pejalan kaki. Di kamera jalan hitungan orang tidak dipakai, karena pengendara motor sering ikut terhitung.",
+  "Beban emisi di halaman Lalu lintas adalah estimasi relatif untuk membandingkan ruas, bukan pengukuran udara dan bukan berat emisi. Warna jalan yang tidak punya kamera adalah perkiraan dari kamera terdekat.",
   "Prakiraan hujan berasal dari model cuaca Open-Meteo, bukan pengukuran di lokasi.",
   'Wilayah tanpa kamera tidak diketahui kondisinya, dan ditandai "tidak terpantau", bukan aman.',
-  "Sejak sistem berjalan (10 Oktober 2026) belum pernah ada kejadian air naik yang nyata. Aturan dan peringatannya sudah diuji, tetapi ketepatan AI membaca gambar saat banjir sungguhan belum terbukti.",
+  "Sejak sistem berjalan (10 Oktober 2026) belum pernah ada kejadian air naik yang nyata. Aturan dan peringatannya sudah diuji, tetapi ketepatan AI membaca gambar saat banjir sungguhan belum terbukti. AI pernah salah baca: pada 13 Oktober sistem sempat mengeluarkan satu peringatan yang keliru, yang lalu ditelusuri, diperbaiki di aturannya, dan dihapus dari riwayat.",
   "Ketepatan penilaian pada malam hari belum dievaluasi terhadap penilaian manusia.",
   "Hubungan hulu–hilir baru diisi untuk sisi masuk dan keluar empat rumah pompa, dengan jeda waktu yang masih perkiraan awal.",
 ];
@@ -50,9 +53,9 @@ export default function AboutPage() {
         <header>
           <h1 className="text-3xl font-bold">Tentang SemarSight</h1>
           <p className="mt-3 text-base">
-            SemarSight memakai CCTV publik Kota Semarang sebagai sensor kota: membaca kondisi air (sungai, pompa, genangan) dan kepadatan
-            lalu lintas, lalu menghubungkannya dengan prakiraan hujan untuk memberi peringatan dan saran yang bisa ditindaklanjuti. Kamera
-            adalah buktinya; yang ditonjolkan adalah kondisi wilayah.
+            SemarSight memakai CCTV publik Kota Semarang sebagai sensor kota: membaca kondisi air (sungai, pompa, genangan), sampah di
+            perairan, kepadatan lalu lintas, dan keramaian ruang publik, lalu menghubungkannya dengan prakiraan hujan untuk memberi
+            peringatan dan saran yang bisa ditindaklanjuti. Kamera adalah buktinya; yang ditonjolkan adalah kondisi wilayah.
           </p>
           <Suspense fallback={null}>
             <Coverage />

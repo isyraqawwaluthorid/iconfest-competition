@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
@@ -17,7 +18,10 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
             Mosaik
           </Link>
         </nav>
-        <LogoutButton />
+        {/* Tombol ini membaca alamat halaman, jadi dirender di browser dan dibungkus Suspense. */}
+        <Suspense fallback={null}>
+          <LogoutButton />
+        </Suspense>
       </div>
       {children}
     </div>

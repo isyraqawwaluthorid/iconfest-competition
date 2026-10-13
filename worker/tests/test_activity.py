@@ -45,3 +45,17 @@ def test_written_once_then_again_after_an_hour():
     profile.mark_written(NOON_WIB)
     assert not profile.due(NOON_WIB + timedelta(minutes=55))
     assert profile.due(NOON_WIB + timedelta(hours=1))
+
+
+def test_the_usual_crowd_leaves_out_today():
+    profile = Profile()
+    _hour(profile, NOON_WIB, 30, 30)  # hari ini, jam yang sedang berjalan
+    snapshot = profile.snapshot(NOON_WIB + timedelta(minutes=50))
+    assert snapshot["usual_days"] == 0
+    assert snapshot["cameras"]["cam"]["persons"][12] == 30.0
+    assert snapshot["cameras"]["cam"]["persons_usual"][12] is None  # belum ada hari lain: tidak ada pembanding
+    _hour(profile, NOON_WIB - timedelta(days=1), 10, 10)
+    _hour(profile, NOON_WIB - timedelta(days=2), 10, 20)
+    snapshot = profile.snapshot(NOON_WIB + timedelta(minutes=50))
+    assert snapshot["usual_days"] == 2
+    assert snapshot["cameras"]["cam"]["persons_usual"][12] == 15.0

@@ -120,13 +120,14 @@ function levelOf(now: number, usual: number | null): CrowdLevel {
 function measure(members: CameraOverview[], profile: ActivityProfile | null, hour: number): CrowdMeasure {
   const cameras = [...members].sort((a, b) => (b.person_count ?? 0) - (a.person_count ?? 0) || a.name.localeCompare(b.name));
   const live = cameras.filter(isOnline);
-  const hourly = Array.from({ length: 24 }, (_, h) => {
-    const values = cameras.flatMap((camera) => profile?.cameras[camera.id]?.persons[h] ?? []);
-    // Jam dihitung hanya bila setidaknya separuh kamera punya datanya, supaya jumlahnya tidak tampak kecil karena data kurang.
-    return values.length > 0 && values.length * 2 >= cameras.length ? values.reduce((sum, value) => sum + value, 0) : null;
-  });
+  // Jam dihitung hanya bila setidaknya separuh kamera punya datanya, supaya jumlahnya tidak tampak kecil karena data kurang.
+  const summed = (values: number[]) =>
+    values.length > 0 && values.length * 2 >= cameras.length ? values.reduce((sum, value) => sum + value, 0) : null;
+  // Pola per jam memuat hari ini; hanya untuk digambar.
+  const hourly = Array.from({ length: 24 }, (_, h) => summed(cameras.flatMap((camera) => profile?.cameras[camera.id]?.persons[h] ?? [])));
   const now = live.reduce((sum, camera) => sum + (camera.person_count ?? 0), 0);
-  const usual = live.length > 0 ? hourly[hour] : null;
+  // Pembanding hanya dari hari-hari sebelum hari ini: rata-rata yang memuat jam ini sendiri bukan pembanding.
+  const usual = live.length > 0 ? summed(cameras.flatMap((camera) => profile?.cameras[camera.id]?.persons_usual?.[hour] ?? [])) : null;
   return { cameras, online: live.length, now, usual, level: live.length === 0 ? "tidak_diketahui" : levelOf(now, usual), hourly };
 }
 
@@ -152,7 +153,7 @@ export function placeViews(cameras: CameraOverview[], profile: ActivityProfile |
           .filter((group) => group.members.length > 0)
           .map((group) => ({ name: group.name, ...measure(group.members, profile, hour) }))
           .sort((a, b) => b.now - a.now),
-        provisional: (profile?.days ?? 0) < MIN_DAYS,
+        provisional: (profile?.usual_days ?? 0) < MIN_DAYS,
         latest: members.reduce<string | null>((max, c) => (c.latest_snapshot_at && (!max || c.latest_snapshot_at > max) ? c.latest_snapshot_at : max), null),
       },
     ];

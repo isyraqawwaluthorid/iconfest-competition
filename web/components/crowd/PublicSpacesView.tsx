@@ -108,7 +108,7 @@ export function PublicSpacesView({ initialCameras, profile }: Props) {
           <div className="grid gap-4 lg:grid-cols-2">
             {places.map((place, index) => (
               // Tempat teramai mendapat lebar penuh, supaya titik-titiknya muat berdampingan.
-              <PlaceCard key={place.id} place={place} hour={hour} days={profile?.days ?? 0} wide={index === 0} />
+              <PlaceCard key={place.id} place={place} hour={hour} days={profile?.usual_days ?? 0} wide={index === 0} />
             ))}
           </div>
         </>
@@ -167,11 +167,14 @@ function PlaceCard({ place, hour, days, wide }: { place: PlaceView; hour: number
           <p className="mt-3 text-sm">
             <span className="font-display text-3xl font-bold tabular-nums">{place.now}</span> pejalan kaki terlihat sekarang,
             dijumlahkan dari {place.online} sudut kamera
-            {place.usual !== null ? `; biasanya sekitar ${formatNumber(place.usual, 0)} pada pukul ${hourRange(hour)}.` : "."}
+            {place.usual !== null ? `; pada hari-hari sebelumnya rata-rata ${formatNumber(place.usual, 0)} pada pukul ${hourRange(hour)}.` : "."}
           </p>
         )}
         {place.online > 0 && place.usual === null ? (
-          <p className="mt-1 text-xs">Belum ada pembanding untuk jam ini, jadi belum bisa disebut sepi atau ramai.</p>
+          <p className="mt-1 text-xs">
+            Belum ada data jam ini dari hari sebelumnya, jadi belum bisa disebut sepi atau ramai. Pembanding muncul setelah sehari
+            data.
+          </p>
         ) : null}
         {place.usual !== null && place.provisional ? (
           <p className="mt-1 text-xs">Pembanding masih sementara ({days} hari data), jadi hari yang sekadar lebih ramai bisa terbaca ramai.</p>
@@ -181,7 +184,7 @@ function PlaceCard({ place, hour, days, wide }: { place: PlaceView; hour: number
       <div className="space-y-4 p-4 text-sm">
         <div className={wide ? "lg:max-w-xl" : ""}>
           <p className="text-xs font-semibold text-muted">
-            Pola 24 jam{peak !== null ? `: biasanya paling ramai pukul ${hourRange(peak)}` : ""}
+            Pola 24 jam{peak !== null ? `: sejauh ini paling ramai pukul ${hourRange(peak)}` : ""}
           </p>
           {hasPattern ? (
             <HourBars values={place.hourly} max={max} hour={hour} label={`Rata-rata pejalan kaki terlihat di ${place.name} per jam`} />

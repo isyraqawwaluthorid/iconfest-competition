@@ -6,7 +6,7 @@ Proyek lomba **ICONFEST 2026, Software Development, tema Smart City**.
 
 ![Beranda: peta kondisi per kecamatan dengan panel kondisi kota dan ringkasan AI](docs/img/beranda.png)
 
-> **Status (12 Oktober 2026).** Worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI. Status, tren, skor risiko, hubungan hulu–hilir, peringatan, pencatatan kejadian, dan ringkasan AI berjalan. Web berjalan lokal dan belum di-deploy. Sejak sistem berjalan (10 Oktober) belum pernah ada kejadian air naik yang nyata, jadi alur kejadian diperlihatkan lewat halaman simulasi. Progres rinci: [docs/10-tasklist.md](docs/10-tasklist.md).
+> **Status (13 Oktober 2026).** Worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI. Status air, tren, skor risiko, hubungan hulu–hilir, tingkat sampah di perairan, peringatan, pencatatan kejadian, indeks kepadatan lalu lintas, keramaian ruang publik, insight lintas modul, dan ringkasan AI berjalan. Web berjalan lokal dan belum di-deploy. Sejak sistem berjalan (10 Oktober) belum pernah ada kejadian air naik yang nyata, jadi alur kejadian diperlihatkan lewat halaman simulasi. Progres rinci: [docs/10-tasklist.md](docs/10-tasklist.md).
 
 ## Yang dilakukan sistem
 
@@ -141,7 +141,7 @@ Cara menyiapkan mesin baru, memindahkan worker, dan masalah yang pernah terjadi 
 
 ```bash
 cd worker
-pytest                                             # 203 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
+pytest                                             # 204 unit test: aturan, peringatan, kejadian, insight, lintas modul, ruas jalan
 python scripts/status.py                           # detak worker, 20 lokasi air, peringatan, jeda data
 python scripts/calibration_check.py                # kalibrasi tiap kamera air; yang perlu dilihat ditulis lebih dulu
 python scripts/replay_readings.py --all 3          # nilai ulang gambar bukti tersimpan dengan kalibrasi dan prompt saat ini

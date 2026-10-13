@@ -296,6 +296,7 @@ Implementasinya berupa penyelarasan sekali per siklus (`alerts.sync`): aturan me
 ### Profil aktivitas (`fusion/activity.py`, sejak 12 Okt)
 - Rata-rata kendaraan dan orang yang terlihat per gambar, per kamera, per jam dalam sehari (WIB). Diisi dari `traffic_readings` 14 hari terakhir saat worker mulai (bersama riwayat pembanding), lalu ditambah tiap siklus; gambar berkualitas `poor` tidak ikut.
 - Ditulis ke `system_status` (key `activity_profile`) saat worker mulai dan tiap jam. Jam dengan kurang dari 6 gambar ditulis `null`, bukan nol. Ukurannya ±26 KB untuk 80 kamera.
+- Untuk keramaian ruang publik profil juga memuat `persons_usual` per kamera (rata-rata per jam **tanpa hari ini**) dan `usual_days`; hanya itu yang boleh dipakai sebagai pembanding keadaan sekarang.
 - Dipakai lapisan "Aktivitas per jam" di `/lalu-lintas`. Hitungan orang ikut memuat pengendara sepeda motor.
 
 ### Ruas jalan (`roads.py`, `scripts/build_road_segments.py`, sejak 12 Okt)

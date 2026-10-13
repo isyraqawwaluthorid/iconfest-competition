@@ -25,6 +25,9 @@ class Profile:
         self._vehicles: dict[str, list[float]] = defaultdict(lambda: [0.0] * HOURS)
         self._persons: dict[str, list[float]] = defaultdict(lambda: [0.0] * HOURS)
         self._samples: dict[str, list[int]] = defaultdict(lambda: [0] * HOURS)
+        # Hitungan orang juga disimpan per hari, supaya "biasanya" untuk keramaian bisa dihitung tanpa hari ini:
+        # membandingkan keadaan sekarang dengan rata-rata yang memuat jam ini sendiri tidak berarti apa-apa.
+        self._persons_by_day: dict[str, dict[str, tuple[list[float], list[int]]]] = defaultdict(dict)
         self._days: set[str] = set()
         self._first: datetime | None = None
         self._written_at: datetime | None = None
@@ -34,7 +37,11 @@ class Profile:
         self._vehicles[camera_id][local.hour] += vehicles
         self._persons[camera_id][local.hour] += persons
         self._samples[camera_id][local.hour] += 1
-        self._days.add(local.date().isoformat())
+        day = local.date().isoformat()
+        totals, counts = self._persons_by_day[camera_id].setdefault(day, ([0.0] * HOURS, [0] * HOURS))
+        totals[local.hour] += persons
+        counts[local.hour] += 1
+        self._days.add(day)
         if self._first is None or at < self._first:
             self._first = at
 
@@ -51,14 +58,25 @@ class Profile:
         def averages(totals: list[float], samples: list[int]) -> list[float | None]:
             return [round(total / n, 1) if n >= MIN_SAMPLES else None for total, n in zip(totals, samples)]
 
+        today = now.astimezone(WIB).date().isoformat()
+
+        def usual(camera_id: str) -> list[float | None]:
+            """Rata-rata orang per jam dari hari-hari sebelum hari ini."""
+            earlier = [bucket for day, bucket in self._persons_by_day[camera_id].items() if day != today]
+            totals = [sum(bucket[0][hour] for bucket in earlier) for hour in range(HOURS)]
+            counts = [sum(bucket[1][hour] for bucket in earlier) for hour in range(HOURS)]
+            return averages(totals, counts)
+
         return {
             "generated_at": now.isoformat(timespec="seconds"),
             "since": self._first.isoformat(timespec="seconds") if self._first else None,
             "days": len(self._days),
+            "usual_days": len(self._days - {today}),  # hari yang menyumbang `persons_usual`
             "cameras": {
                 camera_id: {
                     "vehicles": averages(self._vehicles[camera_id], samples),
                     "persons": averages(self._persons[camera_id], samples),
+                    "persons_usual": usual(camera_id),
                 }
                 for camera_id, samples in sorted(self._samples.items())
             },

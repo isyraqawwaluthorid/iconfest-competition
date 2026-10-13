@@ -15,7 +15,14 @@ export const activityProfileSchema = z.object({
   generated_at: z.string(),
   since: z.string().nullable(),
   days: z.number(),
-  cameras: z.record(z.string(), z.object({ vehicles: hourly, persons: hourly })),
+  /** Hari sebelum hari ini yang menyumbang `persons_usual`. Kosong pada profil yang ditulis worker versi lama. */
+  usual_days: z.number().optional(),
+  cameras: z.record(
+    z.string(),
+    // `persons_usual`: rata-rata orang per jam TANPA hari ini, satu-satunya yang boleh dipakai sebagai pembanding
+    // keadaan sekarang. `persons` memuat hari ini dan hanya untuk menggambar pola.
+    z.object({ vehicles: hourly, persons: hourly, persons_usual: hourly.optional() }),
+  ),
 });
 
 export type ActivityProfile = z.infer<typeof activityProfileSchema>;
