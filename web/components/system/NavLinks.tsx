@@ -11,10 +11,11 @@ const NAV = [
   { href: "/simulasi", label: "Simulasi" },
   { href: "/tentang", label: "Tentang" },
 ];
-// Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah.
+// Kamera adalah bukti pendukung, bukan tampilan utama, jadi dikelompokkan terpisah di belakang garis pemisah.
+// Kelompok ini tidak diberi tulisan judul: tulisan di antara menu terbaca sebagai halaman tersendiri.
 const SOURCES = [
-  { href: "/kamera", label: "Kamera" },
-  { href: "/mosaik", label: "Mosaik" },
+  { href: "/kamera", label: "Peta kamera" },
+  { href: "/mosaik", label: "Galeri kamera" },
 ];
 
 // Halaman rincian yang dibuka dari Beranda dan tidak punya menu sendiri; saat dibuka, menu Beranda tetap menyala.
@@ -46,7 +47,7 @@ export function NavLinks() {
     // Di layar sempit menu menjadi satu baris yang bisa digeser, supaya tidak memakan tiga baris di atas peta.
     <nav aria-label="Navigasi utama" className="flex max-w-full items-center gap-1 overflow-x-auto lg:flex-wrap">
       {NAV.map(link)}
-      <span className="label-caps mx-2 shrink-0 whitespace-nowrap text-muted">Sumber data</span>
+      <span aria-hidden className="mx-2 h-5 w-px shrink-0 bg-border" />
       {SOURCES.map(link)}
     </nav>
   );
