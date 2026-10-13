@@ -2,7 +2,7 @@
 
 Dokumen acuan untuk memantau progres: apa yang sudah selesai, apa yang tertinggal, dan apa yang dikerjakan berikutnya. Turunan rinci dari `08-roadmap.md`; urutan kerja mengikuti `15-pengantar-lanjutan.md`.
 
-**Terakhir diperbarui: Selasa, 13 Oktober 2026, 16.45 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
+**Terakhir diperbarui: Selasa, 13 Oktober 2026, 17.15 WIB.** Diperbarui setiap kali satu bagian pekerjaan selesai.
 
 Cara membaca:
 - `[x]` selesai dan ada buktinya. `[ ]` belum selesai.
@@ -14,16 +14,16 @@ Cara membaca:
 
 | Bagian | Selesai | Sebagian | Belum | Jadwal semula |
 |---|---|---|---|---|
-| Fase 0 — Prasyarat | 5 dari 7 | – | 2 (manual) | sebelum 10 Okt |
+| Fase 0 — Prasyarat | 6 dari 7 | – | 1 (manual) | sebelum 10 Okt |
 | Fase 1 — Worker dasar dan perekaman | 15 dari 16 | – | 1 (belum perlu) | Sab 10 Okt |
 | Fase 2 — Lalu lintas, web dasar, deploy | 13 dari 14 | – | 1 | Min 11 Okt |
 | Fase 3 — Modul air | 12 dari 15 | 2 | 1 (manual) | Sen 12 Okt |
 | Fase 4 — Fusi dan insight | 8 dari 9 | 1 | 0 | Sel 13 Okt |
 | Fase 5 — Kelengkapan dan keandalan | 4 dari 8 | 2 | 2 | Rab 14 Okt |
-| Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | – | 7 | Kam 15 Okt |
+| Fase 6 — Evaluasi, dokumen, video | 1 dari 8 | 1 | 6 | Kam 15 Okt |
 | Fase 7 — Pengumpulan | 0 dari 4 | – | 4 | Jum 16 Okt |
 | Arah visual (TV) | 7 dari 8 | – | 1 | – |
-| **Jumlah inti** | **65 dari 89 (73%)** | **5** | **19** | |
+| **Jumlah inti** | **66 dari 89 (74%)** | **6** | **17** | |
 | Fitur tambahan (TX) | 2 dari 9 | – | 7 | setelah inti |
 
 Hitungan per tugas di atas tidak sama dengan "progres 75%" versi lomba. Ukuran yang dipakai `08-roadmap.md` adalah: pipeline berjalan nyata dari kamera sampai web, modul air dan lalu lintas aktif, insight dan peringatan muncul, dan deploy publik stabil. Dari empat hal itu, **tiga sudah terpenuhi; yang belum adalah deploy publik.**
@@ -53,7 +53,6 @@ Tugas yang hari jadwalnya sudah lewat atau jatuh hari ini, dan belum selesai:
 | **T3.10** Uji klasifikasi malam | Sen 12 Okt | Sebagian | Akurasi malam belum pernah diperiksa terhadap penilaian manusia |
 | **T3.11** Foto referensi malam | Sen 12 Okt | Tinggal satu: Banger-IN (bukan unggulan). Dua lainnya disimpan 12 Okt pukul 18.27 | Tidak ada dampak selama Banger-IN tidak dinilai AI |
 | **T0.6** Email izin ke Diskominfo | sebelum 10 Okt | Belum [M] | Dasar pemanfaatan data untuk laporan |
-| **T0.7** Jam tenggat dan template laporan | sebelum 10 Okt | Belum [M] | Laporan tidak bisa disusun tanpa template |
 
 ## 4. Rencana sampai tenggat
 
@@ -92,7 +91,6 @@ Heksagon aktivitas ikut mulai dari nol dan terisi semua jam lagi pada Rabu malam
 | **T3.13** Melihat sekilas tiga kalibrasi yang diubah asisten 12 Okt | tidak mendesak | KP.Kali-OUT, Kartini-OUT, IPdome-Polder Tawang; sudah diuji, cadangan tersedia |
 | **T2.10** Akun Vercel dan langkah deploy | Sel 13 Okt | Dipandu langkah demi langkah |
 | **T4.4** (opsional) Memastikan tiga pasangan hulu–hilir yang meragukan | kapan saja | Empat pasangan rumah pompa sudah berjalan; tiga lainnya butuh pengetahuan aliran setempat |
-| **T0.7** Jam tenggat dan template laporan dari panitia | Sel 13 Okt | CP Software Development ada di `MULAI-DI-SINI.md` |
 | **T0.6** Email izin ke Diskominfo | Rab 14 Okt | |
 | **T6.6, T6.7, T6.8** Laporan, video demo, surat bermaterai | Kam 15 Okt | Kerangka di `09-demo-evaluation-report.md`; siapkan materai |
 | **T7.3, T7.4** Repo publik; ganti kunci Supabase dan sandi admin | Kam 15 Okt | Setelah mengganti kunci, `.env` di PC dan variabel di Vercel ikut diperbarui |
@@ -110,7 +108,7 @@ Heksagon aktivitas ikut mulai dari nol dan terisi semua jam lagi pada Rabu malam
 - [x] **T0.4 [M]** Salin `.env.example` → `.env`, isi `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_*`, `SUPABASE_STORAGE_BUCKET`.
 - [x] **T0.5 [M]** Buat API key OpenAI khusus proyek (masa berlaku 30 hari, lewat final 26 Okt). Pastikan auto recharge mati agar pengeluaran tidak melewati kredit.
 - [ ] **T0.6 [M]** Kirim email permohonan izin ke Diskominfo Kota Semarang.
-- [ ] **T0.7 [M]** Tanyakan jam batas pengumpulan 16 Okt dan template laporan ke panitia.
+- [x] **T0.7 [M]** Jam batas pengumpulan dan template laporan. Selesai 13 Okt: batas pengumpulan Jumat 16 Okt pukul 23.59 WIB dan penjurian 16–25 Okt (dari pemilik proyek); template resmi (`TEMPLATE SOFTWARE DEVELOPMENT.docx`) dan surat pernyataan orisinalitas diunduh dari folder panitia ke `C:\semarsight\laporan-penyisihan\`.
 
 ## Fase 1 — Worker dasar dan perekaman (Sabtu 10 Okt)
 
@@ -243,7 +241,7 @@ Pemeriksaan rutin: `scripts/calibration_check.py` dijalankan di awal tiap sesi k
 - [ ] **T6.3 [K]** `/admin/sistem`: heartbeat, panggilan AI hari ini, error terbaru. Sementara ini tersedia lewat `scripts/status.py`.
 - [ ] **T6.4 [K]** Perbaiki bug kritis saja; bekukan fitur.
 - [x] **T6.5 [K]** README lengkap: arsitektur, cara menjalankan, env, keterbatasan, atribusi data. Selesai 12 Okt: ringkasan dan status, dua tangkapan layar, prinsip rancangan, diagram arsitektur, daftar halaman, cara menjalankan dengan tabel variabel, alat uji, delapan keterbatasan, privasi, dan sumber data. Perlu diperbarui lagi setelah deploy (tautan publik) dan setelah evaluasi akurasi.
-- [ ] **T6.6 [M]** Laporan penyisihan sesuai template panitia (kerangka di `09-demo-evaluation-report.md`).
+- [ ] **T6.6 [M]** Laporan penyisihan sesuai template panitia. **Sebagian** 13 Okt: draf isi lengkap mengikuti bab-bab template ada di `16-draf-laporan-penyisihan.md`, dengan angka sistem per 13 Okt dan sumber untuk angka dari luar. Yang masih harus dikerjakan tim: identitas tim dan NIM, kata pengantar, tautan deploy dan repo, tangkapan layar (ambil Kamis atau Jumat), membaca ulang sumber pustaka, memperbarui angka bertanda `[PERBARUI]`, lalu memindahkannya ke berkas template.
 - [ ] **T6.7 [M]** Rekam video demo.
 - [ ] **T6.8 [M]** Surat pernyataan orisinalitas bermaterai, discan.
 
@@ -308,4 +306,4 @@ Yang paling tidak boleh terlambat, karena tidak bisa dikejar dengan menulis kode
 | 12 Okt | Worker pindah ke PC (T5.5 sebagian), perbaikan unggahan (T1.16); insight dari LLM dan tampilannya (T4.7, TV.5, T4.9); temuan pembanding lalu lintas (T2.14 ditambahkan); tasklist disusun ulang dengan ringkasan, daftar tertinggal, dan rencana |
 | 12 Okt sore | Pemeriksaan salah baca modul air (T3.12, T3.14 selesai; T3.13 menunggu pemilik proyek); tabel kalibrasi dan referensi per kamera ditambahkan; rencana dijadikan urutan kerja, bukan kalender; pembanding lalu lintas per jam (T2.14 selesai); referensi siang empat kamera jalan disimpan; `calibration_check.py` untuk pemeriksaan rutin; hubungan hulu–hilir empat rumah pompa (T4.4 selesai, T4.3 sebagian); garis N IPdome digeser; tren 24 jam di panel kecamatan (TV.4 selesai); halaman simulasi kejadian (T5.4 selesai); linimasa perkembangan dan penanda peta di beranda dan simulasi (TV.8 selesai); pencatatan kejadian dan belajar jeda (T4.5 selesai); halaman Riwayat dengan unduhan CSV (T5.2 selesai); halaman Tentang (T5.3 selesai); penilaian ganda untuk hasil yang naik (T3.15 selesai) setelah indikasi palsu di Banger-SD-IN; garis N Kartini-OUT digeser; README lengkap (T6.5 selesai) |
 | 12 Okt malam | Halaman Lalu Lintas dari video referensi pemilik proyek (T5.1 selesai): ruas jalan berwarna kepadatan, heksagon aktivitas per jam (TX.7), beban emisi relatif (TX.8); aturan "sedikit kendaraan tidak disebut padat"; referensi malam DPU-Mberok2-OUT dan Semarang Indah_IN (T3.11 tinggal Banger-IN); atas masukan pemilik proyek: semua jalan berwarna (tanpa abu-abu), peta dasar berwarna di semua halaman, tombol "Peta gelap", pin kamera yang membesar saat didekati (kamera setempat digabung berangka), kisi heksagon yang memenuhi kota, dan kecamatan tidak terpantau di Beranda tanpa arsiran (garis batas saja) |
-| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2. Insight lintas modul genangan → lalu lintas (T4.6 selesai). Halaman Air (T4.8 selesai, tanpa menu sendiri). Garis W Banger-SD-IN ditambahkan pemilik proyek. Evaluasi hitungan kendaraan (T2.12 selesai): sepeda motor hanya sepertiga yang terhitung. **Model penghitung diganti ke yolo11s pukul 16.29 WIB**; pembanding lalu lintas dikumpulkan ulang |
+| 13 Okt siang | Pemeriksaan awal sesi: worker 291 siklus tanpa jeda dalam 24 jam. **Peringatan palsu pertama** di Semarang Indah_OUT (status resmi "waspada" 12.47 WIB dari dua salah baca saat sinar siang); garis N kamera itu digeser dan diuji ulang. Alur status resmi → peringatan → kejadian untuk pertama kalinya berjalan dengan data langsung; status turun sendiri 14.22 WIB dan baris kejadian palsunya dihapus dari Riwayat atas keputusan pemilik proyek. **Arti garis di prompt AI diselaraskan dengan cara kalibrasi:** waspada berarti air mencapai garis W, bukan melewati N; 104 gambar bukti dinilai ulang dan penilaian naik yang dihitung turun dari 14 menjadi 0–2. Insight lintas modul genangan → lalu lintas (T4.6 selesai). Halaman Air (T4.8 selesai, tanpa menu sendiri). Garis W Banger-SD-IN ditambahkan pemilik proyek. Evaluasi hitungan kendaraan (T2.12 selesai): sepeda motor hanya sepertiga yang terhitung. **Model penghitung diganti ke yolo11s pukul 16.29 WIB**; pembanding lalu lintas dikumpulkan ulang. Template laporan panitia diunduh (T0.7 selesai) dan draf laporan penyisihan ditulis (T6.6 sebagian) |
