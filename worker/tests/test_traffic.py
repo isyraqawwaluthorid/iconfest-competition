@@ -1,5 +1,6 @@
 import pytest
 
+from semarsight_worker.analyzers import traffic
 from semarsight_worker.analyzers.traffic import Counts, Detection, count_detections, inference_size
 
 WIDTH, HEIGHT = 1000, 500
@@ -46,3 +47,30 @@ def test_roi_uses_the_bottom_centre_not_the_box_centre():
 
 def test_incomplete_roi_is_treated_as_no_roi():
     assert count_detections([_box(2, 900, 100)], WIDTH, HEIGHT, {"points": [[0, 0], [1, 1]]}).cars == 1
+
+
+def test_a_person_on_a_motorcycle_is_not_counted_as_a_person():
+    motorcycle = Detection(3, 100, 200, 160, 300)
+    rider = Detection(0, 105, 140, 155, 280)  # kaki di dalam kotak motor, sebagian besar kotaknya menumpuk
+    pedestrian = Detection(0, 400, 150, 440, 300)
+    counts = traffic.count_detections([motorcycle, rider, pedestrian], 960, 540)
+    assert (counts.persons, counts.motorcycles) == (1, 1)
+
+
+def test_at_most_two_riders_per_motorcycle_and_bicycles_count_too():
+    motorcycle = Detection(3, 100, 200, 200, 300)
+    on_it = [Detection(0, 100 + 20 * i, 130, 150 + 20 * i, 290) for i in range(3)]
+    assert traffic.count_detections([motorcycle, *on_it], 960, 540).persons == 1
+    bicycle, cyclist = Detection(1, 500, 200, 560, 300), Detection(0, 505, 120, 555, 290)
+    assert traffic.count_detections([bicycle, cyclist], 960, 540).persons == 0
+
+
+def test_a_person_beside_or_above_a_motorcycle_is_still_a_pedestrian():
+    motorcycle = Detection(3, 100, 200, 160, 300)
+    beside = Detection(0, 170, 140, 210, 300)  # di samping: kakinya di luar kotak motor
+    behind = Detection(0, 110, 60, 150, 190)  # di belakang, lebih jauh: kakinya di atas kotak motor
+    assert traffic.count_detections([motorcycle, beside, behind], 960, 540).persons == 2
+
+
+def test_method_tag_names_the_model_and_the_counting_rules():
+    assert traffic.method_tag("yolo11s.pt") == f"yolo11s.pt/r{traffic.COUNT_RULES}"

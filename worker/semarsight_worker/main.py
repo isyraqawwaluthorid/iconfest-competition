@@ -147,7 +147,7 @@ def run_cycle(
         )  # fmt: skip
 
     database.insert_health_checks([_health_row(r) for r in recordable])
-    database.insert_traffic_readings([_traffic_row(r, settings.yolo_model) for r in recordable if r.traffic])
+    database.insert_traffic_readings([_traffic_row(r, traffic.method_tag(settings.yolo_model)) for r in recordable if r.traffic])
     try:
         water_updates = water_pipeline.commit(recordable, before)
     except Exception:  # noqa: BLE001 - kegagalan modul air tidak boleh menahan status kamera lain
@@ -302,7 +302,8 @@ def refresh_weather(database: Database, weather: dict[str, openmeteo.GridWeather
 def seed_history(history: baseline.History, profile: activity.Profile, database: Database, model_name: str) -> None:
     """Isi riwayat pembanding dan profil aktivitas dari pembacaan 14 hari terakhir, agar tidak mulai dari nol saat restart.
 
-    Hanya pembacaan dari model deteksi yang sedang dipakai; setelah model diganti, pembanding mulai dari nol.
+    Hanya pembacaan dari cara hitung yang sedang dipakai (model deteksi dan versi aturan hitung); setelah salah
+    satunya diganti, pembanding mulai dari nol.
     """
     metric_by_camera = {cam.id: _density_metric(cam) for cam in database.active_cameras()}
     rows = database.recent_traffic(datetime.now(timezone.utc) - baseline.HISTORY, model_name)
@@ -473,7 +474,7 @@ def main(argv: list[str] | None = None) -> int:
     frame_states = acquisition.load_frame_states(state_path)
     history = baseline.History()
     profile = activity.Profile()
-    seed_history(history, profile, database, settings.yolo_model)
+    seed_history(history, profile, database, traffic.method_tag(settings.yolo_model))
     weather: dict[str, openmeteo.GridWeather] = {}
     refresh_weather(database, weather)
     water_pipeline = WaterPipeline(settings, database, weather)
