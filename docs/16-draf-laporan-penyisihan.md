@@ -2,6 +2,8 @@
 
 Draf isi laporan, mengikuti urutan bab pada template resmi panitia (`TEMPLATE SOFTWARE DEVELOPMENT.docx`, diunduh 13 Okt 2026; salinannya di `C:\semarsight\laporan-penyisihan\`). Isi di bawah ini dipindahkan ke template itu.
 
+**Versi Word (14 Okt):** isi draf ini sudah dipindahkan ke template resmi dengan angka per 14 Okt 20.27 WIB, sepuluh gambar, tujuh tabel, daftar isi, dan nomor halaman: `C:\semarsight\laporan-penyisihan\Laporan-Penyisihan-SemarSight.docx` (di luar repo karena memuat identitas tim). Gambar dan alat penyusunnya ada di subfolder `gambar\`. Bagian yang hanya bisa diisi tim disorot kuning. Perubahan isi selanjutnya dikerjakan di berkas Word itu; draf ini tidak lagi menjadi acuan utama.
+
 Cara memakai draf ini:
 - Bagian bertanda `[ISI: …]` hanya bisa diisi tim (nama, NIM, tautan, tangkapan layar).
 - Angka sistem diambil 13 Okt 2026 pukul 16.40 WIB. **Perbarui pada hari pengumpulan** (jalankan `worker/scripts/status.py`); bagian yang perlu diperbarui bertanda `[PERBARUI]`.
