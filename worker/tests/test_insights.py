@@ -321,3 +321,21 @@ def test_a_raised_site_carries_the_traffic_around_it_and_a_calm_site_does_not():
     assert (near["cameras"], near["busier_than_usual"], near["baseline"]) == (2, 1, "per_jam")
     assert near["busiest"]["name"] == "Simpang Satu"
     assert "traffic_nearby" not in by_name["Pompa B"]  # perlu verifikasi, tetapi statusnya tidak naik
+
+
+def test_the_reason_a_site_needs_verification_reaches_the_facts():
+    cameras = [_camera("a", "Pompa A"), _camera("b", "Pompa B")]
+    statuses = {"a": _status(needs_verification=True), "b": _status(needs_verification=True)}
+    latest = {"a": {"captured_at": NOW.isoformat(), "smoothing": {"level": None, "unusable": "gambar terakhir kurang jelas untuk dinilai"}}}
+    facts = insights.build_facts(cameras, statuses, _weather(), [], NOW, None, latest)
+    by_name = {site["name"]: site for site in facts["water"]["attention"]}
+    assert by_name["Pompa A"]["verification_reason"] == "gambar terakhir kurang jelas untuk dinilai"
+    assert "verification_reason" not in by_name["Pompa B"]  # penilaian lama tanpa catatan alasan: tidak ditebak
+
+
+def test_enforce_files_an_item_under_the_module_of_the_cameras_it_names():
+    facts = _facts({"a": _status(trash="banyak"), "b": _status()})
+    trash = _result().items[0].model_copy(update={"title": "Sampah banyak di Pompa A", "module": "ruang_publik", "camera_ids": ["a"]})
+    general = trash.model_copy(update={"title": "Catatan umum", "module": "sistem", "camera_ids": []})
+    checked, _ = insights.enforce(_result(items=[trash, general]), facts)
+    assert [item.module for item in checked.items] == ["air", "sistem"]

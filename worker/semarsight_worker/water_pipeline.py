@@ -147,6 +147,7 @@ class WaterPipeline:
             trash = smoothing.confirm_trash(before.get("trash"), readings)
             outcome = {
                 "level": smoothing.LEVELS[level] if level is not None else None,
+                "unusable": smoothing.unusable_reason(latest, cam.water_kind),  # mengapa penilaian ini tidak dihitung
                 "previous": before.get("water_status"),
                 "confirmed": confirmed,
                 "trash": trash,  # status sampah resmi setelah penilaian ini; penilaian mentahnya ada di kolom `trash`

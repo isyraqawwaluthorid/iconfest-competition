@@ -113,8 +113,15 @@ def build_facts(
         for cam in cameras
         if "water" in cam.modules and statuses.get(cam.id, {}).get("water_status")
     ]
+    def verification(cam: CameraRow, status: dict[str, Any]) -> dict[str, Any]:
+        """Alasan "perlu verifikasi" dari penilaian terakhir, supaya AI menjelaskannya alih-alih menebak."""
+        if not status.get("needs_verification"):
+            return {}
+        reason = (((latest_readings or {}).get(cam.id) or {}).get("smoothing") or {}).get("unusable")
+        return {"verification_reason": reason} if reason else {}
+
     attention = [
-        _water_fact(cam, status, area(cam), weather) | relations(cam) | traffic_around(cam, status)
+        _water_fact(cam, status, area(cam), weather) | verification(cam, status) | relations(cam) | traffic_around(cam, status)
         for cam, status in sites
         if _needs_attention(status)
     ]
@@ -317,6 +324,7 @@ def enforce(result: InsightResult, facts: dict[str, Any]) -> tuple[InsightResult
 
     ceiling = ITEM_CEILING[facts["overall_level"]]
     camera_ids = _camera_ids(facts)
+    water_ids, traffic_ids = _site_ids(facts)
     items, rejected = [], []
     for item in result.items[: MAX_ITEMS_CALM if facts["overall_level"] == "aman" else MAX_ITEMS]:
         text = " ".join([item.title, item.body, item.cause, item.impact, *item.evidence, *(r.action for r in item.recommendations)])
@@ -324,17 +332,40 @@ def enforce(result: InsightResult, facts: dict[str, Any]) -> tuple[InsightResult
         if problems:
             rejected.append(f"{item.title}: {', '.join(problems)}")
             continue
+        kept = [camera_id for camera_id in item.camera_ids if camera_id in camera_ids]
         items.append(
             item.model_copy(
                 update={
                     "level": item.level if ITEM_RANK[item.level] <= ITEM_RANK[ceiling] else ceiling,
-                    "camera_ids": [camera_id for camera_id in item.camera_ids if camera_id in camera_ids],
+                    "camera_ids": kept,
+                    "module": _module_of(item.module, kept, water_ids, traffic_ids),
                 }
             )
         )
     if not items:
         return None, rejected or ["tidak ada item"]
     return result.model_copy(update={"overall_level": facts["overall_level"], "items": items}), rejected
+
+
+def _site_ids(facts: dict[str, Any]) -> tuple[set[str], set[str]]:
+    """Kamera lokasi air dan kamera lalu lintas di fakta. Titik lalu lintas di sekitar lokasi air
+    (`traffic_nearby`) dihitung sebagai lalu lintas, bukan air."""
+    water = facts.get("water") or {}
+    sites = [*water.get("attention", []), *water.get("highest_risk", []), *water.get("trash_heavy", []), *water.get("pending_confirmation", [])]
+    nearby = {site["traffic_nearby"]["busiest"].get("camera_id") for site in sites if (site.get("traffic_nearby") or {}).get("busiest")}
+    return {site["camera_id"] for site in sites if site.get("camera_id")}, _camera_ids(facts.get("traffic") or {}) | (nearby - {None})
+
+
+def _module_of(module: str, camera_ids: list[str], water_ids: set[str], traffic_ids: set[str]) -> str:
+    """Modul item mengikuti kamera yang disebutnya. AI pernah melabeli sampah di saluran sebagai "ruang_publik"
+    (13 Okt). Item lintas modul dan sistem, serta item tanpa kamera, dibiarkan seperti yang ditulis AI."""
+    if not camera_ids or module in ("lintas_modul", "sistem"):
+        return module
+    if all(camera_id in water_ids for camera_id in camera_ids) and not any(camera_id in traffic_ids for camera_id in camera_ids):
+        return "air"
+    if all(camera_id in traffic_ids for camera_id in camera_ids) and not any(camera_id in water_ids for camera_id in camera_ids):
+        return "lalu_lintas"
+    return module
 
 
 def known_numbers(facts: dict[str, Any]) -> list[float]:

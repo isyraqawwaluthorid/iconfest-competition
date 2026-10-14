@@ -123,3 +123,18 @@ def test_lighter_levels_follow_the_majority_and_roads_stay_not_applicable():
     assert smoothing.confirm_trash("sedikit", _trash("tidak_terlihat", "sedikit", "tidak_terlihat", "tidak_terlihat")) == "tidak_terlihat"
     assert smoothing.confirm_trash("tidak_terlihat", _trash("sedikit", "tidak_terlihat")) == "sedikit"  # seri: yang terbaru
     assert smoothing.confirm_trash(None, _trash("tidak_relevan")) == "tidak_relevan"
+
+
+def test_unusable_reason_explains_every_reading_level_of_ignores():
+    reason = smoothing.unusable_reason
+    assert reason(_r("normal"), "sungai") is None
+    assert reason(_r("waspada", confidence=0.7), "sungai") is None
+    assert "kurang jelas" in reason(_r("normal", quality="poor"), "sungai")
+    assert "rendah" in reason(_r("normal", confidence=0.4), "sungai")
+    assert "tidak dapat menilai" in reason(_r("tidak_dapat_dinilai"), "sungai")
+    assert "belum cukup" in reason(_r("awas", confidence=0.6), "pompa_out")
+    contradicting = Reading(status="siaga", road_flood="tidak_relevan", confidence=0.9, quality="good", change_vs_reference="sama")
+    assert "foto kondisi normal" in reason(contradicting, "sungai")
+    # Aturan yang sama dengan level_of: ada alasan berarti tidak dihitung, tanpa alasan berarti dihitung.
+    for reading in [_r("normal"), _r("awas", confidence=0.6), _r("normal", quality="poor"), contradicting, _r("siaga", confidence=0.66)]:
+        assert (reason(reading, "sungai") is None) == (smoothing.level_of(reading, "sungai") is not None)

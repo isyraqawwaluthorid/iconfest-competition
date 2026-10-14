@@ -51,6 +51,12 @@ Aturan WAJIB:
   boleh terdengar lebih genting daripada overall_level.
 - evidence ditulis sebagai kalimat pendek biasa, misalnya "Status siaga sejak 12 Okt 2026 17.20".
   Jangan menulis nama kolom facts, kunci JSON, atau istilah teknis seperti "baseline" dan "trend".
+- module: "air" untuk status air, genangan, dan sampah di sungai, saluran, atau rumah pompa;
+  "lalu_lintas" untuk kepadatan; "lintas_modul" bila item menghubungkan dua modul. Sampah di saluran
+  bukan "ruang_publik".
+- Lokasi yang perlu verifikasi bisa punya verification_reason. Jika ada, pakai sebagai penyebab dengan
+  kata-kata biasa dan rekomendasikan meninjau gambarnya. Jika tidak ada, tulis bahwa penilaian terakhirnya
+  belum bisa dipakai, tanpa menebak sebabnya.
 - Pakai istilah di facts apa adanya: sampah "banyak", status "waspada/siaga/awas", tren "naik cepat".
 - Tulis desimal dengan koma (1,4 mm; skor 0,71).
 - Bahasa Indonesia yang mudah dipahami orang awam, kalimat pendek. Waktu dalam WIB.

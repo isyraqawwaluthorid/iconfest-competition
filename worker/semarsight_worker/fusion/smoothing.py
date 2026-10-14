@@ -43,19 +43,34 @@ class Reading:
 
 def level_of(reading: Reading, water_kind: str | None) -> int | None:
     """Level 0..3 dari satu pembacaan, atau None jika pembacaan itu tidak layak dipakai."""
-    if reading.confidence < MIN_CONFIDENCE or reading.quality == "poor":
-        return None
-    if water_kind == "jalan":
-        level = ROAD_FLOOD_LEVEL.get(reading.road_flood)
-    else:
-        level = LEVELS.index(reading.status) if reading.status in LEVELS else None
+    return None if unusable_reason(reading, water_kind) else _raw_level(reading, water_kind)
+
+
+def unusable_reason(reading: Reading, water_kind: str | None) -> str | None:
+    """Mengapa satu pembacaan tidak dipakai penghalusan, dalam kalimat untuk orang awam; None bila dipakai.
+
+    Dikirim ke insight supaya "perlu verifikasi" bisa dijelaskan, bukan hanya disebut.
+    """
+    if reading.quality == "poor":
+        return "gambar terakhir kurang jelas untuk dinilai"
+    if reading.confidence < MIN_CONFIDENCE:
+        return "keyakinan AI pada penilaian terakhir rendah"
+    level = _raw_level(reading, water_kind)
+    if level is None:
+        return "AI tidak dapat menilai gambar terakhir"
     if level and reading.confidence < MIN_CONFIDENCE_ELEVATED:
-        return None
+        return "penilaian terakhir menyebut kondisi di atas normal, tetapi keyakinannya belum cukup untuk dihitung"
     if level and reading.change_vs_reference in NOT_HIGHER_THAN_REFERENCE:
         # Jawaban yang bertentangan dengan dirinya sendiri: status di atas normal (atau jalan
         # tergenang), tetapi kondisinya dinilai sama dengan foto referensi normal. Tidak dipakai.
-        return None
-    return level
+        return "penilaian terakhir menyebut kondisi di atas normal, tetapi juga menilai gambarnya sama dengan foto kondisi normal"
+    return None
+
+
+def _raw_level(reading: Reading, water_kind: str | None) -> int | None:
+    if water_kind == "jalan":
+        return ROAD_FLOOD_LEVEL.get(reading.road_flood)
+    return LEVELS.index(reading.status) if reading.status in LEVELS else None
 
 
 def confirm_water_status(current: str | None, readings: list[Reading], water_kind: str | None) -> tuple[str | None, bool]:
