@@ -80,7 +80,7 @@ Tugas terjadwal lain:
 - Hasil: `good | fair | poor`. Pembacaan dari gambar `poor` ditandai keyakinan rendah.
 
 ### ③a Penganalisis lalu lintas dan keramaian (YOLO)
-- YOLO11n (Ultralytics), kelas COCO: person(0), bicycle(1), car(2), motorcycle(3), bus(5), truck(7).
+- YOLO11s (Ultralytics; sampai 13 Okt YOLO11n), kelas COCO: person(0), bicycle(1), car(2), motorcycle(3), bus(5), truck(7).
 - Opsional: ROI jalan per kamera (mengabaikan area parkir/trotoar).
 - Simpan jumlah per kelas, total kendaraan, dan total orang.
 
@@ -133,4 +133,4 @@ Jenis: `water_rising`, `upstream_warning`, `heavy_rain`, `road_flooded`, `traffi
 
 - 146 kamera × 288 siklus/hari ≈ 42 ribu frame/hari (disimpan lokal, bukan Storage).
 - AI vision: hanya kamera air terkalibrasi (15–20 untuk penyisihan). Dengan heartbeat 30 menit ≈ 48 panggilan/kamera/hari + pemicu perubahan; perkirakan ±1.500–2.500 panggilan/hari untuk 20 kamera. Pantau biaya harian di dashboard OpenAI dan turunkan frekuensi jika perlu.
-- YOLO11n di CPU: ±75 frame per siklus, cukup dalam beberapa detik sampai puluhan detik.
+- YOLO11s di CPU: ±75 frame per siklus. Diukur 14 Okt dengan worker dibatasi tanpa GPU: satu siklus 98 detik dengan 1 inti dan 54 detik dengan 2 inti (inti PC desktop; vCPU VPS biasanya lebih lambat).

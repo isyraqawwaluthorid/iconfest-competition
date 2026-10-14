@@ -113,7 +113,7 @@ export default function ThematicMap3D({ summaries, theme, sources, pending, sele
         type: "symbol",
         source: "sites",
         filter: ["!=", ["get", "label"], ""],
-        layout: { "text-field": ["get", "label"], "text-font": LABEL_FONT, "text-size": 11, "text-offset": [0, -2.4], "text-anchor": "bottom", "text-allow-overlap": true },
+        layout: { "text-field": ["get", "label"], "text-font": LABEL_FONT, "text-size": 11, "text-variable-anchor": ["bottom", "top", "right", "left"], "text-radial-offset": 1.4, "text-justify": "auto", "symbol-sort-key": ["-", 0, ["get", "r"]] },
         paint: { "text-color": text, "text-halo-color": halo, "text-halo-width": 2 },
       },
     ];

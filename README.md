@@ -12,7 +12,7 @@ Proyek lomba **ICONFEST 2026, Software Development, tema Smart City**.
 
 - **Memantau 146 CCTV publik** tiap 5 menit dan mencatat mana yang hidup, beku, atau mati. Kamera yang tidak terbaca tidak pernah dianggap normal.
 - **Menilai 20 lokasi air.** AI vision membandingkan muka air dengan garis acuan dan foto kondisi normal. Hasilnya status `normal`, `waspada`, `siaga`, atau `awas`, bukan tinggi air dalam cm.
-- **Menghitung kepadatan lalu lintas** dengan YOLO11n yang berjalan lokal, sebagai indeks relatif terhadap titik itu sendiri pada jam yang sama di hari-hari sebelumnya.
+- **Menghitung kepadatan lalu lintas** dengan YOLO11s yang berjalan lokal, sebagai indeks relatif terhadap titik itu sendiri pada jam yang sama di hari-hari sebelumnya.
 - **Menggabungkan dengan prakiraan hujan** Open-Meteo menjadi skor risiko terbuka per lokasi (status 40%, tren 20%, kondisi hulu 20%, hujan 20%).
 - **Memberi peringatan** dari aturan dan template: air naik, jalan tergenang, peringatan dini untuk lokasi hilir, hujan lebat, sampah menumpuk sebelum hujan, dan kamera unggulan tidak terbaca.
 - **Menjelaskan dengan AI.** Kartu berpola Kondisi → Penyebab → Dampak → Tindakan ditulis LLM dari angka dan status, dengan saran per pihak (BPBD, Dinas PU, Dishub, warga).
@@ -40,7 +40,7 @@ flowchart LR
     A[CCTV publik<br/>PANTAUSEMAR] -->|ffmpeg, tiap 5 menit| B[Worker Python]
     W[Open-Meteo] -->|prakiraan hujan| B
     B --> C{Jenis kamera}
-    C -->|jalan| D[YOLO11n lokal<br/>hitung kendaraan]
+    C -->|jalan| D[YOLO11s lokal<br/>hitung kendaraan]
     C -->|air| E[AI vision<br/>status + alasan]
     D --> F[Aturan<br/>pembanding, penghalusan,<br/>tren, risiko, hulu-hilir]
     E --> F
@@ -61,7 +61,7 @@ Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web 
 | `/simulasi` | **Simulasi kejadian.** Skenario air naik delapan langkah di layar yang sama dengan beranda, berlabel "SIMULASI · Bukan data langsung". Hanya masukannya yang buatan; status, peringatan, dan ringkasan AI dihasilkan aturan dan model yang sama dengan sistem. |
 | `/air` | **Kondisi air per lokasi** (dibuka dari Beranda, tanpa menu sendiri). Satu pin per lokasi air berwarna status resminya; rincian tiap lokasi memuat gambar kamera dengan garis acuan, asal skor risikonya, dan hubungan hulu → hilir. |
 | `/lalu-lintas` | **Lalu lintas dari dekat**, tiga lapisan di satu peta. *Ruas jalan*: potongan jalan di sekitar tiap kamera, berwarna tingkat kepadatan dibanding kebiasaannya. *Aktivitas per jam*: heksagon dengan penggeser jam, dari rata-rata hitungan yang sudah terkumpul. *Beban emisi*: estimasi relatif per ruas dari kendaraan terlihat dan faktor emisi resmi, bukan kg per jam. |
-| `/ruang-publik` | **Keramaian ruang publik.** Pejalan kaki yang terlihat di Kota Lama dan Balai Kota dibanding biasanya pada jam yang sama, dengan pola 24 jam dan gambar kamera sebagai bukti. Bukan jumlah pengunjung. |
+| `/ruang-publik` | **Keramaian ruang publik.** Pejalan kaki yang terlihat di Kota Lama, Balai Kota, dan Goa Kreo dibanding biasanya pada jam yang sama, dengan pola 24 jam dan gambar kamera sebagai bukti. Bukan jumlah pengunjung. |
 | `/riwayat` | Kejadian yang tercatat (mulai, puncak, lama) dengan unduhan CSV. |
 | `/tentang` | Cara kerja, batasan, privasi, dan sumber data. |
 | `/kamera/[id]` | **Bukti visual** satu lokasi: gambar terakhir dengan garis acuan, penilaian AI dan alasannya, pembanding kondisi normal, gambar yang dinilai sebelumnya, rincian skor risiko, dan grafik kepadatan. |
