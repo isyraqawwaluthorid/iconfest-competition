@@ -81,11 +81,14 @@ Pada laptop, pengaturan ini hanya berlaku saat tercolok listrik, dan menutup lay
 | Keperluan | Perintah |
 |---|---|
 | Menyalakan worker (jendela sendiri, menyala ulang otomatis) | `powershell -ExecutionPolicy Bypass -File scripts\windows\mulai-worker.ps1` |
+| Mematikan worker dengan rapi (menunggu siklus selesai, jendelanya ikut ditutup) | `powershell -ExecutionPolicy Bypass -File scripts\windows\matikan-worker.ps1` |
 | Memuat ulang worker setelah kodenya berubah | `powershell -ExecutionPolicy Bypass -File scripts\windows\muat-ulang-worker.ps1` |
 | Membangun dan menjalankan web di `localhost:3000` | `powershell -ExecutionPolicy Bypass -File scripts\windows\mulai-web.ps1` |
 | Web mode pengembangan | `cd web; npm run dev` |
 
 Jendela "SemarSight worker - JANGAN DITUTUP" harus tetap terbuka. Kalau tertutup, worker berhenti; jalankan lagi `mulai-worker.ps1`.
+
+**Tanpa mengetik perintah** (untuk pemilik proyek): buka folder `scripts\windows` di File Explorer lalu klik dua kali `Nyalakan worker.cmd`, `Matikan worker.cmd`, atau `Cek worker.cmd`. Web tidak perlu disentuh: setelah dinyalakan, siklus pertama selesai dalam 1–2 menit dan penanda di pojok kiri atas web kembali "Sistem aktif" dengan sendirinya; setelah dimatikan, data terakhir tetap tampil, dan lewat 15 menit penanda berubah menjadi "Data tertunda" disertai banner kuning. Diuji 15 Okt: mati 11.21, menyala 11.22, siklus pertama selesai 11.23 (jam PC).
 
 Membangun web memakai banyak CPU dan bisa membuat pengambilan gambar worker kehabisan waktu. `mulai-web.ps1` sudah menunggu sampai worker diam di antara dua siklus; kalau membangun secara manual, lakukan di luar menit ke-0 sampai ke-2 dari tiap siklus.
 
