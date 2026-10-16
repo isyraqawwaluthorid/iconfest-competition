@@ -359,6 +359,12 @@ h1, h2, h3 {
 .camera-halo.tone-density-ramai { fill: var(--density-ramai); }
 .camera-halo.tone-density-padat { fill: var(--density-padat); }
 .camera-halo.tone-unknown { fill: var(--status-unknown); }
+/* Lapisan Beban emisi: pin ikut warna tingkat beban ruasnya; abu-abu hanya untuk kamera tanpa gambar. */
+.camera-marker.emission-1, .camera-halo.emission-1 { fill: var(--emission-1); }
+.camera-marker.emission-2, .camera-halo.emission-2 { fill: var(--emission-2); }
+.camera-marker.emission-3, .camera-halo.emission-3 { fill: var(--emission-3); }
+.camera-marker.emission-4, .camera-halo.emission-4 { fill: var(--emission-4); }
+.camera-marker.emission-5, .camera-halo.emission-5 { fill: var(--emission-5); }
 .camera-halo.tone-offline { fill: var(--status-offline); }
 
 /* Lapisan "Aktivitas per jam": satu heksagon per kawasan yang punya kamera; tingkat 0 berarti belum ada data. */

@@ -57,7 +57,7 @@ export default function TrafficMap3D({ layer, rows, selected, scope, onSelect, a
         const shown = active ?? members[0];
         return point(center, {
           ids: members.map((row) => row.camera.id).join("|"),
-          color: paint ? grey : toneColor(shown.status.tone),
+          color: paint ? look(shown).color : toneColor(shown.status.tone),
           r: active ? 8.5 : 7,
           stroke: active ? (dark ? "#ffffff" : "#18181b") : "#ffffff",
           count: members.length > 1 ? String(members.length) : "",

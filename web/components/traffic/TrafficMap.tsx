@@ -154,7 +154,7 @@ function Roads({ rows: ordered, selected, onSelect, paint }: RoadsProps) {
     if (!paint) return { line: `tone-${status.tone}`, dot: `tone-${status.tone}`, label: status.label };
     const painted = paint.get(camera.id);
     return painted
-      ? { line: `emission-${painted.level}`, dot: "tone-unknown", label: `beban ${painted.label.toLowerCase()}` }
+      ? { line: `emission-${painted.level}`, dot: `emission-${painted.level}`, label: `beban ${painted.label.toLowerCase()}` }
       : { line: "tone-unknown", dot: "tone-unknown", label: "tidak ada gambar" };
   };
   // Makin dekat, pin dan garis makin besar, supaya pada skala jalan keduanya tetap menonjol di atas peta.
