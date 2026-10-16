@@ -4,9 +4,9 @@ CCTV publik Kota Semarang sebagai sensor kota. SemarSight membaca kondisi **air*
 
 Proyek lomba **ICONFEST 2026, Software Development, tema Smart City**.
 
-![Beranda: peta kondisi per kecamatan dengan panel kondisi kota dan ringkasan AI](docs/img/beranda.png)
+![Beranda: peta kondisi per kecamatan dengan panel kondisi kota dan ringkasan AI](assets/beranda.png)
 
-> **Status (13 Oktober 2026).** Worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI. Status air, tren, skor risiko, hubungan hulu–hilir, tingkat sampah di perairan, peringatan, pencatatan kejadian, indeks kepadatan lalu lintas, keramaian ruang publik, insight lintas modul, dan ringkasan AI berjalan. Web berjalan lokal dan belum di-deploy. Sejak sistem berjalan (10 Oktober) belum pernah ada kejadian air naik yang nyata, jadi alur kejadian diperlihatkan lewat halaman simulasi. Progres rinci: [docs/10-tasklist.md](docs/10-tasklist.md).
+> **Status (16 Oktober 2026).** Worker merekam 146 kamera tiap 5 menit; 20 lokasi air dinilai AI. Status air, tren, skor risiko, hubungan hulu–hilir, tingkat sampah di perairan, peringatan, pencatatan kejadian, indeks kepadatan lalu lintas, keramaian ruang publik, insight lintas modul, dan ringkasan AI berjalan. Sejak sistem berjalan (10 Oktober) belum pernah ada kejadian air naik yang nyata, jadi alur kejadian diperlihatkan lewat halaman simulasi.
 
 ## Yang dilakukan sistem
 
@@ -31,7 +31,7 @@ Proyek lomba **ICONFEST 2026, Software Development, tema Smart City**.
 
 **Hemat.** AI vision dipanggil hanya saat gambar berubah nyata, saat hujan, atau tiap 30 menit, dengan potongan gambar selebar 512 px. LLM teks dipanggil hanya saat keadaan berubah. Satu penilaian air sekitar $0,0003; satu ringkasan sekitar $0,001.
 
-![Simulasi kejadian: status resmi, indikasi awal, peringatan hulu–hilir, dan ringkasan AI](docs/img/simulasi.png)
+![Simulasi kejadian: status resmi, indikasi awal, peringatan hulu–hilir, dan ringkasan AI](assets/simulasi.png)
 
 ## Arsitektur
 
@@ -51,7 +51,7 @@ flowchart LR
     S --> N[Web Next.js]
 ```
 
-Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web membaca Supabase dengan kunci publik dan berlangganan Realtime. Kunci rahasia hanya ada di worker dan di server Next.js. Rinciannya di [docs/02-architecture.md](docs/02-architecture.md).
+Worker berjalan di satu mesin yang menetap (tidak bisa berjalan di Vercel); web membaca Supabase dengan kunci publik dan berlangganan Realtime. Kunci rahasia hanya ada di worker dan di server Next.js.
 
 ## Halaman
 
@@ -75,7 +75,7 @@ Lencana di header menunjukkan apakah worker masih aktif; banner muncul bila work
 ```
 ai/schemas/     JSON schema keluaran AI (penilaian air, insight)
 data/           daftar 146 kamera publik (seed)
-docs/           brief, arsitektur, spesifikasi, catatan keputusan, tasklist
+assets/         gambar untuk README
 scripts/        skrip bantu Windows: menyalakan worker dan web, mencegah mesin tidur
 supabase/       skema database dan seed kamera
 web/            Next.js (App Router), TypeScript, Tailwind, MapLibre GL (peta 3D) + react-leaflet (cadangan), Recharts
@@ -135,7 +135,6 @@ powershell -ExecutionPolicy Bypass -File scripts\windows\muat-ulang-worker.ps1  
 powershell -ExecutionPolicy Bypass -File scripts\windows\mulai-web.ps1           # build lalu jalan di localhost:3000
 ```
 
-Cara menyiapkan mesin baru, memindahkan worker, dan masalah yang pernah terjadi ada di [docs/14-operasional.md](docs/14-operasional.md).
 
 ## Uji dan alat periksa
 
@@ -178,15 +177,3 @@ Hanya CCTV publik milik pemerintah kota yang dipakai; kamera lingkungan RT/RW ti
 | Peta, jalan, dan batas kecamatan | © kontributor [OpenStreetMap](https://www.openstreetmap.org/copyright), lisensi ODbL; peta vektor 3D disajikan [OpenFreeMap](https://openfreemap.org) (skema OpenMapTiles) |
 
 Angka di situs ini adalah perkiraan dari gambar, bukan pengukuran resmi, dan tidak menggantikan informasi dari BPBD atau BMKG.
-
-## Dokumentasi
-
-| Dokumen | Isi |
-|---|---|
-| [docs/01-project-brief.md](docs/01-project-brief.md) | Masalah, solusi, pengguna, nilai unik |
-| [docs/02-architecture.md](docs/02-architecture.md) | Alur dari CCTV sampai web |
-| [docs/05-worker-spec.md](docs/05-worker-spec.md), [docs/06-web-spec.md](docs/06-web-spec.md) | Spesifikasi worker dan web, termasuk yang sudah dibangun |
-| [docs/07-ai-prompts.md](docs/07-ai-prompts.md) | Prompt, schema, dan pemeriksaan keluaran AI |
-| [docs/13-catatan-keputusan.md](docs/13-catatan-keputusan.md) | Keputusan yang diambil beserta alasan dan buktinya, pelajaran kalibrasi |
-| [docs/14-operasional.md](docs/14-operasional.md) | Menyiapkan mesin, menjalankan, memeriksa, memindahkan worker |
-| [docs/10-tasklist.md](docs/10-tasklist.md) | Daftar tugas, progres, dan tabel kalibrasi per kamera |

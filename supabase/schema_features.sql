@@ -1,5 +1,5 @@
 -- =====================================================================
--- SemarSight — tambahan skema untuk fitur di docs/11-feature-backlog.md
+-- SemarSight — tambahan skema untuk fitur lanjutan
 -- Jalankan SETELAH schema.sql. Idempoten (aman dijalankan ulang).
 -- Hanya jalankan bagian untuk fitur yang benar-benar dikerjakan.
 -- =====================================================================

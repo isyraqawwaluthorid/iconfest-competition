@@ -295,7 +295,7 @@ create table if not exists insights (
   scope       text not null check (scope in ('situasi', 'harian', 'mingguan', 'lintas_modul', 'kamera')),
   camera_id   uuid references cameras(id) on delete cascade,
   headline    text not null,
-  body        jsonb not null,     -- output JSON LLM (lihat docs/07-ai-prompts.md)
+  body        jsonb not null,     -- output JSON LLM (lihat ai/schemas/insight.schema.json)
   facts       jsonb not null,     -- data yang dikirim ke LLM (untuk jejak audit)
   model       text,
   source      data_source not null default 'live'

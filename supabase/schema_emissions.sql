@@ -1,5 +1,5 @@
 -- =====================================================================
--- SemarSight — modul Emisi & Kualitas Udara (docs/12-emisi-kualitas-udara.md)
+-- SemarSight — modul Emisi & Kualitas Udara
 -- Jalankan SETELAH schema.sql (dan seed_cameras.sql). Idempoten.
 -- Tidak bergantung pada schema_features.sql.
 -- =====================================================================
@@ -26,7 +26,7 @@ create table if not exists air_quality_readings (
   so2            real,
   o3             real,
   us_aqi         real,
-  ispu_pm25      real,                          -- nilai ISPU hasil konversi (lihat docs/12)
+  ispu_pm25      real,                          -- nilai ISPU hasil konversi
   ispu_category  ispu_category not null default 'tidak_diketahui',
   fetched_at     timestamptz not null default now(),
   raw            jsonb,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Koordinat gambar ternormalisasi 0..1 (lihat docs/04-database.md). */
+/** Koordinat gambar ternormalisasi 0..1. */
 const point = z.tuple([z.number().min(0).max(1), z.number().min(0).max(1)]);
 
 export const WATER_KINDS = ["sungai", "pompa_in", "pompa_out", "kolam", "jalan"] as const;

@@ -7,7 +7,7 @@ import { isOnline } from "./status";
  * jenis kendaraan. Ini bukan pengukuran dan bukan kg per jam: sistem hanya tahu berapa kendaraan yang terlihat,
  * bukan berapa yang lewat. Sepeda motor juga sering tidak terhitung, jadi porsinya di sini terlalu kecil.
  *
- * Faktor emisi (gram per kendaraan per km) dari Permen LH No. 12/2010; rinciannya di docs/12-emisi-kualitas-udara.md.
+ * Faktor emisi (gram per kendaraan per km) dari Permen LH No. 12/2010.
  * Mobil dianggap 88% bensin dan 12% solar. CO₂ diturunkan dari faktor per kg BBM dengan asumsi konsumsi BBM
  * (motor 40 km/l, mobil 12 km/l, bus 4 km/l, truk 5 km/l).
  */
