@@ -67,7 +67,7 @@ def get_settings() -> Settings:
         max_concurrency=int(_get("MAX_CONCURRENCY", "8")),
         frame_timeout_seconds=int(_get("FRAME_TIMEOUT_SECONDS", "20")),
         frames_dir=Path(_get("FRAMES_DIR", "./frames")),
-        frames_retention_days=int(_get("FRAMES_RETENTION_DAYS", "14")),
+        frames_retention_days=int(_get("FRAMES_RETENTION_DAYS", "3")),
         http_user_agent=_get("HTTP_USER_AGENT", "Mozilla/5.0 (compatible; SemarSight/0.1)"),
         timezone=_get("TIMEZONE", "Asia/Jakarta"),
         yolo_model=_get("YOLO_MODEL", "yolo11s.pt"),
