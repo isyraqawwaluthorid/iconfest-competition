@@ -42,7 +42,7 @@ const PRIVACY = [
   "Hanya CCTV publik milik pemerintah kota. Kamera lingkungan RT/RW tidak dipakai.",
   "Tidak ada pengenalan wajah dan tidak ada pembacaan pelat nomor.",
   "Yang disimpan jangka panjang hanya angka: status, hitungan, dan indeks.",
-  "Gambar yang dinilai AI disimpan 3 hari supaya penilaiannya bisa diperiksa orang, lalu dihapus otomatis. Arsip gambar di mesin pengolah dihapus setelah 14 hari.",
+  "Gambar yang dinilai AI disimpan 3 hari supaya penilaiannya bisa diperiksa orang, lalu dihapus otomatis. Arsip gambar mentah di server pengolah dihapus setelah 3 hari.",
 ];
 
 export default function AboutPage() {
