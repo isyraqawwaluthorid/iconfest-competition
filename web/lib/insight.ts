@@ -279,9 +279,12 @@ export function citySituation(cameras: CameraOverview[], weather: GridWeather[])
   if (!wettest) {
     points.push("Data hujan belum tersedia.");
   } else if (wettest.precip_next_3h_mm >= 10) {
-    points.push(`Hujan lebat diprakirakan: hingga ${formatNumber(wettest.precip_next_3h_mm, 1)} mm dalam 3 jam ke depan di ${wettest.name}.`);
+    const word = wettest.precip_next_3h_mm >= 20 ? "sangat lebat" : "lebat";
+    points.push(`Hujan ${word} diprakirakan: hingga ${formatNumber(wettest.precip_next_3h_mm, 1)} mm dalam 3 jam ke depan di ${wettest.name}.`);
   } else if (wettest.precip_next_3h_mm >= 1) {
-    points.push(`Hujan ringan diprakirakan dalam 3 jam ke depan, paling banyak ${formatNumber(wettest.precip_next_3h_mm, 1)} mm di ${wettest.name}.`);
+    // Kata kategori mengikuti legenda peta hujan (ringan 1–5 mm, sedang 5–10 mm).
+    const word = wettest.precip_next_3h_mm >= 5 ? "sedang" : "ringan";
+    points.push(`Hujan ${word} diprakirakan dalam 3 jam ke depan, paling banyak ${formatNumber(wettest.precip_next_3h_mm, 1)} mm di ${wettest.name}.`);
   } else {
     points.push("Tidak ada hujan berarti yang diprakirakan dalam 3 jam ke depan.");
   }
