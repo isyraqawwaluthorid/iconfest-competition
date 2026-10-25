@@ -49,6 +49,19 @@ export function NavLinks() {
       {NAV.map(link)}
       <span aria-hidden className="mx-2 h-5 w-px shrink-0 bg-border" />
       {SOURCES.map(link)}
+      <span aria-hidden className="mx-2 h-5 w-px shrink-0 bg-border" />
+      {/* Pintu masuk petugas. Tanpa sesi, halaman admin mengarahkan ke formulir masuk. */}
+      <Link
+        href="/admin/kamera"
+        aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+        className={`shrink-0 rounded-control border px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
+          pathname.startsWith("/admin")
+            ? "border-primary bg-primary font-semibold text-on-primary"
+            : "border-border font-medium text-muted hover:border-primary hover:text-primary"
+        }`}
+      >
+        Admin
+      </Link>
     </nav>
   );
 }
